@@ -1,2 +1,0 @@
-# Joy
-A computer science 
