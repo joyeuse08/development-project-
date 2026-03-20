@@ -15,6 +15,18 @@ body {
   margin-left: 70%;
   margin-inline: 30px;
 }
+button {
+  padding: 10px;
+  background-color: rgba(128, 49, 128, 0.158);
+  color: white;
+}
+form {
+  background: white;
+  padding: 20px;
+  margin: auto;
+  width: 300px;
+  border-radius: 10px;
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
