@@ -1,5 +1,9 @@
 """
+<<<<<<< HEAD
+WSGI config for ILES project.
+=======
 WSGI config for backend project.
+>>>>>>> b56bb247aa50598bcfeceeb1d964a13359ed384d
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
