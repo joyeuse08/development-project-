@@ -1,0 +1,4 @@
+• As an administrator, I want to create user accounts for students and supervisors so that they can access the system.
+• As an administrator, I want to assign workplace supervisors to students so that the right people review the right logs.
+  As an administrator, i want to monitor the overall system activity so that i can ensure users are active and compliant
+  As an administrator, I want to calculate the weighted score for a student so that thei final internship grade is calculated
