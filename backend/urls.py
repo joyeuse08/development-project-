@@ -1,9 +1,5 @@
 """
-<<<<<<< HEAD
 URL configuration for ILES project.
-=======
-URL configuration for backend project.
->>>>>>> b56bb247aa50598bcfeceeb1d964a13359ed384d
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
@@ -19,11 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-<<<<<<< HEAD
 from django.urls import path,include
-=======
-from django.urls import path 
->>>>>>> b56bb247aa50598bcfeceeb1d964a13359ed384d
 
 urlpatterns = [
     path('admin/', admin.site.urls),
