@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ILES - Student Dashboard</title>
+    <link rel="stylesheet" href="iles.css" />
+  </head>
+  <body class="student-page">
+    <header>
+      <h1>Student Dashboard</h1>
+    </header>
+
+    <div class="container">
+      <div id="userInfo" class="user-info"></div>
+
+      <div class="card log-form">
+        <h2>Submit Weekly Log</h2>
+        <form id="logForm">
+          <input
+            type="number"
+            id="weekNumber"
+            placeholder="Week Number (1-52)"
+            required
+          />
+          <textarea
+            id="activities"
+            placeholder="Describe activities done this week..."
+            rows="4"
+            required
+          ></textarea>
+          <textarea
+            id="challenges"
+            placeholder="Challenges faced..."
+            rows="3"
+            required
+          ></textarea>
+          <textarea
+            id="learnings"
+            placeholder="Key learnings and takeaways..."
+            rows="3"
+          ></textarea>
+          <button type="submit">Submit Log</button>
+        </form>
+      </div>
+
+      <div id="studentLogs" class="logs-container"></div>
+    </div>
+
+    <script src="group12.js"></script>
+  </body>
+</html>
