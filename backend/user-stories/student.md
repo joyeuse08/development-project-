@@ -3,6 +3,6 @@
   As a student intern, I want to view feedback from my supervisors so that i can improve on my performance
   As a student intern, i want to record my daily activities and tasks so as to track what i've accomplished during my internship 
   As a student intern, I want to create a weekly log so l can track my progress over time
-  As a studen intern, I want to recieve notifications when a log is approved or rejected
+  As a student intern, I want to receive notifications when a log is approved or rejected
   As a student intern, I want to submit my weekly log so lt can be reviewed by my workplace supervisor
   
