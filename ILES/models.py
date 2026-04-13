@@ -17,7 +17,7 @@ class CustomUser(AbstractUser):
     staff_number = models.CharField(max_length=20, blank=True, null=True)
     student_number = models.CharField(max_length=20, blank=True, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
     
 # Internship Placement
