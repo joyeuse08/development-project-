@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.contrib.contenttypes.models import contentType
+from django.contrib.contenttypes.fields import GenericForeignKey 
+from django. conf import settings
     
 #CustomUser
 class CustomUser(AbstractUser):
