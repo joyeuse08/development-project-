@@ -1,24 +1,73 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/Auth.context';
 import './App.css';
+
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dash.board';
+import Student from './pages/Student';
+import WorkplaceSupervisor from './pages/WorkplaceSupervisor';
+import AcademicSupervisor from './pages/AcademicSupervisor';
+import Admin from './pages/Admin';
+
+function PrivateRoute({ children, roles }) {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading">Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (roles && !roles.includes(user.role)) return <Navigate to="/dashboard" replace />;
+  return children;
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/student"
+          element={
+            <PrivateRoute roles={['student']}>
+              <Student />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/workplace"
+          element={
+            <PrivateRoute roles={['workplace']}>
+              <WorkplaceSupervisor />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/academic"
+          element={
+            <PrivateRoute roles={['academic']}>
+              <AcademicSupervisor />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute roles={['admin']}>
+              <Admin />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
