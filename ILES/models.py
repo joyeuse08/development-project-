@@ -58,6 +58,8 @@ class Weekly_Log(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
     submitted_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together=('student', 'week')
 
     def __str__(self):
         return f"Week{self.week_number} for {self.placement.student.username}"      
