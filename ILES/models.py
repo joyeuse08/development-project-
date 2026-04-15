@@ -98,7 +98,7 @@ class Weighted_Score(models.Model):
         self.final_score = (self.supervisor_score * 0.6) + (self.academic_score * 0.4)
         self.save()
 
-    def _str_(self):
+    def __str__(self):
         return f"Weighted Score for {self.placement.student.username}: {self.final_score}"    
     
 # Issues
