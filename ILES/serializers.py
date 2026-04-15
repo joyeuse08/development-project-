@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.hashers import make_password
 from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue)
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -41,4 +42,16 @@ class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         exclude = ['created_at']
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'password', 'role', 'department', 'staff_number', 'student_number']
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = CustomUser(**validated_data)
+        user.password = make_password(password)
+        user.save()
+        return user
         
