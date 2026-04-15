@@ -1,0 +1,257 @@
+===========================================================================
+FLASK REMOVAL PLAN — File-by-File, Line-by-Line Change Inventory
+Repository: joyeuse08/development-project-
+===========================================================================
+
+NOTE: "Flask" here refers to the standalone app.py + templates demo.
+      The real React back-end uses Django/DRF (http://localhost:8000).
+      Section 1 removes Flask.
+      Section 2 removes all remaining back-end API coupling from React.
+
+---------------------------------------------------------------------------
+SECTION 1 — FLASK ARTIFACTS TO DELETE COMPLETELY
+---------------------------------------------------------------------------
+
+FILE: app.py  (project root)
+  ACTION : DELETE the entire file.
+  REASON : The whole file is a Flask application. There are no other
+           dependencies on it from anywhere else in the project.
+  LINES  :
+    1   from flask import Flask, render_template, request, redirect, url_for
+    2   (blank)
+    3   app = Flask(__name__)
+    4   (blank)
+    5   @app.route('/')
+    6   def home():
+    7       return render_template('registration.html')
+    8   (blank)
+    9   @app.route('/register', methods=['POST'])
+   10   def register():
+   11       name  = request.form['name']
+   12       email = request.form['email']
+   13       # comment about database
+   14       return redirect(url_for('success'))
+   15   (blank)
+   16   @app.route('/success')
+   17   def success():
+   18       return "Student registered successfully!"
+   19   (blank)
+   20   if __name__ == "__main__":
+   21       app.run(debug=True)
+
+
+FILE: templates/registration.html  (project root)
+  ACTION : DELETE the entire file (and the templates/ directory if empty).
+  REASON : This is a Jinja2 template rendered only by app.py.
+           Contains Flask-specific template syntax (url_for, {{ }}).
+  LINES  :
+    7   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+   12   <form method="POST" action="{{ url_for('register') }}" class="registration-form">
+  (all other lines are plain HTML with no Flask-independent value;
+   the equivalent form is already in frontend/src/pages/Register.js)
+
+
+---------------------------------------------------------------------------
+SECTION 2 — REACT FILES THAT CALL THE DJANGO/DRF BACK-END
+           (change these to use mock/local data or a new API layer)
+---------------------------------------------------------------------------
+
+FILE: frontend/src/axiosConfig.js
+  ACTION : DELETE or empty this file, then remove any import of it.
+  REASON : Sets axios.defaults.baseURL to the Django server.
+           No React source file currently imports this file, but it
+           should be removed so it cannot be unintentionally imported.
+  LINES  :
+    2   import axios from 'axios';
+    3   axios.defaults.baseURL = 'http://localhost:8000';   // REMOVE
+    4   export default axios;
+
+
+FILE: frontend/src/pages/Register.js
+  ACTION : MODIFY — replace the axios API call with local/mock logic.
+  LINES TO CHANGE:
+    3   import axios from 'axios';
+        → REMOVE this import (no longer needed without API call)
+
+   13   const handleSubmit = async (e) => {
+   14     e.preventDefault();
+   15     try {
+   16       await axios.post('http://localhost:8000/api/register/', {
+   17         username,
+   18         password,
+   19         email,
+   20       });
+   21       navigate('/login');
+   22     } catch (err) {
+   23       setError('Registration failed. Username might already exist.');
+   24     }
+   25   };
+        → REPLACE lines 13-25 with client-side registration logic, e.g.:
+            const handleSubmit = (e) => {
+              e.preventDefault();
+              // Example: store in localStorage or a mock user store
+              const users = JSON.parse(localStorage.getItem('users') || '[]');
+              if (users.find(u => u.username === username)) {
+                setError('Registration failed. Username might already exist.');
+                return;
+              }
+              users.push({ username, password, email });
+              localStorage.setItem('users', JSON.stringify(users));
+              navigate('/login');
+            };
+
+
+FILE: frontend/src/context/Auth.context.js
+  ACTION : MODIFY — replace all HTTP calls with local/mock auth.
+  LINES TO CHANGE:
+    3   import axios from 'axios';
+        → REMOVE if axios is no longer used anywhere in this file.
+
+   13   useEffect(() => {
+   14     const token = localStorage.getItem('access_token');
+   15     if (token) {
+   16       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+   17       fetchUser();
+   18     } else {
+   19       setLoading(false);
+   20     }
+   21   }, []);
+        → REPLACE: read the persisted user object from localStorage directly.
+          Example replacement:
+            useEffect(() => {
+              const storedUser = localStorage.getItem('current_user');
+              if (storedUser) setUser(JSON.parse(storedUser));
+              setLoading(false);
+            }, []);
+
+   23   const fetchUser = async () => {
+   24     try {
+   25       const response = await axios.get('http://localhost:8000/api/user/');
+   26       setUser(response.data);
+   27     } catch (error) {
+   28       console.error('Failed to fetch user', error);
+   29       logout();
+   30     } finally {
+   31       setLoading(false);
+   32     }
+   33   };
+        → DELETE the entire fetchUser function (lines 23-33).
+          It is only called from the useEffect above; once that is
+          replaced the function is unused.
+
+   35   const login = async (username, password) => {
+   36     try {
+   37       const response = await axios.post('http://localhost:8000/api/token/', {
+   38         username,
+   39         password,
+   40       });
+   41       const { access, refresh } = response.data;
+   42       localStorage.setItem('access_token', access);
+   43       localStorage.setItem('refresh_token', refresh);
+   44       axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+   45       await fetchUser();
+   46       return true;
+   47     } catch (error) {
+   48       console.error('Login failed', error);
+   49       return false;
+   50     }
+   51   };
+        → REPLACE lines 35-51 with local credential check, e.g.:
+            const login = (username, password) => {
+              const users = JSON.parse(localStorage.getItem('users') || '[]');
+              const found = users.find(
+                u => u.username === username && u.password === password
+              );
+              if (found) {
+                setUser(found);
+                localStorage.setItem('current_user', JSON.stringify(found));
+                return true;
+              }
+              return false;
+            };
+
+   53   const logout = () => {
+   54     localStorage.removeItem('access_token');
+   55     localStorage.removeItem('refresh_token');
+   56     delete axios.defaults.headers.common['Authorization'];
+   57     setUser(null);
+   58   };
+        → MODIFY lines 53-58 — remove token/axios lines, keep setUser(null):
+            const logout = () => {
+              localStorage.removeItem('current_user');
+              setUser(null);
+            };
+
+
+---------------------------------------------------------------------------
+SECTION 3 — FILES THAT DEPEND ON Auth.context BUT NEED NO LINE CHANGES
+           (verify they still work after Section 2 changes)
+---------------------------------------------------------------------------
+
+FILE: frontend/src/pages/Login.js
+  LINES TO VERIFY (no edit needed if Auth.context contract is kept):
+    10  const { login } = useAuth();
+    15  const success = await login(username, password);
+  VERIFY: login() no longer returns a Promise; change "await login(...)"
+          to just "login(...)" or keep async wrapper (both are safe).
+
+FILE: frontend/src/pages/Dash.board.js
+  LINES TO VERIFY (no edit needed):
+    6   const { user, logout } = useAuth();
+    9   <h1>Welcome, {user?.username}</h1>
+  VERIFY: user.username is available in the mock user object — it is,
+          because Register.js stores { username, password, email }.
+
+FILE: frontend/src/index.js
+  LINES TO VERIFY (no edit needed):
+    4   import { AuthProvider } from './context/AuthContext';
+    8   <AuthProvider>
+  VERIFY: AuthProvider contract (user, login, logout, loading) is
+          preserved in the rewritten Auth.context.js — it is.
+
+
+---------------------------------------------------------------------------
+SECTION 4 — NO CHANGES NEEDED (confirmed no Flask / API coupling)
+---------------------------------------------------------------------------
+
+  frontend/src/App.js                — no API calls, no Flask references
+  frontend/src/index.css             — CSS only
+  frontend/src/App.css               — CSS only
+  frontend/src/logo.svg              — asset only
+  frontend/public/*                  — static assets only
+  frontend/package.json              — no Flask dependency listed
+  frontend/*.html                    — plain HTML prototypes, no Flask syntax
+  frontend/group12.js                — local-state only (localStorage)
+  frontend/settings.py               — Django settings stub, no Flask
+  backend/settings.py                — Django settings, no Flask
+  backend/urls.py                    — Django URL conf, no Flask
+  backend/wsgi.py / asgi.py          — Django WSGI/ASGI, no Flask
+  ILES/*, users/*, issues/*          — Django apps, no Flask
+  manage.py                          — Django management, no Flask
+  requirements.txt                   — already only Django + DRF, no Flask
+  db.sqlite3                         — database file, unchanged
+  user-stories/*.md                  — documentation, no Flask
+  requirements.md                    — functional requirements, no Flask
+
+
+---------------------------------------------------------------------------
+SUMMARY OF ACTIONS
+---------------------------------------------------------------------------
+
+  DELETE (2 files):
+    app.py
+    templates/registration.html
+
+  MODIFY (3 files):
+    frontend/src/axiosConfig.js          — delete or clear content
+    frontend/src/pages/Register.js       — lines 3, 13-25
+    frontend/src/context/Auth.context.js — lines 3, 13-21, 23-33, 35-51, 53-58
+
+  VERIFY STILL WORKS (3 files, no edits required):
+    frontend/src/pages/Login.js
+    frontend/src/pages/Dash.board.js
+    frontend/src/index.js
+
+===========================================================================
+END OF PLAN
+===========================================================================
