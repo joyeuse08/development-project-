@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import axios from 'axios';
+
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -10,20 +10,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post('http://localhost:8000/api/register/', {
-        username,
-        password,
-        email,
-      });
-      navigate('/login');
-    } catch (err) {
-      setError('Registration failed. Username might already exist.');
-    }
-  };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <h2>Register</h2>
