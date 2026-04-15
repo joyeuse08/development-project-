@@ -33,10 +33,10 @@ class Internship_Placement(models.Model):
     company_name = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
-    workplace_supervisor = models.ForeignKey(CustomUser,max_length=255,on_delete=models.SET_NULL,
+    workplace_supervisor = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,
         null=True, blank=True, related_name="workplace_supervised",limit_choices_to={'role': 'workplace_supervisor'},
     )    
-    academic_supervisor = models.ForeignKey(CustomUser, max_length=255, on_delete=models.SET_NULL,
+    academic_supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
         null= True, blank=True, related_name="academic_supervised",limit_choices_to={'role': 'academic_supervisor'},
     )                                     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
