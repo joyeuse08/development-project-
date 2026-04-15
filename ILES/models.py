@@ -40,7 +40,7 @@ class Internship_Placement(models.Model):
         null= True, blank=True, related_name="academic_supervised",limit_choices_to={'role': 'academic_supervisor'},
     )                                     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
-    def _str_(self):
+    def __str__(self):
         return f"Placement for {self.student.username} at {self.company_name}"
 
 # Weekly Log
@@ -71,7 +71,7 @@ class Supervisor_Feedback(models.Model):
     supervisor_score = models.PositiveIntegerField()
     evaluated_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Feedback by {self.supervisor.username} for {self.weekly_log}"    
     
 #Academic Supervisor Feedback
@@ -83,7 +83,7 @@ class Academic_Supervisor_Feedback(models.Model):
     academic_score = models.PositiveIntegerField()
     evaluated_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Feedback by {self.academic_supervisor.username} for {self.placement.student.username}"    
     
 # Weighted score
