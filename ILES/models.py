@@ -59,7 +59,7 @@ class Weekly_Log(models.Model):
     submitted_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Week{self.week_number} for {self.placement.student.username}"      
 
 # Supervisor Feedback
