@@ -1,8 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.contenttypes.models import contentType
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey 
-from django. conf import settings
+from django.conf import settings
     
 #CustomUser
 class CustomUser(AbstractUser):
@@ -59,7 +59,7 @@ class Weekly_Log(models.Model):
     submitted_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        unique_together=('student', 'week')
+        unique_together=('placement', 'week_number')
 
     def __str__(self):
         return f"Week{self.week_number} for {self.placement.student.username}"      
@@ -68,7 +68,7 @@ class Weekly_Log(models.Model):
 class Supervisor_Feedback(models.Model):
     weekly_log = models.OneToOneField(Weekly_Log, on_delete=models.CASCADE, related_name='feedbacks')
     supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
-         related_name='feedback_given',limit_choices_to={'role': ['workplace_supervisor']})
+         related_name='feedback_given',limit_choices_to={'role': 'workplace_supervisor'})
     comments = models.TextField()
     supervisor_score = models.PositiveIntegerField()
     evaluated_at = models.DateTimeField(auto_now_add=True)
@@ -80,7 +80,7 @@ class Supervisor_Feedback(models.Model):
 class Academic_Supervisor_Feedback(models.Model):
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='academic_feedbacks')
     academic_supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
-        related_name='academic_feedback_given',limit_choices_to={'role': ['academic_supervisor']})
+        related_name='academic_feedback_given',limit_choices_to={'role': 'academic_supervisor'})
     comments = models.TextField()
     academic_score = models.PositiveIntegerField()
     evaluated_at = models.DateTimeField(auto_now_add=True)
@@ -117,6 +117,6 @@ class Issue(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Issue for {self.placement.student.username} reported by {self.created_by.username}"
 
