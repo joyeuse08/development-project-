@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken', 
-    'corsheaders', 
-    'django_filters',
     'ILES',
 ]
 
@@ -130,7 +128,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
@@ -139,27 +136,5 @@ REST_FRAMEWORK = {
 }
 
 # CORS Settings (for development only)
-CORS_ALLOW_ALL_ORIGINS = True  # Allows all domains - ONLY FOR DEVELOPMENT!
+#CORS_ALLOW_ALL_ORIGINS = True  # Allows all domains - ONLY FOR DEVELOPMENT!
 
-# Optional: Allow specific methods (these are defaults)
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
-
-# Optional: Allow specific headers
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
