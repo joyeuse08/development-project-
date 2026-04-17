@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
 from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer)
+from django.db.models import Q
 
 # Create your views here.
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -134,3 +135,11 @@ def me(request):
         "student_number": request.user.student_number,
         "staff_number": request.user.staff_number,
     }, status=status.HTTP_200_OK)
+
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('ILES.urls')),
+    # REMOVE this line (it breaks because search_items doesn't exist):
+    # path('search/', views.search_items, name='search'),
+]
