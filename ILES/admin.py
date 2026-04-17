@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issues)
+from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue)
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
@@ -36,6 +36,10 @@ class Weighted_ScoreAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'action']
     list_filter = ['timestamp']
      
-
+@admin.register(Issue)
+class IssueAdmin(admin.ModelAdmin):
+    list_display = ['title', 'status', 'created_at']
+    list_filter = ['status']
+    search_fields = ['title']
 
 # Register your models here.
