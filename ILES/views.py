@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
+from django.db.models import Q
 from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer)
 
@@ -133,4 +134,24 @@ def me(request):
         "department": request.user.department,
         "student_number": request.user.student_number,
         "staff_number": request.user.staff_number,
+    }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def search_items(request):
+    query = request.query_params.get('q', '')
+    placements = Internship_Placement.objects.filter(company_name__icontains=query)
+    logs = Weekly_Log.objects.filter(activities__icontains=query)
+    feedbacks = Supervisor_Feedback.objects.filter(feedback__icontains=query) | Academic_Supervisor_Feedback.objects.filter(feedback__icontains=query)
+    issues = Issue.objects.filter(description__icontains=query)
+
+    placement_serializer = Internship_PlacementSerializer(placements, many=True)
+    log_serializer = Weekly_LogSerializer(logs, many=True)
+    feedback_serializer = Supervisor_FeedbackSerializer(feedbacks, many=True)
+    issue_serializer = IssueSerializer(issues, many=True)
+
+    return Response({
+        "placements": placement_serializer.data,
+        "logs": log_serializer.data,
+        "feedbacks": feedback_serializer.data,
+        "issues": issue_serializer.data,
     }, status=status.HTTP_200_OK)
