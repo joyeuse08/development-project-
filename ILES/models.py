@@ -115,3 +115,18 @@ class Issue(models.Model):
     def _str_(self):
         return f"Issue for {self.placement.student.username} reported by {self.created_by.username}"
 
+# log model
+class log(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),   
+    ] 
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='logs')
+    date=models.DateField()
+    description = models.TextField()
+    hours=models.PositiveIntegerField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+
+
