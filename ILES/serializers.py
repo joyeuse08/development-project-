@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
-from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue)
+from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue,Student_log)
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,4 +54,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.password = make_password(password)
         user.save()
         return user
+    
+class Student_logSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student_log
+        fields = '_all_'  
+
+    def validate_hours_spent(self,value):
+        if value <= 0:
+            raise serializers.ValidationError("Must be greater that 0")
+        return value    
         

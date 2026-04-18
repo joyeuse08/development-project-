@@ -66,6 +66,7 @@ class Weekly_Log(models.Model):
 
 # Supervisor Feedback
 class Supervisor_Feedback(models.Model):
+    placement=models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='supervisor_feedbacks')
     weekly_log = models.OneToOneField(Weekly_Log, on_delete=models.CASCADE, related_name='feedbacks')
     supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
          related_name='feedback_given',limit_choices_to={'role': 'workplace_supervisor'})
@@ -121,7 +122,7 @@ class Issue(models.Model):
         return f"Issue for {self.placement.student.username} reported by {self.created_by.username}"
 
 # log model
-class log(models.Model):
+class Student_log(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Draft'),
         ('submitted', 'Submitted'),

@@ -4,15 +4,15 @@ from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedb
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'role', 'is_active']
+    list_display = ['username', 'email', 'role', 'department',]
     search_fields = ['username', 'email']
-    list_filter = ['role', 'is_active']
+    list_filter = ['role']
 
 @admin.register(Internship_Placement)
 class Internship_PlacementAdmin(admin.ModelAdmin):
-    list_display = ['student', 'company_name', 'start_date', 'end_date']
-    search_fields = ['student__username', 'company_name']
-    list_filter = ['start_date']
+    list_display = ['student','company_name','start_date','end_date',]
+    search_fields = ['student__username']
+    list_filter = ['start_date', 'end_date']
 
 @admin.register(Weekly_Log)
 class Weekly_LogAdmin(admin.ModelAdmin):
