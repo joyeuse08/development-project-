@@ -10,18 +10,16 @@
     <header>
       <h1>Academic Supervisor Dashboard</h1>
     </header>
-
     <div class="container">
       <div id="userInfo" class="user-info"></div>
-
       <div class="card academic-review-form">
         <h2>Review Student Log</h2>
         <form id="academicReviewForm">
           <select id="academicStudentSelect" required>
-            <option>Select Student</option>
+            <option value""disabled selected >Select Student</option>
           </select>
           <select id="academicWeekSelect" required>
-            <option>Select Week</option>
+            <option value"" disabled selected>Select Week</option>
           </select>
           <textarea>
             id="academicFeedback"
@@ -38,9 +36,12 @@
             required
           />
           <button type="submit">Submit Review</button>
+                    <div id="Workplace feedback display" class="feedback-box">
+            <p><strong>Workplace feedback:</strong></p>
+            <p>No feedback yet</p>
+          </div>
         </form>
       </div>
-
       <div id="pendingLogs" class="pending-container"></div>
     </div>
 

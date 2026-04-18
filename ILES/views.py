@@ -36,7 +36,7 @@ class Weighted_ScoreViewSet(viewsets.ModelViewSet):
 
 class IssueViewSet(viewsets.ModelViewSet):
     queryset = Issue.objects.all()
-    serializer_class = IssueSerializer  
+    serializer_class = IssueSerializer     
 
 # Registration view
 @api_view(['POST'])
