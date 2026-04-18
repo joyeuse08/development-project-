@@ -16,26 +16,32 @@ class Internship_PlacementAdmin(admin.ModelAdmin):
 
 @admin.register(Weekly_Log)
 class Weekly_LogAdmin(admin.ModelAdmin):
-    list_display = ['placement', 'week_number', 'submitted_at']
-    search_fields = ['student__username']
-    list_filter = ['week_number']
+    list_display = ['placement', 'week_number', 'status', 'submitted_at']
+    search_fields = ['placement__student__username']
+    list_filter = ['week_number', 'status']
 
 @admin.register(Supervisor_Feedback)
 class Supervisor_FeedbackAdmin(admin.ModelAdmin):
-    list_display = ['supervisor','evaluated_at']
-    search_fields = ['supervisor__username', 'student__username']
+    list_display = ['supervisor', 'weekly_log', 'evaluated_at']
+    search_fields = ['supervisor__username', 'weekly_log__placement__student__username']
+    list_filter = ['evaluated_at']
 
 @admin.register(Academic_Supervisor_Feedback)
 class Academic_Supervisor_FeedbackAdmin(admin.ModelAdmin):
     list_display = ['academic_supervisor', 'placement', 'evaluated_at']
-    search_fields = ['academic_supervisor__username', 'student__username']
+    search_fields = ['academic_supervisor__username', 'placement__student__username']
+    list_filter = ['evaluated_at']
 
 @admin.register(Weighted_Score)
 class Weighted_ScoreAdmin(admin.ModelAdmin):
-    list_display = ['placement', 'final_score']
+    list_display = ['placement', 'final_score', 'calculated_at']
     search_fields = ['placement__student__username']
     list_filter = ['calculated_at']
-
-
+     
+@admin.register(Issue)
+class IssueAdmin(admin.ModelAdmin):
+    list_display = ['title', 'status', 'created_at']
+    list_filter = ['status']
+    search_fields = ['title']
 
 # Register your models here.
