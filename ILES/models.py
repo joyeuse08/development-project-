@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey 
 from django.conf import settings
+from django.utils import timezone
     
 #CustomUser
 class CustomUser(AbstractUser):
@@ -56,7 +57,7 @@ class Weekly_Log(models.Model):
     challenges = models.TextField(blank = True)
     learnings = models.TextField(blank = True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
-    submitted_at = models.DateTimeField()
+    submitted_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         unique_together=('placement', 'week_number')
