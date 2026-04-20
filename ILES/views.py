@@ -77,7 +77,9 @@ def register(request):
             "role": user.role,
         }
     }, status=status.HTTP_201_CREATED)
-
+    if serializer.is_valid():
+    return Response({...}, status=status.HTTP_201_CREATED)
+else:
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
  # login view
@@ -120,10 +122,10 @@ def logout(request):
     request.user.auth_token.delete()
     return Response(
         {"message": "Logged out succesfully"},
-        status=status.HTTP_200_ok)
+        status=status.HTTP_200_OK)
 
 #Me view
-@api_view(["POST"])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def me(request):
     #return the user details
@@ -138,6 +140,7 @@ def me(request):
     }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def search_items(request):
     query = request.query_params.get('q', '')
     placements = Internship_Placement.objects.filter(company_name__icontains=query)
