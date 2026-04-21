@@ -18,8 +18,9 @@ from django.contrib import admin
 from django.urls import path,include
 from ILES import views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('ILES.urls')),
-    path('search/', views.search_items, name='search'),
+   
 ]

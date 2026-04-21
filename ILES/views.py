@@ -10,6 +10,7 @@ from django.db.models import Q
 from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
 
+
 # Create your views here.
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
