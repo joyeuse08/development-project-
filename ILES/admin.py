@@ -22,7 +22,7 @@ class Weekly_LogAdmin(admin.ModelAdmin):
 
 @admin.register(Supervisor_Feedback)
 class Supervisor_FeedbackAdmin(admin.ModelAdmin):
-    list_display = ['supervisor', 'weekly_log', 'evaluated_at']
+    list_display = ['placement','supervisor', 'weekly_log', 'evaluated_at']
     search_fields = ['supervisor__username', 'weekly_log__placement__student__username']
     list_filter = ['evaluated_at']
 
@@ -40,7 +40,7 @@ class Weighted_ScoreAdmin(admin.ModelAdmin):
      
 @admin.register(Issue)
 class IssueAdmin(admin.ModelAdmin):
-    list_display = ['title', 'status', 'created_at']
+    list_display = ['title', 'placement','status', 'created_at']
     list_filter = ['status']
     search_fields = ['title']
 
