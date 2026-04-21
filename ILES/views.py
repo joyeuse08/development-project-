@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes,action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue
-from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer)
+from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log
+from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
 
 
 # Create your views here.
@@ -21,8 +21,48 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
     serializer_class = Internship_PlacementSerializer
 
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
-    queryset = Weekly_Log.objects.all()
     serializer_class = Weekly_LogSerializer 
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Weekly_Log.objects.all()
+
+        if hasattr(user, 'profile') and user.profile.role == 'supervisor':
+            queryset = (queryset.filter(supervisor=user))
+
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset 
+
+    @action(detail=True, methods=['post'])
+    def review(self, request, pk=None):
+        weekly_log = self.get_object()
+        weekly_log.status = request.data.get('status', weekly_log.status)
+        weekly_log.feedback = request.data.get('feedback', '')
+        weekly_log.save()
+        return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
+    
+class Student_logViewSet(viewsets.ModelViewSet):
+    serializer_class = Student_logSerializer
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Student_log.objects.all()
+
+        if hasattr(user, 'profile') and user.profile.role == 'supervisor':
+            queryset = (queryset.filter(supervisor=user))
+
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset
+    
+    @action(detail=True, methods=['post'])
+    def review(self, request, pk=None):
+        student_log = self.get_object()
+        student_log.status = request.data.get('status', student_log.status)
+        student_log.feedback = request.data.get('feedback', '')
+        student_log.save()
+        return Response({'message': 'Student Log updated', 'status': student_log.status})
 
 class Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
     queryset = Supervisor_Feedback.objects.all()
