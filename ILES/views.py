@@ -257,3 +257,20 @@ def add_comment(request, report_id):
     
     return Response({'message': 'Comment added'})
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Notification
+from .serializers import NotificationSerializer
+
+@api_view(['GET'])
+def get_notifications(request):
+    notifications = request.user.notifications.all()[:50]  # Last 50 notifications
+    serializer = NotificationSerializer(notifications, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def mark_notification_read(request, id):
+    notification = Notification.objects.get(id=id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return Response({'status': 'read'})
