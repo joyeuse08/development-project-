@@ -220,3 +220,19 @@ def submit_report(request):
     
     return Response({'message': 'Report submitted and notifications sent'})
 
+def approve_report(request, report_id):
+    report = Report.objects.get(id=report_id)
+    report.status = 'approved'
+    report.save()
+    
+    
+    Notification.objects.create(
+        recipient=report.intern,
+        actor=request.user,  # The supervisor
+        verb=f'approved your report: {report.title}',
+        target_id=report.id,
+        target_type='report'
+    )
+    
+    return Response({'message': 'Report approved'})
+
