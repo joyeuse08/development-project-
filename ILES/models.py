@@ -151,30 +151,22 @@ class Issue(models.Model):
 
 
 
+
+
 class Notification(models.Model):
-    recipient = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='notifications'
-    )
-    actor = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='actor_notifications'
-    )
-    verb = models.CharField(max_length=50)
-    target_ct = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
-    target_id = models.PositiveIntegerField(null=True, blank=True)
-    target = GenericForeignKey('target_ct', 'target_id')
-    timestamp = models.DateTimeField(auto_now_add=True)
+    recipient = models.ForeignKey('User', on_delete=models.CASCADE, related_name='notifications')
+    actor = models.ForeignKey('User', on_delete=models.CASCADE, related_name='actor_notifications')
+    verb = models.CharField(max_length=200)
+    target_id = models.IntegerField(null=True, blank=True)  # ID of the object (report, comment, etc.)
+    target_type = models.CharField(max_length=50, null=True, blank=True)  # 'report', 'comment', etc.
+    created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-
+    
     class Meta:
-        ordering = ['-timestamp']
-
+        ordering = ['-created_at']
+    
     def __str__(self):
         return f"{self.actor} {self.verb} -> {self.recipient}"
-
 
 
 
