@@ -199,3 +199,24 @@ def search_items(request):
         "feedbacks": feedback_serializer.data,
         "issues": issue_serializer.data,
     }, status=status.HTTP_200_OK)
+
+
+
+
+from .models import Notification
+
+def submit_report(request):
+    report.save()
+    supervisors = User.objects.filter(role__in=['internship_supervisor', 'academic_supervisor', 'workplace_supervisor'])
+    
+    for supervisor in supervisors:
+        Notification.objects.create(
+            recipient=supervisor,
+            actor=request.user,  # The intern
+            verb=f'submitted a report: {report.title}',
+            target_id=report.id,
+            target_type='report'
+        )
+    
+    return Response({'message': 'Report submitted and notifications sent'})
+
