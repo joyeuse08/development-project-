@@ -236,3 +236,24 @@ def approve_report(request, report_id):
     
     return Response({'message': 'Report approved'})
 
+
+def add_comment(request, report_id):
+    comment = Comment.objects.create(
+        report_id=report_id,
+        author=request.user,
+        content=request.data['content']
+    )
+    
+    report = Report.objects.get(id=report_id)
+    
+    if request.user != report.intern:
+        Notification.objects.create(
+            recipient=report.intern,
+            actor=request.user,
+            verb=f'commented on your report: {comment.content[:50]}',
+            target_id=comment.id,
+            target_type='comment'
+        )
+    
+    return Response({'message': 'Comment added'})
+
