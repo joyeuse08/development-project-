@@ -20,3 +20,10 @@ urlpatterns = [
     path('me/',views.me, name="me"),
     path('', include(router.urls)), 
 ]
+
+from . import views
+
+urlpatterns = [
+    path('api/notifications/', views.get_notifications),
+    path('api/notifications/<int:id>/read/', views.mark_notification_read),
+]
