@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +9,18 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { register } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const success = await register(username, email, password);
+    if (success) {
+      navigate('/login');
+    } else {
+      setError('Registration failed. Please try again.');
+    }
+  };
 
   
   return (
