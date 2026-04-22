@@ -4,29 +4,108 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ILES - Admin Dashboard</title>
+    <script src="group12.js"></script>
     <link rel="stylesheet" href="iles.css" />
   </head>
-  <body class="admin-page">
-    <header>
-      <h1>Admin Dashboard</h1>
-    </header>
-
-    <div class="container">
-      <div id="userInfo" class="user-info"></div>
-
-      <div id="adminDashboard" class="dashboard-stats"></div>
-
-      <div class="card">
-        <h2>System Statistics</h2>
-        <div id="allUsers" class="users-table"></div>
+  <body>
+    <div class="header">
+      <div>
+        <h1>Admin Dashboard</h1>
       </div>
-
-      <div class="card">
-        <h2>All Log Submissions</h2>
-        <div id="allLogs" class="logs-list"></div>
+      <div class="user-info">
+        <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
     </div>
 
-    <script src="group12.js"></script>
+    <div class="container">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <h2>Welcome, <span id="welcomeName">Admin</span>! 👋</h2>
+        <p>
+          Manage users, monitor system activity, and oversee all internship logs
+        </p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number" id="totalUsers">0</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number" id="totalStudents">0</div>
+            <div class="stat-label">Students</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number" id="totalWorkplace">0</div>
+            <div class="stat-label">Workplace Supervisors</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number" id="totalAcademic">0</div>
+            <div class="stat-label">Academic Supervisors</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number" id="totalLogs">0</div>
+            <div class="stat-label">Total Logs</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number" id="pendingLogs">0</div>
+            <div class="stat-label">Pending Logs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Statistics - Users Table -->
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-users"></i>
+          <h2>System Users</h2>
+          <span class="badge" id="userCount">0</span>
+        </div>
+        <div class="users-table-container">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr>
+                <td colspan="4" style="text-align: center">Loading users...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- All Log Submissions -->
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-file-alt"></i>
+          <h2>All Log Submissions</h2>
+          <span class="badge" id="logsCount">0</span>
+        </div>
+        <div id="allLogs" class="logs-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <p>Loading logs...</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
