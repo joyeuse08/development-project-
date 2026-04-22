@@ -8,26 +8,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Optional: try to restore login from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem('user');
       if (saved) setUser(JSON.parse(saved));
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, []);
 
   const login = async (username, password) => {
-    // Minimal placeholder auth so the app compiles + navigates.
-    // Replace with real API call when backend auth endpoint is ready.
     const nextUser = { username };
     setUser(nextUser);
     try {
       localStorage.setItem('user', JSON.stringify(nextUser));
-    } catch {
-      // ignore
-    }
+    } catch {}
     return true;
   };
 
@@ -35,12 +28,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     try {
       localStorage.removeItem('user');
-    } catch {
-      // ignore
-    }
+    } catch {}
   };
 
-  const value = { user, login, logout, loading };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

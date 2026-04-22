@@ -62,8 +62,7 @@ class Weekly_Log(models.Model):
     challenges = models.TextField(blank = True)
     learnings = models.TextField(blank = True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
-    feedback = models.TextField(blank=True)
-    submitted_at = models.DateTimeField()
+    submitted_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         unique_together=('placement', 'week_number')
