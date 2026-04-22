@@ -17,19 +17,23 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const nextUser = { username };
-    setUser(nextUser);
     try {
-      localStorage.setItem('user', JSON.stringify(nextUser));
-    } catch {}
-    return true;
+      setLoading(true);
+      const { data } = await api.post('/api/auth/login', { username, password });
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    try {
-      localStorage.removeItem('user');
-    } catch {}
+  const logout = async () => {
+    try { await api.post('/api/auth/logout'); } catch {}
+    setuser (null);
+      localStorage.removeItem('user')
   };
 
   return (
