@@ -45,8 +45,8 @@ const register = async (username, email, password) => {
       return false;
     } finally {
       setLoading(false);
-    }
-  };
+}; 
+  
   
   return (
     <AuthContext.Provider value={{ user, login, logout, register, loading }}>
