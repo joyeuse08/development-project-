@@ -1,7 +1,3 @@
-// ============================================
-// ILES SYSTEM - WORKING JAVASCRIPT
-// Matches your HTML structure exactly
-// ============================================
 
 // ============================================
 // SECTION 1: STORAGE FUNCTIONS
