@@ -155,8 +155,8 @@ class Issue(models.Model):
 
 
 class Notification(models.Model):
-    recipient = models.ForeignKey('User', on_delete=models.CASCADE, related_name='notifications')
-    actor = models.ForeignKey('User', on_delete=models.CASCADE, related_name='actor_notifications')
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_notifications')
+    actor     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_notifications')
     verb = models.CharField(max_length=200)
     target_id = models.IntegerField(null=True, blank=True)  # ID of the object (report, comment, etc.)
     target_type = models.CharField(max_length=50, null=True, blank=True)  # 'report', 'comment', etc.
