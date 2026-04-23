@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey 
 from django.conf import settings
+from django.utils import timezone
 from django.utils.timezone import now
 
 
