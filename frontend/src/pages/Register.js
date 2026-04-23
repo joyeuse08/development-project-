@@ -10,7 +10,16 @@ const Register = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!username || !email || !password) {
+      setError('All fields are required');
+      return;
+    }
+    navigate('/login');
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <h2>Register</h2>
