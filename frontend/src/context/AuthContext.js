@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try { await api.post('/api/auth/logout'); } catch {}
-    setuser (null);
-      localStorage.removeItem('user')
+    setUser (null);
+      localStorage.removeItem('user');
   }; 
   
 const register = async (username, email, password) => {
