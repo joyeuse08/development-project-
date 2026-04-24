@@ -12,14 +12,17 @@ from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, 
 
 
 # Create your views here.
+#Custom User views
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+#Internship placement views
 class Internship_PlacementViewSet(viewsets.ModelViewSet):
     queryset = Internship_Placement.objects.all()
     serializer_class = Internship_PlacementSerializer
-
+    
+#Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
     serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
