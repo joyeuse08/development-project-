@@ -53,4 +53,4 @@ const register = async (username, email, password) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}};
