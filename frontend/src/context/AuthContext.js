@@ -45,6 +45,7 @@ const register = async (username, email, password) => {
       return false;
     } finally {
       setLoading(false);
+    }
 }; 
   
   
@@ -53,4 +54,4 @@ const register = async (username, email, password) => {
       {children}
     </AuthContext.Provider>
   );
-}};
+};
