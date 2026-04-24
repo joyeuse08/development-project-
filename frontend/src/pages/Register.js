@@ -9,7 +9,6 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const navigate = useNavigate();
   const { register } = useAuth();
 
   const handleSubmit = async (e) => {
