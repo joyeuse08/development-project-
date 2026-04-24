@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dash.board';
+import Dashboard from './pages/Dash.board.js';
 import './App.css';
 
 function PrivateRoute({ children }) {
