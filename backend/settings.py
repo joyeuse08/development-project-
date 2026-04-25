@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken', 
     'ILES',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Allows all domains - ONLY FOR DEVELOPMENT!
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -77,8 +81,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'iles_db',
+        'USER': 'postgres',
+        'PASSWORD': 'Glokknine/17',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -139,3 +147,10 @@ REST_FRAMEWORK = {
 # CORS Settings (for development only)
 #CORS_ALLOW_ALL_ORIGINS = True  # Allows all domains - ONLY FOR DEVELOPMENT!
 
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True    
+EMAIL_HOST_USER = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your-email-password' 
