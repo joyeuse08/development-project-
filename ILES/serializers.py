@@ -58,8 +58,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 class Student_logSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student_log
-        fields = '_all_'  
-        read_only_fields = ['student','created_at']
+        fields = '__all__'
+        read_only_fields = ['student', 'created_at']
 
     def validate_hours_spent(self,value):
         if value <= 0:
