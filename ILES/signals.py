@@ -18,7 +18,7 @@ def notify_on_weekly_log(sender, instance, created, **kwargs):
         subject = f"Student Log Updated for {internship.student.username}"
         message = (
         f"{placement.student.username} your weekly log for week {instance.week_number} has been updated. " 
-        f"Current status: {instance.get_status_display()} 
+        f"Current status: {instance.get_status_display()}."
         )
         recipient = [placement.student.email]
         send_notification_email(subject, message, recipient)   
