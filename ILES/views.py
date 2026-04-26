@@ -87,43 +87,39 @@ class IssueViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
-    serializer = CustomUserSerializer(data=request.data)
+    serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
          user = serializer.save()
 
-         #setting the passsword properly
-         user.set_password(request.data["password"])
-         user.save()
+         #assign user to group based on role
+                 role = request.data.get("role", "student")
+        group_name = {
+            "student": "Student",
+            "workplace": "Workplace Supervisor",
+            "academic": "Academic Supervisor",
+            "admin": "Internship Administrator"
+        }.get(role, "Student")
 
-         #assigning user to group based on role
-         role = request.data.get("role", "student")
-         group_name = {
-             "student": "Student",
-             "workplace_supervisor": "Workplace Supervisor",
-             "academic_supervisor": "Academic Supervisor",
-             "admin": "Internship Administrator"
-         }.get(role, "Student")
-
+        group, _ = Group.objects.get_or_create(name=group_name)
+        user.groups.add(group)
          group, created = Group.objects.get_or_create(name=group_name)
          user.groups.add(group)
 
          #create a token for the user
          token, _ = Token.objects.get_or_create(user=user)
     
-    return Response({
-        "message": "Registration succcesful",
-        "token": token.key,
-        "user": { 
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "role": user.role,
-        }
-    }, status=status.HTTP_201_CREATED)
-    if serializer.is_valid():
-     return Response({...}, status=status.HTTP_201_CREATED)
-    else:
-     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "message": "Registration successful",
+            "token": token.key,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "role": user.role,
+            }
+        }, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
  # login view
 @api_view(['POST'])
