@@ -13,23 +13,25 @@ def send_notification_email(subject, message, recipient_list):
 @receiver(post_save, sender=Weekly_Log)
 def notify_on_weekly_log(sender, instance, created, **kwargs):
     if not created:
-        placement = instance.internship_placement
-        subject = f"New Weekly Log Updated for {placement.student.username}"
+        placement = instance.placement
+        subject = f"Weekly Log Updated for {placement.student.username}"
         message = (
-            f"{placement.student.username} your weekly log for the week of {instance.week_number} has been updated. Current status: {instance.get_status_display()}."
+            f"{placement.student.username} your weekly log for week {instance.week_number} has been updated. "
+            f"Current status: {instance.get_status_display()}."
         )
-        recipient = [instance.placement.student.email]
-        send_notification_email(subject, message, recipient)   
+        recipient = [placement.student.email]
+        send_notification_email(subject, message, recipient)
 
 @receiver(post_save, sender=Student_log)
 def notify_on_student_log(sender, instance, created, **kwargs):
     if not created:
-        placement = instance.internship_placement
-        subject = f"New Student Log Updated for {placement.student.username}"
+        placement = instance.student
+        subject = f"Student Log Updated for {placement.student.username}"
         message = (
-            f"{placement.student.username} your student log has been updated. Current status: {instance.get_status_display()}."
+            f"{placement.student.username} your student log has been updated. "
+            f"Current status: {instance.get_status_display()}."
         )
-        recipient = [instance.placement.student.email]
+        recipient = [placement.student.email]
         send_notification_email(subject, message, recipient)   
 
 @receiver(post_save, sender=Internship_Placement)        
