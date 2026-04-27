@@ -106,7 +106,7 @@ def register(request):
          user.groups.add(group)
 
          #create a token for the user
-         token, _ = Token.objects.get_or_create(user=user)
+        token, _ = Token.objects.get_or_create(user=user)
     
         return Response({
             "message": "Registration successful",
@@ -184,16 +184,16 @@ def search_items(request):
     query = request.query_params.get('q', '')
     placements = Internship_Placement.objects.filter(company_name__icontains=query)
     logs = Weekly_Log.objects.filter(activities__icontains=query)
-    feedbacks = Supervisor_Feedback.objects.filter(comments__icontains=query) academic_feedbacks = Academic_Supervisor_Feedback.objects.filter(comments__icontains=query)
+    feedbacks = Supervisor_Feedback.objects.filter(comments__icontains=query)
+    academic_feedbacks = Academic_Supervisor_Feedback.objects.filter(comments__icontains=query)
     issues = Issue.objects.filter(issue_type__icontains=query)
-
     placement_serializer = Internship_PlacementSerializer(placements, many=True)
     log_serializer = Weekly_LogSerializer(logs, many=True)
     feedback_serializer = Supervisor_FeedbackSerializer(feedbacks, many=True)
     academic_serializer = Academic_Supervisor_FeedbackSerializer(academic_feedbacks, many=True)
     issue_serializer = IssueSerializer(issues, many=True)
 
-    return Response({
+     return Response({
         "placements": placement_serializer.data,
         "logs": log_serializer.data,
         "feedbacks": feedback_serializer.data,
