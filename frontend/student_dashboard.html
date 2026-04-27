@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard - ILES</title>
+    <script src="group12.js"></script>
+    <link rel="stylesheet" href="iles.css" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <h1>STUDENT DASHBOARD</h1>
+      </div>
+      <div class="user-info">
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <h2>Welcome, <span id="welcomeName">Student</span>! 👋</h2>
+        <p>Track and manage your internship logs below.</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon"></div>
+          <div class="stat-number" id="totalLogs">0</div>
+          <div class="stat-label">Total Logs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"></div>
+          <div class="stat-number" id="pendingLogs">0</div>
+          <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-number" id="approvedLogs">0</div>
+          <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"></div>
+          <div class="stat-number" id="avgScore">0</div>
+          <div class="stat-label">Avg Score</div>
+        </div>
+      </div>
+
+      <!-- Action Cards -->
+      <div class="actions-grid">
+        <a href="Application.html" class="action-card">
+          <div class="action-icon"></div>
+          <h3>My information</h3>
+          <p>Fill in your personal and academic details</p>
+          <span class="action-btn">Add information</span>
+        </a>
+        <a href="log.html" class="action-card">
+          <div class="action-icon"></div>
+          <h3>Submit Logs</h3>
+          <p>Submit your internship activities for the week</p>
+          <span class="action-btn"> Add New Log</span>
+        </a>
+
+        <a href="Admin.html" class="action-card">
+          <div class="action-icon"></div>
+          <h3>View Submissions</h3>
+          <p>See all your submitted internship logs</p>
+          <span class="action-btn"> View Logs</span>
+        </a>
+
+        <a href="Academic.html" class="action-card">
+          <div class="action-icon"></div>
+          <h3>See Feedback</h3>
+          <p>Check feedback from your supervisors</p>
+          <span class="action-btn"> View Feedback</span>
+        </a>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-section">
+        <h3>Recent Activity</h3>
+        <div id="recentActivity" class="activity-list">
+          <!-- Recent activities will be loaded here -->
+          <div class="activity-item">
+            <div class="activity-text">
+              <div class="activity-title">
+                Log Entry: "Worked on project report"
+              </div>
+            </div>
+            <span class="status-badge status-pending">Pending Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

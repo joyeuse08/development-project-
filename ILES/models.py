@@ -154,6 +154,24 @@ class Issue(models.Model):
 
 
 
+class Notification(models.Model):
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_notifications')
+    actor     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_notifications')
+    verb = models.CharField(max_length=200)
+    target_id = models.IntegerField(null=True, blank=True)  # ID of the object (report, comment, etc.)
+    target_type = models.CharField(max_length=50, null=True, blank=True)  # 'report', 'comment', etc.
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.actor} {self.verb} -> {self.recipient}"
+
+
+
+
 
 
 

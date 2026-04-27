@@ -12,14 +12,17 @@ from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, 
 
 
 # Create your views here.
+#Custom User views
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+#Internship placement views
 class Internship_PlacementViewSet(viewsets.ModelViewSet):
     queryset = Internship_Placement.objects.all()
     serializer_class = Internship_PlacementSerializer
-
+    
+#Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
     serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
@@ -199,3 +202,78 @@ def search_items(request):
         "feedbacks": feedback_serializer.data,
         "issues": issue_serializer.data,
     }, status=status.HTTP_200_OK)
+
+
+
+
+from .models import Notification
+
+def submit_report(request):
+    report.save()
+    supervisors = User.objects.filter(role__in=['internship_supervisor', 'academic_supervisor', 'workplace_supervisor'])
+    
+    for supervisor in supervisors:
+        Notification.objects.create(
+            recipient=supervisor,
+            actor=request.user,  # The intern
+            verb=f'submitted a report: {report.title}',
+            target_id=report.id,
+            target_type='report'
+        )
+    
+    return Response({'message': 'Report submitted and notifications sent'})
+
+def approve_report(request, report_id):
+    report = Report.objects.get(id=report_id)
+    report.status = 'approved'
+    report.save()
+    
+    
+    Notification.objects.create(
+        recipient=report.intern,
+        actor=request.user,  # The supervisor
+        verb=f'approved your report: {report.title}',
+        target_id=report.id,
+        target_type='report'
+    )
+    
+    return Response({'message': 'Report approved'})
+
+
+def add_comment(request, report_id):
+    comment = Comment.objects.create(
+        report_id=report_id,
+        author=request.user,
+        content=request.data['content']
+    )
+    
+    report = Report.objects.get(id=report_id)
+    
+    if request.user != report.intern:
+        Notification.objects.create(
+            recipient=report.intern,
+            actor=request.user,
+            verb=f'commented on your report: {comment.content[:50]}',
+            target_id=comment.id,
+            target_type='comment'
+        )
+    
+    return Response({'message': 'Comment added'})
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Notification
+from .serializers import NotificationSerializer
+
+@api_view(['GET'])
+def get_notifications(request):
+    notifications = request.user.notifications.all()[:50]  # Last 50 notifications
+    serializer = NotificationSerializer(notifications, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def mark_notification_read(request, id):
+    notification = Notification.objects.get(id=id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return Response({'status': 'read'})
