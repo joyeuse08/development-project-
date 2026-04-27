@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -39,6 +39,7 @@ const Login = () => {
         required
       />
       <button type="submit">Login</button>
+      <p>Don't have an account? <Link to="/register">Register</Link></p>
     </form>
   );
 };

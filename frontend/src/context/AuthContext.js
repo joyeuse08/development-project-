@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('user');
-      const token = localStorage.getitem('token');
+      const token = localStorage.getItem('token');
       if (saved) setUser(JSON.parse(saved));
       if (token) api.defaults.headers.common['Authorization'] = `Token ${token}`;
     } catch {}
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post('/api/login/', { username, password });
       setUser(data.user);
       localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setname('token', data.token);
+      localStorage.setItem('token', data.token);
       api.defaults.headers.common['Authorization'] = `Token ${data.token}`;
       return true;
     } catch {
@@ -41,17 +41,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
   };
-  const register = async (username, email, password) => {
+  const register = async (username, email, password, role, department) => {
     try {
       setLoading(true);
-      await api.post('/api/register/', { username, email, password });
+      await api.post('/api/register/', { username, email, password, role, department });
       return true;
     } catch {
       return false;
     } finally {
       setLoading(false);
     }
-}; 
+  };
   
   return (
     <AuthContext.Provider value={{ user, login, logout, register, loading }}>
