@@ -1,86 +1,68 @@
-
 // ============================================
-// SECTION 1: STORAGE FUNCTIONS
+// ILES SYSTEM
 // ============================================
 
+// ========== 1. STORAGE (Save/Load Data) ==========
 function getUsers() {
-  const users = localStorage.getItem("iles_users");
-  return users ? JSON.parse(users) : [];
+  return JSON.parse(localStorage.getItem("iles_users") || "[]");
 }
-
-function saveUsers(users) {
-  localStorage.setItem("iles_users", JSON.stringify(users));
+function saveUsers(u) {
+  localStorage.setItem("iles_users", JSON.stringify(u));
 }
-
 function getCurrentUser() {
-  const user = localStorage.getItem("iles_current_user");
-  return user ? JSON.parse(user) : null;
+  return JSON.parse(localStorage.getItem("iles_current_user") || "null");
 }
-
-function setCurrentUser(user) {
-  localStorage.setItem("iles_current_user", JSON.stringify(user));
+function setCurrentUser(u) {
+  localStorage.setItem("iles_current_user", JSON.stringify(u));
 }
-
 function clearCurrentUser() {
   localStorage.removeItem("iles_current_user");
 }
-
 function getLogs() {
-  const logs = localStorage.getItem("iles_logs");
-  return logs ? JSON.parse(logs) : [];
+  return JSON.parse(localStorage.getItem("iles_logs") || "[]");
+}
+function saveLogs(l) {
+  localStorage.setItem("iles_logs", JSON.stringify(l));
+}
+function getStudentLogs(id) {
+  return getLogs()
+    .filter((l) => l.studentId === id)
+    .sort((a, b) => b.week - a.week);
+}
+function updateLog(id, updates) {
+  let logs = getLogs();
+  let i = logs.findIndex((l) => l.id === id);
+  if (i !== -1) {
+    logs[i] = { ...logs[i], ...updates };
+    saveLogs(logs);
+    return true;
+  }
+  return false;
 }
 
-function saveLogs(logs) {
-  localStorage.setItem("iles_logs", JSON.stringify(logs));
+// ========== 2. HELPERS ==========
+function showMessage(msg, type) {
+  let d = document.createElement("div");
+  d.className = `message ${type}`;
+  d.textContent = msg;
+  d.style.cssText = `position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:8px;z-index:9999;background:${type === "success" ? "#d4edda" : "#f8d7da"};color:${type === "success" ? "#155724" : "#721c24"}`;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 3000);
+}
+function formatDate(d) {
+  return d ? new Date(d).toLocaleDateString() : "Not submitted";
+}
+function escapeHtml(t) {
+  if (!t) return "";
+  let d = document.createElement("div");
+  d.textContent = t;
+  return d.innerHTML;
 }
 
-// ============================================
-// SECTION 2: HELPER FUNCTIONS
-// ============================================
-
-function showMessage(message, type) {
-  const existingMsg = document.querySelector(".message");
-  if (existingMsg) existingMsg.remove();
-
-  const msgDiv = document.createElement("div");
-  msgDiv.className = `message ${type}`;
-  msgDiv.textContent = message;
-  msgDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        z-index: 9999;
-        background: ${type === "success" ? "#d4edda" : "#f8d7da"};
-        color: ${type === "success" ? "#155724" : "#721c24"};
-        border-left: 4px solid ${type === "success" ? "#28a745" : "#dc3545"};
-    `;
-  document.body.appendChild(msgDiv);
-  setTimeout(() => msgDiv.remove(), 3000);
-}
-
-function escapeHtml(text) {
-  if (!text) return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "Not submitted";
-  const date = new Date(dateString);
-  return date.toLocaleDateString();
-}
-
-// ============================================
-// SECTION 3: INITIALIZE DEFAULT DATA
-// ============================================
-
+// ========== 3. DEFAULT DATA (First time only) ==========
 function initDefaultData() {
-  let users = getUsers();
-  if (users.length === 0) {
-    users = [
+  if (getUsers().length === 0) {
+    saveUsers([
       {
         id: 1,
         username: "student1",
@@ -113,13 +95,10 @@ function initDefaultData() {
         fullName: "Admin User",
         email: "admin@iles.com",
       },
-    ];
-    saveUsers(users);
+    ]);
   }
-
-  let logs = getLogs();
-  if (logs.length === 0) {
-    logs = [
+  if (getLogs().length === 0) {
+    saveLogs([
       {
         id: 1,
         studentId: 1,
@@ -127,7 +106,6 @@ function initDefaultData() {
         week: 1,
         activities: "Worked on project setup",
         challenges: "Understanding codebase",
-        learnings: "React components",
         status: "approved",
         submittedAt: "2024-01-10",
         workplaceFeedback: "Good work!",
@@ -142,1135 +120,467 @@ function initDefaultData() {
         week: 2,
         activities: "Implemented authentication",
         challenges: "JWT handling",
-        learnings: "Auth flow",
         status: "pending",
         submittedAt: "2024-01-17",
       },
-    ];
-    saveLogs(logs);
+    ]);
   }
 }
 
-// ============================================
-// SECTION 4: AUTHENTICATION
-// ============================================
-
+// ========== 4. AUTHENTICATION ==========
 function login(username, password, role) {
-  const users = getUsers();
-  let expectedRole = "";
-  if (role === "Student") expectedRole = "student";
-  else if (role === "Workplace Supervisor")
-    expectedRole = "workplace_supervisor";
-  else if (role === "Academic Supervisor") expectedRole = "academic_supervisor";
-  else if (role === "Admin") expectedRole = "admin";
-
-  const user = users.find(
+  let roles = {
+    Student: "student",
+    "Workplace Supervisor": "workplace_supervisor",
+    "Academic Supervisor": "academic_supervisor",
+    Admin: "admin",
+  };
+  let user = getUsers().find(
     (u) =>
       u.username === username &&
       u.password === password &&
-      u.role === expectedRole,
+      u.role === roles[role],
   );
-
   if (user) {
     setCurrentUser(user);
     return { success: true, user: user };
   }
-  return { success: false, message: "Invalid username, password, or role" };
+  return { success: false, message: "Invalid credentials" };
 }
-
-function register(userData) {
-  const users = getUsers();
-
-  if (users.some((u) => u.username === userData.username)) {
-    return { success: false, message: "Username already exists" };
-  }
-
-  let role = "";
-  if (userData.role === "Student") role = "student";
-  else if (userData.role === "Workplace Supervisor")
-    role = "workplace_supervisor";
-  else if (userData.role === "Academic Supervisor")
-    role = "academic_supervisor";
-  else if (userData.role === "Admin") role = "admin";
-
-  const newUser = {
-    id: users.length + 1,
-    username: userData.username,
-    password: userData.password,
-    role: role,
-    fullName: userData.fullName,
-    email: userData.email,
-    createdAt: new Date().toISOString(),
+function register(data) {
+  if (getUsers().some((u) => u.username === data.username))
+    return { success: false, message: "Username exists" };
+  let roles = {
+    Student: "student",
+    "Workplace Supervisor": "workplace_supervisor",
+    "Academic Supervisor": "academic_supervisor",
+    Admin: "admin",
   };
-
-  users.push(newUser);
-  saveUsers(users);
+  let newUser = {
+    id: getUsers().length + 1,
+    username: data.username,
+    password: data.password,
+    role: roles[data.role],
+    fullName: data.fullName,
+    email: data.email,
+  };
+  saveUsers([...getUsers(), newUser]);
   return { success: true, message: "Registration successful" };
 }
-
 function logout() {
   clearCurrentUser();
-  showMessage("Logged out successfully!", "success");
-  setTimeout(() => {
-    window.location.href = "welcome.html";
-  }, 1000);
+  showMessage("Logged out!", "success");
+  setTimeout(() => (window.location.href = "welcome.html"), 1000);
 }
 
-// ============================================
-// SECTION 5: LOG FUNCTIONS
-// ============================================
-
-function submitLog(logData) {
-  const logs = getLogs();
-  const newLog = {
+// ========== 5. LOG FUNCTIONS ==========
+function submitLog(data) {
+  let logs = getLogs();
+  let newLog = {
     id: logs.length + 1,
-    ...logData,
+    ...data,
     submittedAt: new Date().toISOString(),
     status: "pending",
   };
-  logs.push(newLog);
-  saveLogs(logs);
+  saveLogs([...logs, newLog]);
   return { success: true };
 }
 
-function getStudentLogs(studentId) {
-  const logs = getLogs();
-  return logs
-    .filter((log) => log.studentId === studentId)
-    .sort((a, b) => b.week - a.week);
+// ========== 6. WELCOME PAGE ==========
+function setupWelcome() {
+  let loginTab = document.getElementById("loginTab");
+  let registerTab = document.getElementById("registerTab");
+  let loginForm = document.getElementById("loginForm");
+  let registerForm = document.getElementById("registerForm");
+
+  loginTab.onclick = () => {
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+  };
+  registerTab.onclick = () => {
+    registerTab.classList.add("active");
+    loginTab.classList.remove("active");
+    registerForm.style.display = "block";
+    loginForm.style.display = "none";
+  };
+
+  document.getElementById("loginFormElement").onsubmit = (e) => {
+    e.preventDefault();
+    let result = login(
+      loginUsername.value,
+      loginPassword.value,
+      loginRole.value,
+    );
+    if (result.success) {
+      showMessage(`Welcome ${result.user.fullName}!`, "success");
+      setTimeout(
+        () =>
+          (window.location.href =
+            result.user.role === "student"
+              ? "student_dashboard.html"
+              : result.user.role === "workplace_supervisor"
+                ? "workplace_supervisor.html"
+                : result.user.role === "academic_supervisor"
+                  ? "academic_supervisor.html"
+                  : "admin.html"),
+        1500,
+      );
+    } else showMessage(result.message, "error");
+  };
+
+  document.getElementById("registerFormElement").onsubmit = (e) => {
+    e.preventDefault();
+    if (regPassword.value !== regConfirmPassword.value) {
+      showMessage("Passwords don't match", "error");
+      return;
+    }
+    let result = register({
+      username: regUsername.value,
+      password: regPassword.value,
+      fullName: regFullName.value,
+      email: regEmail.value,
+      role: regRole.value,
+    });
+    if (result.success) {
+      showMessage("Registration successful! Please login.", "success");
+      loginTab.click();
+    } else showMessage(result.message, "error");
+  };
 }
 
-function updateLog(logId, updates) {
-  const logs = getLogs();
-  const index = logs.findIndex((l) => l.id === logId);
-  if (index !== -1) {
-    logs[index] = { ...logs[index], ...updates };
-    saveLogs(logs);
-    return { success: true };
-  }
-  return { success: false };
-}
-
-// ============================================
-// SECTION 6: WELCOME PAGE
-// ============================================
-
-function initWelcomePage() {
-  const loginTab = document.getElementById("loginTab");
-  const registerTab = document.getElementById("registerTab");
-  const loginForm = document.getElementById("loginForm");
-  const registerForm = document.getElementById("registerForm");
-  const loginFormElement = document.getElementById("loginFormElement");
-  const registerFormElement = document.getElementById("registerFormElement");
-
-  if (loginTab && registerTab) {
-    loginTab.addEventListener("click", () => {
-      loginTab.classList.add("active");
-      registerTab.classList.remove("active");
-      if (loginForm) loginForm.style.display = "block";
-      if (registerForm) registerForm.style.display = "none";
-    });
-
-    registerTab.addEventListener("click", () => {
-      registerTab.classList.add("active");
-      loginTab.classList.remove("active");
-      if (registerForm) registerForm.style.display = "block";
-      if (loginForm) loginForm.style.display = "none";
-    });
-  }
-
-  if (loginFormElement) {
-    loginFormElement.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const username = document.getElementById("loginUsername").value.trim();
-      const password = document.getElementById("loginPassword").value.trim();
-      const role = document.getElementById("loginRole").value;
-
-      if (!username || !password) {
-        showMessage("Please enter username and password", "error");
-        return;
-      }
-
-      if (!role || role === "Select Role") {
-        showMessage("Please select your role", "error");
-        return;
-      }
-
-      const result = login(username, password, role);
-      if (result.success) {
-        showMessage(`Welcome back, ${result.user.fullName}!`, "success");
-        setTimeout(() => {
-          if (result.user.role === "student")
-            window.location.href = "student_dashboard.html";
-          else if (result.user.role === "workplace_supervisor")
-            window.location.href = "workplace_supervisor.html";
-          else if (result.user.role === "academic_supervisor")
-            window.location.href = "academic_supervisor.html";
-          else if (result.user.role === "admin")
-            window.location.href = "admin.html";
-        }, 1500);
-      } else {
-        showMessage(result.message, "error");
-      }
-    });
-  }
-
-  if (registerFormElement) {
-    registerFormElement.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const username = document.getElementById("regUsername").value.trim();
-      const password = document.getElementById("regPassword").value;
-      const confirmPassword =
-        document.getElementById("regConfirmPassword").value;
-      const fullName = document.getElementById("regFullName").value.trim();
-      const email = document.getElementById("regEmail").value.trim();
-      const role = document.getElementById("regRole").value;
-
-      if (
-        !username ||
-        !password ||
-        !confirmPassword ||
-        !fullName ||
-        !email ||
-        !role
-      ) {
-        showMessage("Please fill all fields", "error");
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        showMessage("Passwords do not match", "error");
-        return;
-      }
-
-      const result = register({ username, password, fullName, email, role });
-      if (result.success) {
-        showMessage("Registration successful! Please login.", "success");
-        registerFormElement.reset();
-        if (loginTab) loginTab.click();
-      } else {
-        showMessage(result.message, "error");
-      }
-    });
-  }
-}
-
-// ============================================
-// SECTION 7: STUDENT DASHBOARD
-// ============================================
-
+// ========== 7. STUDENT DASHBOARD ==========
 function loadStudentDashboard() {
-  const user = getCurrentUser();
+  let user = getCurrentUser();
   if (!user || user.role !== "student") {
     window.location.href = "welcome.html";
     return;
   }
-
-  const welcomeSpan = document.getElementById("welcomeName");
-  if (welcomeSpan) welcomeSpan.textContent = user.fullName.split(" ")[0];
-
-  const logs = getStudentLogs(user.id);
-  const totalLogs = logs.length;
-  const pendingLogs = logs.filter((l) => l.status === "pending").length;
-  const approvedLogs = logs.filter((l) => l.status === "approved").length;
-
-  const totalEl = document.getElementById("totalLogs");
-  const pendingEl = document.getElementById("pendingLogs");
-  const approvedEl = document.getElementById("approvedLogs");
-
-  if (totalEl) totalEl.textContent = totalLogs;
-  if (pendingEl) pendingEl.textContent = pendingLogs;
-  if (approvedEl) approvedEl.textContent = approvedLogs;
-
-  const recentContainer = document.getElementById("recentActivity");
-  if (recentContainer) {
-    const recentLogs = logs.slice(-3).reverse();
-    if (recentLogs.length === 0) {
-      recentContainer.innerHTML =
-        '<div class="activity-item">No logs yet</div>';
-    } else {
-      recentContainer.innerHTML = recentLogs
+  document.getElementById("welcomeName").innerHTML =
+    user.fullName.split(" ")[0];
+  let logs = getStudentLogs(user.id);
+  document.getElementById("totalLogs").innerHTML = logs.length;
+  document.getElementById("pendingLogs").innerHTML = logs.filter(
+    (l) => l.status === "pending",
+  ).length;
+  document.getElementById("approvedLogs").innerHTML = logs.filter(
+    (l) => l.status === "approved",
+  ).length;
+  let recent = logs.slice(-3).reverse();
+  document.getElementById("recentActivity").innerHTML = recent.length
+    ? recent
         .map(
-          (log) => `
-                <div class="activity-item">
-                    <div class="activity-text">
-                        <div class="activity-title">Week ${log.week}: ${log.activities.substring(0, 50)}</div>
-                    </div>
-                    <span class="status-badge status-${log.status}">${log.status === "pending" ? "Pending" : "Approved"}</span>
-                </div>
-            `,
+          (l) =>
+            `<div class="activity-item"><div>Week ${l.week}: ${l.activities.substring(0, 50)}</div><span class="status-badge status-${l.status}">${l.status}</span></div>`,
         )
-        .join("");
-    }
-  }
+        .join("")
+    : "<div>No logs yet</div>";
 }
 
-// ============================================
-// SECTION 8: LOG PAGE
-// ============================================
-
-function initLogPage() {
-  const user = getCurrentUser();
+// ========== 8. LOG PAGE ==========
+function setupLogPage() {
+  let user = getCurrentUser();
   if (!user) {
     window.location.href = "welcome.html";
     return;
   }
-
-  const welcomeSpan = document.getElementById("welcomeName");
-  if (welcomeSpan) welcomeSpan.textContent = user.fullName.split(" ")[0];
-
+  document.getElementById("welcomeName").innerHTML =
+    user.fullName.split(" ")[0];
   displayUserLogs();
-  updateTotalLogs();
-
-  const logForm = document.getElementById("logForm");
-  if (logForm) {
-    logForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const week = parseInt(document.getElementById("weekNumber").value);
-      const activities = document.getElementById("activities").value.trim();
-      const challenges = document.getElementById("challenges").value.trim();
-      const learnings = document.getElementById("learnings").value.trim();
-
-      if (!week || week < 1 || week > 52) {
-        showMessage("Week must be between 1 and 52", "error");
-        return;
-      }
-
-      if (!activities || activities.length < 10) {
-        showMessage("Please describe your activities", "error");
-        return;
-      }
-
-      if (!challenges || challenges.length < 5) {
-        showMessage("Please describe challenges", "error");
-        return;
-      }
-
-      const existingLogs = getStudentLogs(user.id);
-      if (existingLogs.some((l) => l.week === week)) {
-        showMessage(`Week ${week} already submitted!`, "error");
-        return;
-      }
-
-      submitLog({
-        studentId: user.id,
-        studentName: user.fullName,
-        week: week,
-        activities: activities,
-        challenges: challenges,
-        learnings: learnings || "",
-      });
-
-      showMessage(`Week ${week} submitted!`, "success");
-      logForm.reset();
-      displayUserLogs();
-      updateTotalLogs();
+  document.getElementById("logForm").onsubmit = (e) => {
+    e.preventDefault();
+    let week = parseInt(weekNumber.value);
+    let activities = activities.value.trim();
+    let challenges = challenges.value.trim();
+    if (!week || week < 1 || week > 52) {
+      showMessage("Week must be 1-52", "error");
+      return;
+    }
+    if (activities.length < 10) {
+      showMessage("Describe activities", "error");
+      return;
+    }
+    if (getStudentLogs(user.id).some((l) => l.week === week)) {
+      showMessage(`Week ${week} already submitted!`, "error");
+      return;
+    }
+    submitLog({
+      studentId: user.id,
+      studentName: user.fullName,
+      week: week,
+      activities: activities,
+      challenges: challenges,
+      learnings: learnings.value || "",
     });
-  }
+    showMessage(`Week ${week} submitted!`, "success");
+    e.target.reset();
+    displayUserLogs();
+  };
 }
-
 function displayUserLogs() {
-  const user = getCurrentUser();
-  if (!user) return;
-
-  const logs = getStudentLogs(user.id);
-  const container = document.getElementById("logsContainer");
-
-  if (!container) return;
-
-  if (logs.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No logs yet</p></div>';
-    return;
-  }
-
-  container.innerHTML = logs
-    .map(
-      (log) => `
-        <div class="log-item">
-            <div class="log-header">
-                <span class="log-week">Week ${log.week}</span>
-                <span class="status-badge status-${log.status}">${log.status === "pending" ? "Pending" : "Approved"}</span>
-            </div>
-            <div class="log-content">
-                <div><strong>Activities:</strong> ${escapeHtml(log.activities)}</div>
-                <div><strong>Challenges:</strong> ${escapeHtml(log.challenges)}</div>
-                ${log.learnings ? `<div><strong>Learnings:</strong> ${escapeHtml(log.learnings)}</div>` : ""}
-                ${log.workplaceFeedback ? `<div><strong>Workplace Feedback:</strong> ${escapeHtml(log.workplaceFeedback)}</div>` : ""}
-                <div><small>Submitted: ${formatDate(log.submittedAt)}</small></div>
-            </div>
-        </div>
-    `,
-    )
-    .join("");
+  let logs = getStudentLogs(getCurrentUser().id);
+  document.getElementById("logsContainer").innerHTML = logs.length
+    ? logs
+        .map(
+          (l) =>
+            `<div class="log-item"><div><strong>Week ${l.week}</strong> - ${l.status}</div><div>${l.activities}</div>${l.workplaceFeedback ? `<div>Feedback: ${l.workplaceFeedback}</div>` : ""}<div><small>${formatDate(l.submittedAt)}</small></div></div>`,
+        )
+        .join("")
+    : "<div>No logs yet</div>";
 }
 
-function updateTotalLogs() {
-  const user = getCurrentUser();
-  if (!user) return;
-
-  const logs = getStudentLogs(user.id);
-  const totalEl = document.getElementById("totalLogs");
-  if (totalEl) totalEl.textContent = logs.length;
-}
-
-// ============================================
-// SECTION 9: WORKPLACE SUPERVISOR
-// ============================================
-
-function initWorkplaceDashboard() {
-  const user = getCurrentUser();
+// ========== 9. WORKPLACE SUPERVISOR ==========
+function setupWorkplace() {
+  let user = getCurrentUser();
   if (!user || user.role !== "workplace_supervisor") {
     window.location.href = "welcome.html";
     return;
   }
-
-  const welcomeSpan = document.getElementById("welcomeName");
-  if (welcomeSpan) welcomeSpan.textContent = user.fullName.split(" ")[0];
-
-  loadStudentSelect();
-  displayPendingLogs();
+  document.getElementById("welcomeName").innerHTML =
+    user.fullName.split(" ")[0];
+  displayPendingWorkplaceLogs();
 }
-
-function loadStudentSelect() {
-  const users = getUsers();
-  const students = users.filter((u) => u.role === "student");
-  const select = document.getElementById("academicStudentSelect");
-
-  if (select) {
-    select.innerHTML = '<option value="">Select Student</option>';
-    students.forEach((s) => {
-      const option = document.createElement("option");
-      option.value = s.id;
-      option.textContent = s.fullName;
-      select.appendChild(option);
-    });
-  }
+function displayPendingWorkplaceLogs() {
+  let pending = getLogs().filter((l) => l.status === "pending");
+  document.getElementById("pendingLogsList").innerHTML = pending.length
+    ? pending
+        .map((l) => {
+          let s = getUsers().find((u) => u.id === l.studentId);
+          return `<div class="pending-item"><div><strong>${s?.fullName}</strong> - Week ${l.week}</div><div>${l.activities.substring(0, 100)}...</div><button onclick="openReviewModal(${l.id})">Review</button></div>`;
+        })
+        .join("")
+    : "<div>No pending logs</div>";
 }
-
-function displayPendingLogs() {
-  const logs = getLogs();
-  const pendingLogs = logs.filter((l) => l.status === "pending");
-  const container = document.getElementById("pendingLogsList");
-
-  if (!container) return;
-
-  const pendingCount = document.getElementById("pendingReviews");
-  const pendingCountSpan = document.getElementById("pendingCount");
-  if (pendingCount) pendingCount.textContent = pendingLogs.length;
-  if (pendingCountSpan) pendingCountSpan.textContent = pendingLogs.length;
-
-  if (pendingLogs.length === 0) {
-    container.innerHTML =
-      '<div class="empty-state"><p>No pending logs</p></div>';
-    return;
-  }
-
-  container.innerHTML = pendingLogs
-    .map((log) => {
-      const student = getUsers().find((u) => u.id === log.studentId);
-      return `
-            <div class="pending-item">
-                <div class="pending-header">
-                    <span class="student-name">${student?.fullName || log.studentName}</span>
-                    <span class="week-badge">Week ${log.week}</span>
-                </div>
-                <div class="pending-activities">${log.activities.substring(0, 100)}...</div>
-                <button class="review-btn" onclick="openReviewModal(${log.id})">Review Log</button>
-            </div>
-        `;
-    })
-    .join("");
-}
-
-function openReviewModal(logId) {
-  const logs = getLogs();
-  const log = logs.find((l) => l.id === logId);
-  if (!log) return;
-
-  const student = getUsers().find((u) => u.id === log.studentId);
-
+function openReviewModal(id) {
+  let log = getLogs().find((l) => l.id === id);
+  let student = getUsers().find((u) => u.id === log.studentId);
   document.getElementById("reviewLogId").value = log.id;
-  document.getElementById("reviewStudentName").value =
-    student?.fullName || log.studentName;
+  document.getElementById("reviewStudentName").value = student?.fullName;
   document.getElementById("reviewWeek").value = `Week ${log.week}`;
   document.getElementById("reviewActivities").value = log.activities;
-  document.getElementById("feedback").value = "";
-  document.getElementById("score").value = "";
-
   document.getElementById("reviewModal").classList.add("active");
 }
-
+function submitWorkplaceReview(e) {
+  e.preventDefault();
+  let id = parseInt(reviewLogId.value);
+  let fb = feedback.value.trim();
+  let sc = parseFloat(score.value);
+  if (fb.length < 5) {
+    showMessage("Provide meaningful feedback", "error");
+    return;
+  }
+  if (isNaN(sc) || sc < 0 || sc > 10) {
+    showMessage("Enter score 0-10", "error");
+    return;
+  }
+  if (
+    updateLog(id, {
+      workplaceFeedback: fb,
+      workplaceScore: sc,
+      status: "reviewed_by_workplace",
+    })
+  ) {
+    showMessage("Review submitted!", "success");
+    closeModal();
+    displayPendingWorkplaceLogs();
+  }
+}
 function closeModal() {
   document.getElementById("reviewModal").classList.remove("active");
 }
 
-function submitWorkplaceReview(e) {
-  e.preventDefault();
-
-  const logId = parseInt(document.getElementById("reviewLogId").value);
-  const feedback = document.getElementById("feedback").value.trim();
-  const score = parseFloat(document.getElementById("score").value);
-
-  if (!feedback || feedback.length < 5) {
-    showMessage("Please provide meaningful feedback", "error");
-    return;
-  }
-
-  if (isNaN(score) || score < 0 || score > 10) {
-    showMessage("Please enter a valid score (0-10)", "error");
-    return;
-  }
-
-  const result = updateLog(logId, {
-    workplaceFeedback: feedback,
-    workplaceScore: score,
-    status: "reviewed_by_workplace",
-  });
-
-  if (result.success) {
-    showMessage("Review submitted successfully!", "success");
-    closeModal();
-    displayPendingLogs();
-  }
-}
-
-// ============================================
-// SECTION 10: ACADEMIC SUPERVISOR
-// ============================================
-
-function initAcademicDashboard() {
-  const user = getCurrentUser();
+// ========== 10. ACADEMIC SUPERVISOR ==========
+function setupAcademic() {
+  let user = getCurrentUser();
   if (!user || user.role !== "academic_supervisor") {
     window.location.href = "welcome.html";
     return;
   }
-
-  const welcomeSpan = document.getElementById("welcomeName");
-  if (welcomeSpan) welcomeSpan.textContent = user.fullName.split(" ")[0];
-
-  loadAcademicStudentSelect();
-  displayAcademicPendingLogs();
-  updateAcademicStats();
+  document.getElementById("welcomeName").innerHTML =
+    user.fullName.split(" ")[0];
+  displayPendingAcademicLogs();
 }
-
-function loadAcademicStudentSelect() {
-  const users = getUsers();
-  const students = users.filter((u) => u.role === "student");
-  const select = document.getElementById("academicStudentSelect");
-
-  if (select) {
-    select.innerHTML = '<option value="">Select Student</option>';
-    students.forEach((s) => {
-      const option = document.createElement("option");
-      option.value = s.id;
-      option.textContent = s.fullName;
-      select.appendChild(option);
-    });
-  }
+function displayPendingAcademicLogs() {
+  let pending = getLogs().filter((l) => l.status === "reviewed_by_workplace");
+  document.getElementById("pendingLogsList").innerHTML = pending.length
+    ? pending
+        .map((l) => {
+          let s = getUsers().find((u) => u.id === l.studentId);
+          return `<div class="pending-item"><div><strong>${s?.fullName}</strong> - Week ${l.week}</div><div>Workplace Score: ${l.workplaceScore}/10</div><button onclick="openAcademicModal(${l.id})">Approve</button></div>`;
+        })
+        .join("")
+    : "<div>No pending approvals</div>";
 }
-
-function displayAcademicPendingLogs() {
-  const logs = getLogs();
-  const pendingLogs = logs.filter((l) => l.status === "reviewed_by_workplace");
-  const container = document.getElementById("pendingLogsList");
-
-  if (!container) return;
-
-  const pendingCount = document.getElementById("pendingReviews");
-  if (pendingCount) pendingCount.textContent = pendingLogs.length;
-
-  if (pendingLogs.length === 0) {
-    container.innerHTML =
-      '<div class="empty-state"><p>No pending approvals</p></div>';
-    return;
-  }
-
-  container.innerHTML = pendingLogs
-    .map((log) => {
-      const student = getUsers().find((u) => u.id === log.studentId);
-      return `
-            <div class="pending-item" onclick="openAcademicModal(${log.id})">
-                <div class="pending-header">
-                    <span class="student-name">${student?.fullName || log.studentName}</span>
-                    <span class="week-badge">Week ${log.week}</span>
-                </div>
-                <div class="pending-activities">${log.activities.substring(0, 100)}...</div>
-                <div class="workplace-info">Workplace Score: ${log.workplaceScore || "N/A"}/10</div>
-                <button class="review-btn" onclick="event.stopPropagation(); openAcademicModal(${log.id})">Review & Approve</button>
-            </div>
-        `;
-    })
-    .join("");
-}
-
-function openAcademicModal(logId) {
-  const logs = getLogs();
-  const log = logs.find((l) => l.id === logId);
-  if (!log) return;
-
-  const student = getUsers().find((u) => u.id === log.studentId);
-
+function openAcademicModal(id) {
+  let log = getLogs().find((l) => l.id === id);
+  let student = getUsers().find((u) => u.id === log.studentId);
   document.getElementById("modalLogId").value = log.id;
-  document.getElementById("modalStudentName").value =
-    student?.fullName || log.studentName;
+  document.getElementById("modalStudentName").value = student?.fullName;
   document.getElementById("modalWeek").value = `Week ${log.week}`;
   document.getElementById("modalActivities").value = log.activities;
-  document.getElementById("modalWorkplaceText").innerHTML =
-    log.workplaceFeedback || "No workplace feedback";
-  document.getElementById("modalAcademicFeedback").value = "";
-  document.getElementById("modalAcademicScore").value = "";
-
   document.getElementById("reviewModal").classList.add("active");
 }
-
 function submitAcademicReview(e) {
   e.preventDefault();
-
-  const logId = parseInt(document.getElementById("modalLogId").value);
-  const feedback = document
-    .getElementById("modalAcademicFeedback")
-    .value.trim();
-  const score = parseFloat(document.getElementById("modalAcademicScore").value);
-
-  if (!feedback || feedback.length < 5) {
-    showMessage("Please provide meaningful feedback", "error");
+  let id = parseInt(modalLogId.value);
+  let fb = modalAcademicFeedback.value.trim();
+  let sc = parseFloat(modalAcademicScore.value);
+  if (fb.length < 5) {
+    showMessage("Provide feedback", "error");
     return;
   }
-
-  if (isNaN(score) || score < 0 || score > 10) {
-    showMessage("Please enter a valid score (0-10)", "error");
+  if (isNaN(sc) || sc < 0 || sc > 10) {
+    showMessage("Enter score 0-10", "error");
     return;
   }
-
-  const result = updateLog(logId, {
-    academicFeedback: feedback,
-    academicScore: score,
-    status: "approved",
-  });
-
-  if (result.success) {
-    showMessage("Log approved successfully!", "success");
+  if (
+    updateLog(id, {
+      academicFeedback: fb,
+      academicScore: sc,
+      status: "approved",
+    })
+  ) {
+    showMessage("Approved!", "success");
     closeModal();
-    displayAcademicPendingLogs();
-    updateAcademicStats();
+    displayPendingAcademicLogs();
   }
 }
 
-function updateAcademicStats() {
-  const logs = getLogs();
-  const approvedLogs = logs.filter((l) => l.status === "approved");
-  const totalScore = approvedLogs.reduce(
-    (sum, l) => sum + (l.academicScore || 0),
-    0,
-  );
-  const avgScore =
-    approvedLogs.length > 0 ? (totalScore / approvedLogs.length).toFixed(1) : 0;
-
-  const approvedCount = document.getElementById("approvedCount");
-  const avgScoreEl = document.getElementById("avgScore");
-
-  if (approvedCount) approvedCount.textContent = approvedLogs.length;
-  if (avgScoreEl) avgScoreEl.textContent = avgScore;
-}
-
-// ============================================
-// SECTION 11: ADMIN DASHBOARD
-// ============================================
-
-function initAdminDashboard() {
-  const user = getCurrentUser();
+// ========== 11. ADMIN DASHBOARD ==========
+function setupAdmin() {
+  let user = getCurrentUser();
   if (!user || user.role !== "admin") {
     window.location.href = "welcome.html";
     return;
   }
-
-  const welcomeSpan = document.getElementById("welcomeName");
-  if (welcomeSpan) welcomeSpan.textContent = user.fullName.split(" ")[0];
-
-  updateAdminStats();
-  displayAdminUsers();
-  displayAdminLogs();
-}
-
-function updateAdminStats() {
-  const users = getUsers();
-  const logs = getLogs();
-
-  const students = users.filter((u) => u.role === "student").length;
-  const workplace = users.filter(
+  document.getElementById("welcomeName").innerHTML =
+    user.fullName.split(" ")[0];
+  let users = getUsers();
+  let logs = getLogs();
+  document.getElementById("totalUsers").innerHTML = users.length;
+  document.getElementById("totalStudents").innerHTML = users.filter(
+    (u) => u.role === "student",
+  ).length;
+  document.getElementById("totalWorkplace").innerHTML = users.filter(
     (u) => u.role === "workplace_supervisor",
   ).length;
-  const academic = users.filter((u) => u.role === "academic_supervisor").length;
-  const pending = logs.filter((l) => l.status === "pending").length;
-
-  const totalUsers = document.getElementById("totalUsers");
-  const totalStudents = document.getElementById("totalStudents");
-  const totalWorkplace = document.getElementById("totalWorkplace");
-  const totalAcademic = document.getElementById("totalAcademic");
-  const totalLogs = document.getElementById("totalLogs");
-  const pendingLogs = document.getElementById("pendingLogs");
-  const userCount = document.getElementById("userCount");
-  const logsCount = document.getElementById("logsCount");
-
-  if (totalUsers) totalUsers.textContent = users.length;
-  if (totalStudents) totalStudents.textContent = students;
-  if (totalWorkplace) totalWorkplace.textContent = workplace;
-  if (totalAcademic) totalAcademic.textContent = academic;
-  if (totalLogs) totalLogs.textContent = logs.length;
-  if (pendingLogs) pendingLogs.textContent = pending;
-  if (userCount) userCount.textContent = users.length;
-  if (logsCount) logsCount.textContent = logs.length;
-}
-
-function displayAdminUsers() {
-  const users = getUsers();
-  const tbody = document.getElementById("usersTableBody");
-
-  if (!tbody) return;
-
-  tbody.innerHTML = users
+  document.getElementById("totalAcademic").innerHTML = users.filter(
+    (u) => u.role === "academic_supervisor",
+  ).length;
+  document.getElementById("totalLogs").innerHTML = logs.length;
+  document.getElementById("pendingLogs").innerHTML = logs.filter(
+    (l) => l.status === "pending",
+  ).length;
+  document.getElementById("usersTableBody").innerHTML = users
     .map(
-      (user) => `
-        <tr>
-            <td>${user.username}</td>
-            <td>${user.fullName}</td>
-            <td>${user.email || "-"}</td>
-            <td>${user.role.replace("_", " ")}</td>
-        </tr>
-    `,
+      (u) =>
+        `<tr><td>${u.username}<tr><td>${u.fullName}</td><td>${u.email || "-"}</td><td>${u.role.replace("_", " ")}</td></tr>`,
     )
     .join("");
-}
-
-function displayAdminLogs() {
-  const logs = getLogs();
-  const container = document.getElementById("allLogs");
-
-  if (!container) return;
-
-  if (logs.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No logs yet</p></div>';
-    return;
-  }
-
-  container.innerHTML = logs
-    .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
-    .map((log) => {
-      const student = getUsers().find((u) => u.id === log.studentId);
-      return `
-            <div class="log-item">
-                <div class="log-header">
-                    <span class="log-student">${student?.fullName || log.studentName}</span>
-                    <span class="log-week">Week ${log.week}</span>
-                    <span class="log-status status-${log.status}">${log.status}</span>
-                </div>
-                <div class="log-activities">${log.activities.substring(0, 100)}...</div>
-                <div class="log-date">${formatDate(log.submittedAt)}</div>
-            </div>
-        `;
+  document.getElementById("allLogs").innerHTML = logs
+    .map((l) => {
+      let s = users.find((u) => u.id === l.studentId);
+      return `<div><strong>${s?.fullName}</strong> - Week ${l.week} - ${l.status}</div>`;
     })
     .join("");
 }
-// ============================================
-// SECTION 12: MULTI-STEP FORM FUNCTIONS
-// ============================================
 
-let currentStep = 1;
-const totalSteps = 4;
-
-function updateStepVisibility() {
-  console.log("Updating step visibility to:", currentStep);
-
-  for (let i = 1; i <= totalSteps; i++) {
-    const section = document.getElementById(`section${i}`);
-    const step = document.getElementById(`step${i}`);
-    if (section) section.classList.remove("active");
-    if (step) {
-      step.classList.remove("active");
-      step.classList.remove("completed");
-    }
-  }
-
-  const currentSection = document.getElementById(`section${currentStep}`);
-  if (currentSection) currentSection.classList.add("active");
-
-  const currentStepElement = document.getElementById(`step${currentStep}`);
-  if (currentStepElement) currentStepElement.classList.add("active");
-
-  for (let i = 1; i < currentStep; i++) {
-    const prevStep = document.getElementById(`step${i}`);
-    if (prevStep) prevStep.classList.add("completed");
-  }
-
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const submitBtn = document.getElementById("submitBtn");
-
-  if (prevBtn)
-    prevBtn.style.display = currentStep === 1 ? "none" : "inline-flex";
-  if (nextBtn)
-    nextBtn.style.display = currentStep === totalSteps ? "none" : "inline-flex";
-  if (submitBtn)
-    submitBtn.style.display =
-      currentStep === totalSteps ? "inline-flex" : "none";
-
-  if (currentStep === totalSteps) {
-    populateReview();
-  }
+// ========== 12. APPLICATION FORM (Multi-step) ==========
+let step = 1;
+function setupApplicationForm() {
+  updateStep();
+  document.getElementById("nextBtn").onclick = nextStep;
+  document.getElementById("prevBtn").onclick = prevStep;
+  document.getElementById("submitBtn").onclick = submitApp;
 }
-
-function validateStep(step) {
-  if (step === 1) {
-    const studentName = document.getElementById("studentName")?.value.trim();
-    const regNumber = document.getElementById("regNumber")?.value.trim();
-    const email = document.getElementById("email")?.value.trim();
-    const phone = document.getElementById("phone")?.value.trim();
-    const address = document.getElementById("address")?.value.trim();
-
-    if (!studentName) {
-      alert("Please enter your full name");
+function updateStep() {
+  for (let i = 1; i <= 4; i++) {
+    let s = document.getElementById(`section${i}`);
+    if (s) s.classList.remove("active");
+    let st = document.getElementById(`step${i}`);
+    if (st) {
+      st.classList.remove("active", "completed");
+    }
+  }
+  document.getElementById(`section${step}`).classList.add("active");
+  document.getElementById(`step${step}`).classList.add("active");
+  for (let i = 1; i < step; i++)
+    document.getElementById(`step${i}`).classList.add("completed");
+  document.getElementById("prevBtn").style.display =
+    step === 1 ? "none" : "inline-flex";
+  document.getElementById("nextBtn").style.display =
+    step === 4 ? "none" : "inline-flex";
+  document.getElementById("submitBtn").style.display =
+    step === 4 ? "inline-flex" : "none";
+  if (step === 4) populateReview();
+}
+function validate(s) {
+  if (s === 1) {
+    if (!studentName.value) {
+      alert("Enter name");
       return false;
     }
-    if (!regNumber) {
-      alert("Please enter registration number");
+    if (!regNumber.value) {
+      alert("Enter registration");
       return false;
     }
-    if (!email || !email.includes("@")) {
-      alert("Please enter valid email");
-      return false;
-    }
-    if (!phone) {
-      alert("Please enter phone number");
-      return false;
-    }
-    if (!address) {
-      alert("Please enter address");
+    if (!email.value.includes("@")) {
+      alert("Valid email");
       return false;
     }
     return true;
   }
-
-  if (step === 2) {
-    const academicProgram = document
-      .getElementById("academicProgram")
-      ?.value.trim();
-    const department = document.getElementById("department")?.value.trim();
-    const yearOfStudy = document.getElementById("yearOfStudy")?.value.trim();
-    const courseCode = document.getElementById("courseCode")?.value.trim();
-    const expectedGraduation =
-      document.getElementById("expectedGraduation")?.value;
-
-    if (!academicProgram) {
-      alert("Please enter academic program");
-      return false;
-    }
-    if (!department) {
-      alert("Please enter department");
-      return false;
-    }
-    if (!yearOfStudy) {
-      alert("Please enter year of study");
-      return false;
-    }
-    if (!courseCode) {
-      alert("Please enter course code");
-      return false;
-    }
-    if (!expectedGraduation) {
-      alert("Please select expected graduation date");
+  if (s === 2) {
+    if (!academicProgram.value) {
+      alert("Enter program");
       return false;
     }
     return true;
   }
-
-  if (step === 3) {
-    const organization = document.getElementById("organization")?.value.trim();
-    const orgSupervisor = document
-      .getElementById("orgSupervisor")
-      ?.value.trim();
-    const internshipWeeks = document.getElementById("internshipWeeks")?.value;
-    const internshipDuration =
-      document.getElementById("internshipDuration")?.value;
-
-    if (!organization) {
-      alert("Please enter organization name");
-      return false;
-    }
-    if (!orgSupervisor) {
-      alert("Please enter supervisor name");
-      return false;
-    }
-    if (!internshipWeeks) {
-      alert("Please select internship weeks");
-      return false;
-    }
-    if (!internshipDuration) {
-      alert("Please select internship duration");
+  if (s === 3) {
+    if (!organization.value) {
+      alert("Enter organization");
       return false;
     }
     return true;
   }
-
   return true;
 }
-
 function nextStep() {
-  console.log("Next button clicked! Current step:", currentStep);
-  if (validateStep(currentStep)) {
-    if (currentStep < totalSteps) {
-      currentStep++;
-      updateStepVisibility();
-      console.log("Now at step:", currentStep);
-    }
+  if (validate(step) && step < 4) {
+    step++;
+    updateStep();
   }
 }
-
 function prevStep() {
-  if (currentStep > 1) {
-    currentStep--;
-    updateStepVisibility();
+  if (step > 1) {
+    step--;
+    updateStep();
   }
 }
-
-function getStepNumber(fieldId) {
-  const step1Fields = ["studentName", "regNumber", "email", "phone", "address"];
-  const step2Fields = [
-    "academicProgram",
-    "department",
-    "yearOfStudy",
-    "courseCode",
-    "expectedGraduation",
-    "gpa",
-  ];
-  if (step1Fields.includes(fieldId)) return 1;
-  if (step2Fields.includes(fieldId)) return 2;
-  return 3;
-}
-
 function populateReview() {
-  const container = document.getElementById("reviewContainer");
-  if (!container) return;
-
-  const fields = [
-    { label: "Student Name", id: "studentName" },
-    { label: "Registration Number", id: "regNumber" },
-    { label: "Email", id: "email" },
-    { label: "Phone", id: "phone" },
-    { label: "Address", id: "address" },
-    { label: "Academic Program", id: "academicProgram" },
-    { label: "Department", id: "department" },
-    { label: "Year of Study", id: "yearOfStudy" },
-    { label: "Course Code", id: "courseCode" },
-    { label: "Expected Graduation", id: "expectedGraduation" },
-    { label: "GPA", id: "gpa" },
-    { label: "Organization", id: "organization" },
-    { label: "Organization Address", id: "orgAddress" },
-    { label: "Supervisor", id: "orgSupervisor" },
-    { label: "Supervisor Email", id: "supervisorEmail" },
-    { label: "Internship Weeks", id: "internshipWeeks" },
-    { label: "Internship Duration", id: "internshipDuration" },
-  ];
-
-  let html = "";
-  for (const field of fields) {
-    const element = document.getElementById(field.id);
-    let value = element ? element.value : "Not provided";
-    if (value === "") value = "Not provided";
-    if (field.id === "internshipWeeks" && element) {
-      value = element.options[element.selectedIndex]?.text || "Not provided";
-    }
-    if (field.id === "internshipDuration" && element) {
-      value = element.options[element.selectedIndex]?.text || "Not provided";
-    }
-    html += `
-            <div class="review-item">
-                <span class="review-label">${field.label}:</span>
-                <span class="review-value">${escapeHtml(value)}</span>
-                <span class="review-edit" onclick="goToStep(${getStepNumber(field.id)})">Edit</span>
-            </div>
-        `;
-  }
-  container.innerHTML = html;
+  document.getElementById("reviewContainer").innerHTML =
+    `<div>Name: ${studentName.value}</div><div>Registration: ${regNumber.value}</div><div>Email: ${email.value}</div><div>Program: ${academicProgram.value}</div><div>Organization: ${organization.value}</div>`;
 }
-
-function goToStep(step) {
-  currentStep = step;
-  updateStepVisibility();
-}
-
-function submitApplicationForm(e) {
+function submitApp(e) {
   e.preventDefault();
-
-  if (!validateStep(3)) return;
-
-  const user = getCurrentUser();
-  if (!user) {
-    alert("Please login first");
-    window.location.href = "welcome.html";
-    return;
-  }
-
-  const applicationData = {
-    studentId: user.id,
-    studentName: document.getElementById("studentName")?.value,
-    regNumber: document.getElementById("regNumber")?.value,
-    email: document.getElementById("email")?.value,
-    phone: document.getElementById("phone")?.value,
-    address: document.getElementById("address")?.value,
-    academicProgram: document.getElementById("academicProgram")?.value,
-    department: document.getElementById("department")?.value,
-    yearOfStudy: document.getElementById("yearOfStudy")?.value,
-    courseCode: document.getElementById("courseCode")?.value,
-    expectedGraduation: document.getElementById("expectedGraduation")?.value,
-    gpa: document.getElementById("gpa")?.value,
-    organization: document.getElementById("organization")?.value,
-    orgAddress: document.getElementById("orgAddress")?.value,
-    orgSupervisor: document.getElementById("orgSupervisor")?.value,
-    supervisorEmail: document.getElementById("supervisorEmail")?.value,
-    internshipWeeks: document.getElementById("internshipWeeks")?.value,
-    internshipDuration: document.getElementById("internshipDuration")?.value,
-    startDate: document.getElementById("startDate")?.value,
-    submittedAt: new Date().toISOString(),
-  };
-
-  let applications = JSON.parse(
-    localStorage.getItem("iles_applications") || "[]",
-  );
-  applications.push(applicationData);
-  localStorage.setItem("iles_applications", JSON.stringify(applications));
-
-  const formBody = document.querySelector(".form-body");
-  if (formBody) {
-    formBody.innerHTML = `
-            <div class="success-message">
-                <i class="fas fa-check-circle"></i>
-                <h3>Application Submitted Successfully! 🎉</h3>
-                <p>Your internship application has been received.</p>
-                <a href="student_dashboard.html" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 30px; border-radius: 12px; text-decoration: none; display: inline-block;">Go to Dashboard</a>
-            </div>
-        `;
-    const progressSteps = document.querySelector(".progress-steps");
-    if (progressSteps) progressSteps.style.display = "none";
-  }
-
-  alert("Application submitted successfully!");
+  alert("Application submitted!");
+  setTimeout(() => (window.location.href = "student_dashboard.html"), 2000);
 }
 
-function initApplicationForm() {
-  console.log("Initializing application form...");
-
-  // Check if we're on the right page
-  const hasForm = document.getElementById("applicationForm");
-  if (!hasForm) {
-    console.log("No application form found on this page");
-    return;
-  }
-
-  console.log("Found application form, setting up event listeners...");
-
-  updateStepVisibility();
-
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const submitBtn = document.getElementById("submitBtn");
-  const form = document.getElementById("applicationForm");
-
-  console.log(
-    "Buttons found - Prev:",
-    !!prevBtn,
-    "Next:",
-    !!nextBtn,
-    "Submit:",
-    !!submitBtn,
-  );
-
-  if (prevBtn) {
-    prevBtn.addEventListener("click", prevStep);
-    console.log("Previous button listener added");
-  }
-  if (nextBtn) {
-    nextBtn.addEventListener("click", nextStep);
-    console.log("Next button listener added");
-  }
-  if (submitBtn) {
-    submitBtn.addEventListener("click", submitApplicationForm);
-    console.log("Submit button listener added");
-  }
-  if (form) {
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-    });
-  }
-}
-// ============================================
-// SECTION 13: MAIN INITIALIZATION
-// ============================================
-
+// ========== 13. MAIN CONTROLLER (This runs when page loads) ==========
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("DOM Content Loaded - Initializing...");
-
   initDefaultData();
+  let page = window.location.pathname.split("/").pop();
 
-  const path = window.location.pathname;
-  const fileName = path.split("/").pop();
-  const pageUrl = window.location.href;
+  console.log("ILES System loaded on:", page);
 
-  console.log("Current page:", fileName);
-  console.log("Full URL:", pageUrl);
-
-  // Check for welcome page
-  if (
-    fileName === "welcome.html" ||
-    fileName === "" ||
-    document.body.classList.contains("welcome-page")
-  ) {
-    initWelcomePage();
-  }
-  // Check for student dashboard
-  else if (fileName === "student_dashboard.html") {
-    loadStudentDashboard();
-    const logoutBtn = document.querySelector(".logout-btn");
-    if (logoutBtn) logoutBtn.onclick = logout;
-  }
-  // Check for log page
-  else if (fileName === "log.html") {
-    initLogPage();
-    const logoutBtn = document.querySelector(".logout-btn");
-    if (logoutBtn) logoutBtn.onclick = logout;
-  }
-  // Check for workplace supervisor
-  else if (fileName === "workplace_supervisor.html") {
-    initWorkplaceDashboard();
-    const logoutBtn = document.querySelector(".logout-btn");
-    if (logoutBtn) logoutBtn.onclick = logout;
-    const reviewForm = document.getElementById("reviewForm");
-    if (reviewForm)
-      reviewForm.addEventListener("submit", submitWorkplaceReview);
-  }
-  // Check for academic supervisor
-  else if (fileName === "academic_supervisor.html") {
-    initAcademicDashboard();
-    const logoutBtn = document.querySelector(".logout-btn");
-    if (logoutBtn) logoutBtn.onclick = logout;
-    const modalForm = document.getElementById("modalReviewForm");
-    if (modalForm) modalForm.addEventListener("submit", submitAcademicReview);
-  }
-  // Check for admin dashboard
-  else if (fileName === "admin.html") {
-    initAdminDashboard();
-    const logoutBtn = document.querySelector(".logout-btn");
-    if (logoutBtn) logoutBtn.onclick = logout;
-  }
-  // ✅ FIXED: Check for application page - MORE FLEXIBLE
-  else if (
-    fileName.includes("application") ||
-    fileName.includes("internship") ||
-    document.getElementById("applicationForm")
-  ) {
-    console.log("Application page detected!");
-    initApplicationForm();
-  }
-
-  console.log("ILES System loaded on:", fileName);
+  if (page === "welcome.html") setupWelcome();
+  else if (page === "student_dashboard.html") loadStudentDashboard();
+  else if (page === "log.html") setupLogPage();
+  else if (page === "workplace_supervisor.html") setupWorkplace();
+  else if (page === "academic_supervisor.html") setupAcademic();
+  else if (page === "admin.html") setupAdmin();
+  else if (page.includes("application")) setupApplicationForm();
 });
