@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('user');
-      const token = localStorage.getitem('token');
+      const token = localStorage.getItem('token');
       if (saved) setUser(JSON.parse(saved));
       if (token) api.defaults.headers.common['Authorization'] = `Token ${token}`;
     } catch {}
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post('/api/login/', { username, password });
       setUser(data.user);
       localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setname('token', data.token);
+      localStorage.setItem('token', data.token);
       api.defaults.headers.common['Authorization'] = `Token ${data.token}`;
       return true;
     } catch {
