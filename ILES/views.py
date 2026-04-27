@@ -134,7 +134,7 @@ def login(request):
             "error": "Username and password are required"
         }, status=status.HTTP_400_BAD_REQUEST)
     #authenticate the user
-    user = `authenticate(username=username, password=password)
+    user = authenticate(username=username, password=password)
     if user: #getting token from user
         token, _ = Token.objects.get_or_create(user=user)
         return Response({
