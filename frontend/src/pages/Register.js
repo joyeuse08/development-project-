@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
+import axios from 'axios';
+=======
 import { useAuth } from '../context/AuthContext';
 
+>>>>>>> 7988d038061275bf0c59bfd791e61960b93a7a08
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -21,7 +25,27 @@ const Register = () => {
     }
   };
 
+const handleSubmit = async(e) => {
+  e.preventDefault();
   
+  try{
+    const response = await axios.post(
+"http://127.0.0.1:8000/api/register/",
+          {
+            username,
+            email,
+            password
+          }
+    );
+  
+     console.log(response.data);
+     alert("Registered successfully");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+   
   return (
     <form onSubmit={handleSubmit}>
       <h2>Register</h2>
