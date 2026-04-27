@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log
+from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log, Notification
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
 
 
@@ -134,7 +134,7 @@ def login(request):
             "error": "Username and password are required"
         }, status=status.HTTP_400_BAD_REQUEST)
     #authenticate the user
-    user = authenticate(username=username, password=password)
+    user = `authenticate(username=username, password=password)
     if user: #getting token from user
         token, _ = Token.objects.get_or_create(user=user)
         return Response({
