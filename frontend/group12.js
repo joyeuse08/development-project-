@@ -2,7 +2,7 @@
 // ILES SYSTEM
 // ============================================
 
-// ========== 1. STORAGE (Save/Load Data) ==========
+// ========== 1. STORAGE -Save/Load Data ==========
 function getUsers() {
   return JSON.parse(localStorage.getItem("iles_users") || "[]");
 }
@@ -45,7 +45,7 @@ function showMessage(msg, type) {
   let d = document.createElement("div");
   d.className = `message ${type}`;
   d.textContent = msg;
-  d.style.cssText = `position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:8px;z-index:9999;background:${type === "success" ? "#d4edda" : "#f8d7da"};color:${type === "success" ? "#155724" : "#721c24"}`;
+  d.style.cssText = `position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:8px;z-index:9999;background:${type === "success" ? "#d4edda" : "#f8d7da"};color:${type === "success" ? "#155724" : "#721c24"};font-weight:bold;`;
   document.body.appendChild(d);
   setTimeout(() => d.remove(), 3000);
 }
@@ -59,7 +59,7 @@ function escapeHtml(t) {
   return d.innerHTML;
 }
 
-// ========== 3. DEFAULT DATA (First time only) ==========
+// ========== 3. DEFAULT DATA-First time only ==========
 function initDefaultData() {
   if (getUsers().length === 0) {
     saveUsers([
@@ -291,13 +291,13 @@ function setupLogPage() {
   document.getElementById("logForm").onsubmit = (e) => {
     e.preventDefault();
     let week = parseInt(weekNumber.value);
-    let activities = activities.value.trim();
-    let challenges = challenges.value.trim();
+    let activitiesText = document.getElementById("activities").value.trim();
+    let challengesText = document.getElementById("challenges").value.trim();
     if (!week || week < 1 || week > 52) {
       showMessage("Week must be 1-52", "error");
       return;
     }
-    if (activities.length < 10) {
+    if (activitiesText.length < 10) {
       showMessage("Describe activities", "error");
       return;
     }
@@ -309,9 +309,9 @@ function setupLogPage() {
       studentId: user.id,
       studentName: user.fullName,
       week: week,
-      activities: activities,
-      challenges: challenges,
-      learnings: learnings.value || "",
+      activities: activitiesText,
+      challenges: challengesText,
+      learnings: document.getElementById("learnings").value || "",
     });
     showMessage(`Week ${week} submitted!`, "success");
     e.target.reset();
@@ -324,7 +324,7 @@ function displayUserLogs() {
     ? logs
         .map(
           (l) =>
-            `<div class="log-item"><div><strong>Week ${l.week}</strong> - ${l.status}</div><div>${l.activities}</div>${l.workplaceFeedback ? `<div>Feedback: ${l.workplaceFeedback}</div>` : ""}<div><small>${formatDate(l.submittedAt)}</small></div></div>`,
+            `<div class="log-item"><div><strong>Week ${l.week}</strong> - ${l.status}</div><div>${l.activities}</div>${l.workplaceFeedback ? `<div>Feedback: ${l.workplaceFeedback}</div>` : ""}<div>Score: ${l.workplaceScore || "-"}/10</div></div>`,
         )
         .join("")
     : "<div>No logs yet</div>";
@@ -475,7 +475,7 @@ function setupAdmin() {
   document.getElementById("usersTableBody").innerHTML = users
     .map(
       (u) =>
-        `<tr><td>${u.username}<tr><td>${u.fullName}</td><td>${u.email || "-"}</td><td>${u.role.replace("_", " ")}</td></tr>`,
+        `<tr><td>${u.username}</td><td>${u.fullName}</td><td>${u.email || "-"}</td><td>${u.role.replace("_", " ")}</td></tr>`,
     )
     .join("");
   document.getElementById("allLogs").innerHTML = logs
@@ -486,7 +486,7 @@ function setupAdmin() {
     .join("");
 }
 
-// ========== 12. APPLICATION FORM (Multi-step) ==========
+// ========== 12. APPLICATION FORM -Multi-step ==========
 let step = 1;
 function setupApplicationForm() {
   updateStep();
@@ -565,11 +565,17 @@ function populateReview() {
 }
 function submitApp(e) {
   e.preventDefault();
+  console.log("hello - Application form submission started");
+  console.log("Processing form data...");
+  console.log("Validating student information...");
   alert("Application submitted!");
+  console.log("Application submitted successfully");
+  console.log("Redirecting to student dashboard...");
+  console.log("goodbye - Application form submission complete");
   setTimeout(() => (window.location.href = "student_dashboard.html"), 2000);
 }
 
-// ========== 13. MAIN CONTROLLER (This runs when page loads) ==========
+// ========== 13. MAIN CONTROLLER -This runs when page loads==========
 document.addEventListener("DOMContentLoaded", function () {
   initDefaultData();
   let page = window.location.pathname.split("/").pop();
