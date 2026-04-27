@@ -89,9 +89,9 @@ class IssueViewSet(viewsets.ModelViewSet):
 def register(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
-         user = serializer.save()
+        user = serializer.save()
 
-         #assign user to group based on role
+        #assign user to group based on role
         role = request.data.get("role", "student")
         group_name = {
             "student": "Student",
@@ -102,10 +102,10 @@ def register(request):
 
         group, _ = Group.objects.get_or_create(name=group_name)
         user.groups.add(group)
-         group, created = Group.objects.get_or_create(name=group_name)
-         user.groups.add(group)
 
-         #create a token for the user
+        
+
+        #create a token for the user
         token, _ = Token.objects.get_or_create(user=user)
     
         return Response({
@@ -133,7 +133,7 @@ def login(request):
         return Response({
             "error": "Username and password are required"
         }, status=status.HTTP_400_BAD_REQUEST)
-     # authenticate the user
+    #authenticate the user
     user = authenticate(username=username, password=password)
     if user: #getting token from user
         token, _ = Token.objects.get_or_create(user=user)
@@ -193,7 +193,7 @@ def search_items(request):
     academic_serializer = Academic_Supervisor_FeedbackSerializer(academic_feedbacks, many=True)
     issue_serializer = IssueSerializer(issues, many=True)
 
-     return Response({
+    return Response({
         "placements": placement_serializer.data,
         "logs": log_serializer.data,
         "feedbacks": feedback_serializer.data,
