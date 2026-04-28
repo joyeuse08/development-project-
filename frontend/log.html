@@ -16,9 +16,7 @@
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
     </div>
-
     <div class="container">
-      <!-- Welcome Banner -->
       <div class="welcome-banner">
         <div class="welcome-text">
           <h2>Welcome, <span id="welcomeName">Student</span>! 👋</h2>
@@ -29,8 +27,6 @@
           <div class="label">Total Logs</div>
         </div>
       </div>
-
-      <!-- Submit Log Form -->
       <div class="form-card">
         <div class="form-header">
           <i class="fas fa-pen-alt"></i>
@@ -56,7 +52,6 @@
                 <input type="date" id="logDate" />
               </div>
             </div>
-
             <div class="form-group">
               <label>Activities Done <span class="required">*</span></label>
               <textarea
@@ -69,7 +64,6 @@
                 <span id="activitiesCount">0</span> characters
               </div>
             </div>
-
             <div class="form-group">
               <label>Challenges Faced <span class="required">*</span></label>
               <textarea
@@ -82,7 +76,6 @@
                 <span id="challengesCount">0</span> characters
               </div>
             </div>
-
             <div class="form-group">
               <label>Key Learnings & Takeaways</label>
               <textarea
@@ -94,7 +87,6 @@
                 <span id="learningsCount">0</span> characters
               </div>
             </div>
-
             <div class="form-row">
               <div class="form-group">
                 <label>Hours Worked</label>
@@ -116,12 +108,10 @@
                 </select>
               </div>
             </div>
-
             <button type="submit" class="btn-submit">Submit Weekly Log</button>
           </form>
         </div>
       </div>
-      <!-- My Logs Section -->
       <div class="logs-card">
         <div class="logs-header">
           <h2>My Submitted Logs</h2>
@@ -139,7 +129,6 @@
           </select>
         </div>
         <div id="logsContainer" class="logs-container">
-          <!-- Logs will be loaded here -->
           <div class="empty-state">
             <div class="empty-state-icon"></div>
             <p>No logs submitted yet</p>

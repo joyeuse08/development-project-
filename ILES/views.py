@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log
+from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log, Notification
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
 
 
@@ -41,7 +41,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
     def review(self, request, pk=None):
         weekly_log = self.get_object()
         weekly_log.status = request.data.get('status', weekly_log.status)
-        weekly_log.feedback = request.data.get('feedback', '')
+        
         weekly_log.save()
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
     
@@ -63,7 +63,7 @@ class Student_logViewSet(viewsets.ModelViewSet):
     def review(self, request, pk=None):
         student_log = self.get_object()
         student_log.status = request.data.get('status', student_log.status)
-        student_log.feedback = request.data.get('feedback', '')
+        
         student_log.save()
         return Response({'message': 'Student Log updated', 'status': student_log.status})
 
@@ -87,43 +87,39 @@ class IssueViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
-    serializer = CustomUserSerializer(data=request.data)
+    serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
-         user = serializer.save()
+        user = serializer.save()
 
-         #setting the passsword properly
-         user.set_password(request.data["password"])
-         user.save()
+        #assign user to group based on role
+        role = request.data.get("role", "student")
+        group_name = {
+            "student": "Student",
+            "workplace": "Workplace Supervisor",
+            "academic": "Academic Supervisor",
+            "admin": "Internship Administrator"
+        }.get(role, "Student")
 
-         #assigning user to group based on role
-         role = request.data.get("role", "student")
-         group_name = {
-             "student": "Student",
-             "workplace_supervisor": "Workplace Supervisor",
-             "academic_supervisor": "Academic Supervisor",
-             "admin": "Internship Administrator"
-         }.get(role, "Student")
+        group, _ = Group.objects.get_or_create(name=group_name)
+        user.groups.add(group)
 
-         group, created = Group.objects.get_or_create(name=group_name)
-         user.groups.add(group)
+        
 
-         #create a token for the user
-         token, _ = Token.objects.get_or_create(user=user)
+        #create a token for the user
+        token, _ = Token.objects.get_or_create(user=user)
     
-    return Response({
-        "message": "Registration succcesful",
-        "token": token.key,
-        "user": { 
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "role": user.role,
-        }
-    }, status=status.HTTP_201_CREATED)
-    if serializer.is_valid():
-     return Response({...}, status=status.HTTP_201_CREATED)
-    else:
-     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "message": "Registration successful",
+            "token": token.key,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "role": user.role,
+            }
+        }, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
  # login view
 @api_view(['POST'])
@@ -137,7 +133,7 @@ def login(request):
         return Response({
             "error": "Username and password are required"
         }, status=status.HTTP_400_BAD_REQUEST)
-     # authenticate the user
+    #authenticate the user
     user = authenticate(username=username, password=password)
     if user: #getting token from user
         token, _ = Token.objects.get_or_create(user=user)
@@ -188,90 +184,35 @@ def search_items(request):
     query = request.query_params.get('q', '')
     placements = Internship_Placement.objects.filter(company_name__icontains=query)
     logs = Weekly_Log.objects.filter(activities__icontains=query)
-    feedbacks = Supervisor_Feedback.objects.filter(feedback__icontains=query) | Academic_Supervisor_Feedback.objects.filter(feedback__icontains=query)
-    issues = Issue.objects.filter(description__icontains=query)
-
+    feedbacks = Supervisor_Feedback.objects.filter(comments__icontains=query)
+    academic_feedbacks = Academic_Supervisor_Feedback.objects.filter(comments__icontains=query)
+    issues = Issue.objects.filter(issue_type__icontains=query)
     placement_serializer = Internship_PlacementSerializer(placements, many=True)
     log_serializer = Weekly_LogSerializer(logs, many=True)
     feedback_serializer = Supervisor_FeedbackSerializer(feedbacks, many=True)
+    academic_serializer = Academic_Supervisor_FeedbackSerializer(academic_feedbacks, many=True)
     issue_serializer = IssueSerializer(issues, many=True)
 
     return Response({
         "placements": placement_serializer.data,
         "logs": log_serializer.data,
         "feedbacks": feedback_serializer.data,
+        "academic_feedbacks": academic_serializer.data,
         "issues": issue_serializer.data,
     }, status=status.HTTP_200_OK)
 
 
-
-
-from .models import Notification
-
-def submit_report(request):
-    report.save()
-    supervisors = User.objects.filter(role__in=['internship_supervisor', 'academic_supervisor', 'workplace_supervisor'])
-    
-    for supervisor in supervisors:
-        Notification.objects.create(
-            recipient=supervisor,
-            actor=request.user,  # The intern
-            verb=f'submitted a report: {report.title}',
-            target_id=report.id,
-            target_type='report'
-        )
-    
-    return Response({'message': 'Report submitted and notifications sent'})
-
-def approve_report(request, report_id):
-    report = Report.objects.get(id=report_id)
-    report.status = 'approved'
-    report.save()
-    
-    
-    Notification.objects.create(
-        recipient=report.intern,
-        actor=request.user,  # The supervisor
-        verb=f'approved your report: {report.title}',
-        target_id=report.id,
-        target_type='report'
-    )
-    
-    return Response({'message': 'Report approved'})
-
-
-def add_comment(request, report_id):
-    comment = Comment.objects.create(
-        report_id=report_id,
-        author=request.user,
-        content=request.data['content']
-    )
-    
-    report = Report.objects.get(id=report_id)
-    
-    if request.user != report.intern:
-        Notification.objects.create(
-            recipient=report.intern,
-            actor=request.user,
-            verb=f'commented on your report: {comment.content[:50]}',
-            target_id=comment.id,
-            target_type='comment'
-        )
-    
-    return Response({'message': 'Comment added'})
-
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import Notification
 from .serializers import NotificationSerializer
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_notifications(request):
-    notifications = request.user.notifications.all()[:50]  # Last 50 notifications
+    notifications = request.user.received_notifications.all()[:50]
     serializer = NotificationSerializer(notifications, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def mark_notification_read(request, id):
     notification = Notification.objects.get(id=id, recipient=request.user)
     notification.is_read = True
