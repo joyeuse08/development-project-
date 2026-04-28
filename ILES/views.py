@@ -12,18 +12,19 @@ from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, 
 
 
 # Create your views here.
-#Custom User views
+# Custom User views
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
-#Internship placement views
+# Internship placement views
 class Internship_PlacementViewSet(viewsets.ModelViewSet):
     queryset = Internship_Placement.objects.all()
     serializer_class = Internship_PlacementSerializer
     
-#Weekly log views
+# Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
+    queryset= weekly_log.object.all()
     serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
         user = self.request.user
@@ -32,7 +33,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         if hasattr(user, 'profile') and user.profile.role == 'supervisor':
             queryset = (queryset.filter(supervisor=user))
 
-        status = self.request.query_params.get('status')
+        log_status = self.request.query_params.get('status')
         if status:
             queryset = queryset.filter(status=status)
         return queryset 
@@ -46,6 +47,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
     
 class Student_logViewSet(viewsets.ModelViewSet):
+    queryset = weekly_log.objects.all()
     serializer_class = Student_logSerializer
     def get_queryset(self):
         user = self.request.user
@@ -54,7 +56,7 @@ class Student_logViewSet(viewsets.ModelViewSet):
         if hasattr(user, 'profile') and user.profile.role == 'supervisor':
             queryset = (queryset.filter(supervisor=user))
 
-        status = self.request.query_params.get('status')
+        log_status = self.request.query_params.get('status')
         if status:
             queryset = queryset.filter(status=status)
         return queryset
@@ -91,7 +93,7 @@ def register(request):
     if serializer.is_valid():
         user = serializer.save()
 
-        #assign user to group based on role
+        # assign user to group based on role
         role = request.data.get("role", "student")
         group_name = {
             "student": "Student",
@@ -105,7 +107,7 @@ def register(request):
 
         
 
-        #create a token for the user
+        # create a token for the user
         token, _ = Token.objects.get_or_create(user=user)
     
         return Response({
@@ -128,12 +130,12 @@ def login(request):
     username = request.data.get("username")
     password = request.data.get("password")
     
-    #check if username and password are provided
+    # check if username and password are provided
     if not username or not password:
         return Response({
             "error": "Username and password are required"
         }, status=status.HTTP_400_BAD_REQUEST)
-    #authenticate the user
+    # authenticate the user
     user = authenticate(username=username, password=password)
     if user: #getting token from user
         token, _ = Token.objects.get_or_create(user=user)
@@ -153,7 +155,7 @@ def login(request):
         "error": "Invalid credentials"
     }, status=status.HTTP_401_UNAUTHORIZED)
 
-#logout view
+# logout view
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def logout(request):
@@ -163,7 +165,7 @@ def logout(request):
         {"message": "Logged out succesfully"},
         status=status.HTTP_200_OK)
 
-#Me view
+# Me view
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def me(request):
@@ -214,7 +216,7 @@ def get_notifications(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_notification_read(request, id):
-    notification = Notification.objects.get(id=id, recipient=request.user)
+    notification = Notification.get_object_or_404(id=id, recipient=request.user)
     notification.is_read = True
     notification.save()
     return Response({'status': 'read'})
