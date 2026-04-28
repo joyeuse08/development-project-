@@ -38,10 +38,10 @@ class Internship_Placement(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     workplace_supervisor = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,
-        null=True, blank=True, related_name="workplace_supervised",limit_choices_to={'role': 'workplace_supervisor'},
+        null=True, blank=True, related_name="workplace_supervised",limit_choices_to={'role': 'workplace'},
     )    
     academic_supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
-        null= True, blank=True, related_name="academic_supervised",limit_choices_to={'role': 'academic_supervisor'},
+        null= True, blank=True, related_name="academic_supervised",limit_choices_to={'role': 'academic'},
     )                                     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     def __str__(self):
@@ -80,7 +80,7 @@ class Student_log(models.Model):
         ('rejected', 'Rejected'),   
     ] 
     student = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='logs')
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null =True, blank =True, related_name='student_logs', limit_choices_to={'role': 'workplace_supervisor'})
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null =True, blank =True, related_name='student_logs', limit_choices_to={'role': 'workplace'})
     title = models.CharField(max_length=255,null=True, blank=True)
     date=models.DateField()
     description = models.TextField()
@@ -98,7 +98,7 @@ class Supervisor_Feedback(models.Model):
     placement=models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='supervisor_feedbacks', null =True, blank=True)
     weekly_log = models.OneToOneField(Weekly_Log, on_delete=models.CASCADE, related_name='feedbacks')
     student_log = models.ForeignKey(Student_log, on_delete=models.CASCADE, related_name='supervisor_feedbacks', null=True, blank=True)
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='feedback_given',limit_choices_to={'role': 'workplace_supervisor'})
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='feedback_given',limit_choices_to={'role': 'workplace'})
     comments = models.TextField()
     supervisor_score = models.PositiveIntegerField()
     evaluated_at = models.DateTimeField(auto_now_add=True)
