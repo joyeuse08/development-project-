@@ -24,7 +24,7 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
     
 # Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
-    queryset= weekly_log.object.all()
+    queryset= weekly_log.objects.all()
     serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
         user = self.request.user
@@ -47,7 +47,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
     
 class Student_logViewSet(viewsets.ModelViewSet):
-    queryset = weekly_log.objects.all()
+    queryset = student_log.objects.all()
     serializer_class = Student_logSerializer
     def get_queryset(self):
         user = self.request.user
@@ -216,7 +216,7 @@ def get_notifications(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_notification_read(request, id):
-    notification = Notification.get_object_or_404(id=id, recipient=request.user)
+    notification = get_object_or_404(Notification, id=id, recipient=request.user)
     notification.is_read = True
     notification.save()
     return Response({'status': 'read'})
