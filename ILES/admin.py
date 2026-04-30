@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue)
+from .models import (CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log, Notification)
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
@@ -44,4 +44,14 @@ class IssueAdmin(admin.ModelAdmin):
     list_filter = ['status']
     search_fields = ['title']
 
+@admin.register(Student_log)
+class Student_logAdmin(admin.ModelAdmin):
+    list_display = ['student', 'date', 'status', 'created_at']
+    list_filter = ['status']
+    search_fields = ['student__student__username']
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['actor', 'recipient', 'verb', 'is_read', 'created_at']
+    list_filter = ['is_read']
 # Register your models here.
