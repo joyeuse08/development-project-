@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey 
+ 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import now
@@ -57,7 +56,7 @@ class Weekly_Log(models.Model):
         ("rejected", "Rejected"),
     ]
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='weekly_logs')
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null =True, blank =True, related_name='weekly_logs', limit_choices_to={'role': 'workplace_supervisor'}) 
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='weekly_logs', limit_choices_to={'role': 'workplace'}) 
     week_number = models.PositiveIntegerField()
     activities = models.TextField()
     challenges = models.TextField(blank = True)
@@ -86,7 +85,7 @@ class Student_log(models.Model):
     description = models.TextField()
     hours=models.PositiveIntegerField()
     challenges = models.TextField(blank=True)
-    attatchment = models.FileField(upload_to='log_attachments/', blank=True, null=True)
+    attachment = models.FileField(upload_to='log_attachments/', blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     feedback = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(default=now)
@@ -110,7 +109,7 @@ class Supervisor_Feedback(models.Model):
 class Academic_Supervisor_Feedback(models.Model):
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='academic_feedbacks')
     academic_supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
-        related_name='academic_feedback_given',limit_choices_to={'role': 'academic_supervisor'})
+        related_name='academic_feedback_given', limit_choices_to={'role': 'academic'})
     comments = models.TextField()
     academic_score = models.PositiveIntegerField()
     evaluated_at = models.DateTimeField(auto_now_add=True)
