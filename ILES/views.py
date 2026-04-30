@@ -31,7 +31,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         queryset = Weekly_Log.objects.all()
 
         if user.role in ('workplace', 'academic'):
-    queryset = queryset.filter(supervisor=user)
+            queryset = queryset.filter(supervisor=user)
 
         log_status = self.request.query_params.get('status')
         if log_status:
