@@ -39,9 +39,11 @@ class Weighted_ScoreSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class IssueSerializer(serializers.ModelSerializer):
+    reported_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    
     class Meta:
         model = Issue
-        exclude = ['created_at']
+        exclude = ['__all__']
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
