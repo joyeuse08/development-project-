@@ -184,12 +184,12 @@ export default function IssuesList() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
 
-    fetch("/api/issues/", {
+    fetch("http://localhost:8000/api/issues/", {
       headers: {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(token && { Authorization: `Token ${token}` }),
       },
     })
       .then((res) => {
