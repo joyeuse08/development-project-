@@ -4,15 +4,10 @@ const STATUS_CONFIG = {
   open: { label: "Open", color: "#e74c3c", bg: "#fdf0ef", icon: "🔴" },
   in_progress: { label: "In Progress", color: "#f39c12", bg: "#fef9ec", icon: "🟡" },
   resolved: { label: "Resolved", color: "#27ae60", bg: "#edfaf3", icon: "🟢" },
-  closed: { label: "Closed", color: "#7f8c8d", bg: "#f4f4f4", icon: "⚫" },
+  
 };
 
-const PRIORITY_CONFIG = {
-  low: { label: "Low", color: "#3498db" },
-  medium: { label: "Medium", color: "#f39c12" },
-  high: { label: "High", color: "#e74c3c" },
-  critical: { label: "Critical", color: "#8e44ad" },
-};
+
 
 //Skeleton loader card
 function SkeletonCard() {
@@ -32,7 +27,7 @@ function SkeletonCard() {
 // Single issue card 
 function IssueCard({ issue, onSelect }) {
   const status = STATUS_CONFIG[issue.status] || STATUS_CONFIG.open;
-  const priority = PRIORITY_CONFIG[issue.priority] || PRIORITY_CONFIG.medium;
+ 
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -56,20 +51,7 @@ function IssueCard({ issue, onSelect }) {
         <span style={{ fontSize: 11, color: "#aaa", fontFamily: "monospace" }}>
           #{issue.id}
         </span>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: priority.color,
-            background: priority.color + "18",
-            padding: "2px 8px",
-            borderRadius: 20,
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-          }}
-        >
-          {priority.label}
-        </span>
+        
       </div>
 
       {/* Title */}
@@ -79,7 +61,7 @@ function IssueCard({ issue, onSelect }) {
 
       {/* Description preview */}
       <p style={{ margin: "0 0 14px", fontSize: 13, color: "#666", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-        {issue.description || "No description provided."}
+        {issue.issue_type || "No description provided."}
       </p>
 
       {/* Footer row */}
@@ -119,7 +101,7 @@ function IssueCard({ issue, onSelect }) {
 // Detail modal
 function IssueModal({ issue, onClose }) {
   const status = STATUS_CONFIG[issue.status] || STATUS_CONFIG.open;
-  const priority = PRIORITY_CONFIG[issue.priority] || PRIORITY_CONFIG.medium;
+  
 
   return (
     <div style={styles.overlay} onClick={onClose}>
@@ -130,9 +112,7 @@ function IssueModal({ issue, onClose }) {
           <span style={{ ...styles.badge, color: status.color, background: status.bg }}>
             {status.icon} {status.label}
           </span>
-          <span style={{ ...styles.badge, color: priority.color, background: priority.color + "18" }}>
-            {priority.label} Priority
-          </span>
+          
         </div>
 
         <h2 style={{ margin: "0 0 8px", fontFamily: "'Playfair Display', Georgia, serif", color: "#1a1a2e", fontSize: 20 }}>
@@ -143,7 +123,7 @@ function IssueModal({ issue, onClose }) {
         <div style={styles.detailSection}>
           <strong>Description</strong>
           <p style={{ marginTop: 6, color: "#444", lineHeight: 1.7, fontSize: 14 }}>
-            {issue.description || "No description provided."}
+           {issue.issue_type || "No description provided."}
           </p>
         </div>
 
@@ -152,22 +132,14 @@ function IssueModal({ issue, onClose }) {
             <strong>Reported By</strong>
             <p style={styles.detailValue}>{issue.reported_by_name || "—"}</p>
           </div>
-          <div style={styles.detailSection}>
-            <strong>Assigned To</strong>
-            <p style={styles.detailValue}>{issue.assigned_to_name || "Unassigned"}</p>
-          </div>
+         
           <div style={styles.detailSection}>
             <strong>Created</strong>
             <p style={styles.detailValue}>
               {issue.created_at ? new Date(issue.created_at).toLocaleString() : "—"}
             </p>
           </div>
-          <div style={styles.detailSection}>
-            <strong>Updated</strong>
-            <p style={styles.detailValue}>
-              {issue.updated_at ? new Date(issue.updated_at).toLocaleString() : "—"}
-            </p>
-          </div>
+          
         </div>
       </div>
     </div>
@@ -212,7 +184,7 @@ export default function IssuesList() {
     const matchSearch =
       !searchQuery ||
       issue.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      issue.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      issue.issue_type?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchStatus && matchSearch;
   });
 
