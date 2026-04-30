@@ -32,7 +32,7 @@ def notify_on_student_log(sender, instance, created, **kwargs):
         message = (
          f"{placement.student.username} your student log has been updated. "
 )
-recipient = [placement.student.email]
+        recipient = [placement.student.email]
         send_notification_email(subject, message, recipient)   
 
 @receiver(post_save, sender=Internship_Placement)        
