@@ -63,7 +63,7 @@ class Student_logSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['student', 'created_at']
 
-   def validate_hours(self, value):
+    def validate_hours(self, value):
         if value <= 0:
             raise serializers.ValidationError("Must be greater that 0")
         return value    
