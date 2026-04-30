@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes,action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -24,17 +24,17 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
     
 # Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
-    queryset= weekly_log.objects.all()
+    queryset= Weekly_log.objects.all()
     serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
         user = self.request.user
         queryset = Weekly_Log.objects.all()
 
-        if hasattr(user, 'profile') and user.profile.role == 'supervisor':
-            queryset = (queryset.filter(supervisor=user))
+        if user.role in ('workplace', 'academic'):
+    queryset = queryset.filter(supervisor=user)
 
         log_status = self.request.query_params.get('status')
-        if status:
+        if log_status:
             queryset = queryset.filter(status=status)
         return queryset 
 
@@ -47,17 +47,17 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
     
 class Student_logViewSet(viewsets.ModelViewSet):
-    queryset = student_log.objects.all()
+    queryset = Student_log.objects.all()
     serializer_class = Student_logSerializer
     def get_queryset(self):
         user = self.request.user
         queryset = Student_log.objects.all()
 
-        if hasattr(user, 'profile') and user.profile.role == 'supervisor':
-            queryset = (queryset.filter(supervisor=user))
+        if user.role in ('workplace', 'academic'):
+    queryset = queryset.filter(supervisor=user)
 
         log_status = self.request.query_params.get('status')
-        if status:
+        if log_status:
             queryset = queryset.filter(status=status)
         return queryset
     
