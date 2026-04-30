@@ -24,7 +24,7 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
     
 # Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
-    queryset= Weekly_log.objects.all()
+    queryset= Weekly_Log.objects.all()
     serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
         user = self.request.user
@@ -35,7 +35,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
 
         log_status = self.request.query_params.get('status')
         if log_status:
-            queryset = queryset.filter(status=status)
+            queryset = queryset.filter(status=log_status)
         return queryset 
 
     @action(detail=True, methods=['post'])
@@ -58,7 +58,7 @@ class Student_logViewSet(viewsets.ModelViewSet):
 
         log_status = self.request.query_params.get('status')
         if log_status:
-            queryset = queryset.filter(status=status)
+            queryset = queryset.filter(status=log_status)
         return queryset
     
     @action(detail=True, methods=['post'])
