@@ -43,7 +43,7 @@ class IssueSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Issue
-        exclude = ['__all__']
+        fields = ['__all__']
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
