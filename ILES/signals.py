@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
@@ -7,7 +8,7 @@ def send_notification_email(subject, message, recipient_list):
     send_mail(
         subject,
         message,
-        'your-email@gmail.com',
+        settings.EMAIL_HOST_USER,
         recipient_list)
     
 @receiver(post_save, sender=Weekly_Log)
@@ -17,10 +18,12 @@ def notify_on_weekly_log(sender, instance, created, **kwargs):
         internship = instance.student
         subject = f"Student Log Updated for {internship.student.username}"
         message = (
-        f"{placement.student.username} your weekly log for week {instance.week_number} has been updated. " 
-        f"Current status: {instance.get_status_display()}."
-        )
-        recipient = [placement.student.email]
+        subject = f"Weekly Log Updated for {internship.student.username}"
+message = (
+    f"{internship.student.username} your weekly log for week {instance.week_number} has been updated. "
+    f"Current status: {instance.get_status_display()}."
+)
+recipient = [internship.student.email]
         send_notification_email(subject, message, recipient)   
 
 @receiver(post_save, sender=Student_log)
@@ -29,9 +32,9 @@ def notify_on_student_log(sender, instance, created, **kwargs):
         placement = instance.student
         subject = f"Student Log Updated for {placement.student.username}"
         message = (
-         f"{internship.student.username} your student log has been updated. "
-           )
-        recipient = [internship.student.email]
+         f"{placement.student.username} your student log has been updated. "
+)
+recipient = [placement.student.email]
         send_notification_email(subject, message, recipient)   
 
 @receiver(post_save, sender=Internship_Placement)        
