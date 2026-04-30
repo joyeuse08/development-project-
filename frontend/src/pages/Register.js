@@ -8,12 +8,14 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [department, setDepartment] = useState('');
+  const [role, setRole] = useState('student');
   const navigate = useNavigate();
   const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await register(username, email, password);
+   const success = await register(username, email, password, department, role);
     if (success) {
       navigate('/login');
     } else {
@@ -21,25 +23,7 @@ const Register = () => {
     }
   };
 
-const handleSubmit = async(e) => {
-  e.preventDefault();
-  
-  try{
-    const response = await axios.post(
-"http://127.0.0.1:8000/api/register/",
-          {
-            username,
-            email,
-            password
-          }
-    );
-  
-     console.log(response.data);
-     alert("Registered successfully");
-  } catch (error) {
-    console.error(error);
-  }
-};
+
 
    
   return (
