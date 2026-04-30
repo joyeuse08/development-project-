@@ -20,5 +20,6 @@ urlpatterns = [
     path('me/', views.me, name="me"),
     path('notifications/', views.get_notifications, name="notifications"),
     path('notifications/<int:id>/read/', views.mark_notification_read, name="notification-read"),
+    path('search/', views.search_items, name="search"),
     path('', include(router.urls)),
 ]
