@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes,action
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
@@ -11,161 +11,79 @@ from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Fee
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
 
 
-class IsSupervisorOrAdmin(permissions.BasePermission):
-    """Allows access to workplace/academic supervisors and admins only."""
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ('workplace', 'academic', 'admin')
-
-
-class IsAdminRole(permissions.BasePermission):
-    """Allows access only to users with the admin role."""
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'admin'
-
-
 # Create your views here.
-# Custom User views — admin only for write operations
+# Custom User views
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
-    def get_permissions(self):
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
-            return [IsAdminRole()]
-        return [IsAuthenticated()]
-
 # Internship placement views
 class Internship_PlacementViewSet(viewsets.ModelViewSet):
+    queryset = Internship_Placement.objects.all()
     serializer_class = Internship_PlacementSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.role == 'student':
-            return Internship_Placement.objects.filter(student=user)
-        if user.role == 'workplace':
-            return Internship_Placement.objects.filter(workplace_supervisor=user)
-        if user.role == 'academic':
-            return Internship_Placement.objects.filter(academic_supervisor=user)
-        return Internship_Placement.objects.all()
-
+    
 # Weekly log views
-class Weekly_LogViewSet(viewsets.ModelViewSet):
-    serializer_class = Weekly_LogSerializer
-
+class Weekly_LogViewSet(viewsets.ModelViewSet): 
+    queryset= Weekly_Log.objects.all()
+    serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'student':
-            queryset = Weekly_Log.objects.filter(placement__student=user)
-        elif user.role in ('workplace', 'academic'):
-            queryset = Weekly_Log.objects.filter(supervisor=user)
-        else:
-            queryset = Weekly_Log.objects.all()
+        queryset = Weekly_Log.objects.all()
+
+        if user.role in ('workplace', 'academic'):
+            queryset = queryset.filter(supervisor=user)
 
         log_status = self.request.query_params.get('status')
         if log_status:
             queryset = queryset.filter(status=log_status)
-        return queryset
-
-    def get_permissions(self):
-        if self.action == 'review':
-            return [IsSupervisorOrAdmin()]
-        return [IsAuthenticated()]
+        return queryset 
 
     @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
         weekly_log = self.get_object()
         weekly_log.status = request.data.get('status', weekly_log.status)
+        
         weekly_log.save()
-        Notification.objects.create(
-            recipient=weekly_log.placement.student,
-            actor=request.user,
-            verb=(
-                f"reviewed your weekly log for week {weekly_log.week_number} — "
-                f"Status: {weekly_log.get_status_display()}"
-            ),
-            target_id=weekly_log.id,
-            target_type='weekly_log',
-        )
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
-
+    
 class Student_logViewSet(viewsets.ModelViewSet):
+    queryset = Student_log.objects.all()
     serializer_class = Student_logSerializer
-
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'student':
-            queryset = Student_log.objects.filter(student__student=user)
-        elif user.role in ('workplace', 'academic'):
-            queryset = Student_log.objects.filter(supervisor=user)
-        else:
-            queryset = Student_log.objects.all()
+        queryset = Student_log.objects.all()
+
+        if user.role in ('workplace', 'academic'):
+            queryset = queryset.filter(supervisor=user)
 
         log_status = self.request.query_params.get('status')
         if log_status:
             queryset = queryset.filter(status=log_status)
         return queryset
-
-    def get_permissions(self):
-        if self.action == 'review':
-            return [IsSupervisorOrAdmin()]
-        return [IsAuthenticated()]
-
+    
     @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
         student_log = self.get_object()
         student_log.status = request.data.get('status', student_log.status)
+        
         student_log.save()
-        Notification.objects.create(
-            recipient=student_log.student.student,
-            actor=request.user,
-            verb=(
-                f"reviewed your student log for {student_log.date} — "
-                f"Status: {student_log.get_status_display()}"
-            ),
-            target_id=student_log.id,
-            target_type='student_log',
-        )
         return Response({'message': 'Student Log updated', 'status': student_log.status})
 
 class Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
-    serializer_class = Supervisor_FeedbackSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.role == 'workplace':
-            return Supervisor_Feedback.objects.filter(supervisor=user)
-        if user.role == 'student':
-            return Supervisor_Feedback.objects.filter(placement__student=user)
-        return Supervisor_Feedback.objects.all()
+    queryset = Supervisor_Feedback.objects.all()
+    serializer_class = Supervisor_FeedbackSerializer    
 
 class Academic_Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
+    queryset = Academic_Supervisor_Feedback.objects.all()
     serializer_class = Academic_Supervisor_FeedbackSerializer
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.role == 'academic':
-            return Academic_Supervisor_Feedback.objects.filter(academic_supervisor=user)
-        if user.role == 'student':
-            return Academic_Supervisor_Feedback.objects.filter(placement__student=user)
-        return Academic_Supervisor_Feedback.objects.all()
-
-class Weighted_ScoreViewSet(viewsets.ModelViewSet):
-    serializer_class = Weighted_ScoreSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.role == 'student':
-            return Weighted_Score.objects.filter(placement__student=user)
-        return Weighted_Score.objects.all()
+class Weighted_ScoreViewSet(viewsets.ModelViewSet): 
+    queryset = Weighted_Score.objects.all()
+    serializer_class = Weighted_ScoreSerializer   
 
 class IssueViewSet(viewsets.ModelViewSet):
-    serializer_class = IssueSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.role == 'student':
-            return Issue.objects.filter(placement__student=user)
-        return Issue.objects.all()
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer     
 
 # Registration view
 @api_view(['POST'])

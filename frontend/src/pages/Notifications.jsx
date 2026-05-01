@@ -28,9 +28,9 @@ export default function Notifications() {
   };
 
   const markAsRead = async (id) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     try {
-      await fetch(`/api/notifications/${id}/read/`, {
+      await fetch(`/api/notifications/${id}/mark-read/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

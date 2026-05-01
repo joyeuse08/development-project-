@@ -85,7 +85,6 @@ function LogModal({ log, onClose }) {
 
 function SubmitLogForm({ onSuccess }) {
   const [form, setForm] = useState({
-    placement: "",
     week_number: "",
     activities: "",
     challenges: "",
@@ -103,7 +102,7 @@ function SubmitLogForm({ onSuccess }) {
     setMessage(null);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/api/Weekly_Log/", {
+      const res = await fetch("/api/Weekly-Logs/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -113,7 +112,7 @@ function SubmitLogForm({ onSuccess }) {
       });
       if (!res.ok) throw new Error("Failed to submit log");
       setMessage({ type: "success", text: "Log submitted successfully!" });
-      setForm({ placement: "", week_number: "", activities: "", challenges: "", learnings: "", hours: "", status: "draft" });
+      setForm({ week_number: "", activities: "", challenges: "", learnings: "", hours: "", status: "draft" });
       onSuccess();
     } catch (err) {
       setMessage({ type: "error", text: err.message });
@@ -139,10 +138,6 @@ function SubmitLogForm({ onSuccess }) {
       )}
 
       <div style={styles.formGrid}>
-        <div style={styles.formGroup}>
-          <label style={styles.formLabel}>Placement ID</label>
-          <input name="placement" type="number" value={form.placement} onChange={handleChange} style={styles.input} placeholder="Your placement ID" />
-        </div>
         <div style={styles.formGroup}>
           <label style={styles.formLabel}>Week Number</label>
           <input name="week_number" type="number" value={form.week_number} onChange={handleChange} style={styles.input} placeholder="e.g. 1" />
@@ -188,7 +183,7 @@ export default function WeeklyLog() {
 
   const fetchLogs = () => {
     const token = localStorage.getItem("token");
-    fetch("/api/Weekly_Log/", {
+    fetch("/api/Weekly-Logs/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),

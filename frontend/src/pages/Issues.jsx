@@ -158,7 +158,7 @@ export default function IssuesList() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("/api/issues/", {
+    fetch("http://localhost:8000/api/issues/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),

@@ -135,7 +135,7 @@ export default function AcademicFeedback() {
 
   const fetchFeedbacks = () => {
     const token = localStorage.getItem("token");
-    fetch("/api/Academic_Supervisor_Feedback/", {
+    fetch("/api/academic-feedback/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),
