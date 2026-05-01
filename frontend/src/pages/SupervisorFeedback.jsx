@@ -72,7 +72,7 @@ function SubmitFeedbackForm({ onSuccess }) {
     setMessage(null);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/api/supervisor-feedback/", {
+      const res = await fetch("/api/Supervisor_Feedback/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export default function SupervisorFeedback() {
 
   const fetchFeedbacks = () => {
     const token = localStorage.getItem("token");
-    fetch("/api/supervisor-feedback/", {
+    fetch("/api/Supervisor_Feedback/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),
