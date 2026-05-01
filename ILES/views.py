@@ -11,32 +11,64 @@ from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Fee
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
 
 
+class IsSupervisorOrAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role in ('workplace', 'academic', 'admin')
+
+class IsAdminRole(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'admin'
+
 # Create your views here.
 # Custom User views
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+    
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return [IsAdminRole()]
+        return [IsAuthenticated()]
 
 # Internship placement views
 class Internship_PlacementViewSet(viewsets.ModelViewSet):
-    queryset = Internship_Placement.objects.all()
+   
     serializer_class = Internship_PlacementSerializer
+    
+    def get_queryset(self):
+    user = self.request.user
+    if user.role == 'student':
+        return Internship_Placement.objects.filter(student=user)
+    if user.role == 'workplace':
+        return Internship_Placement.objects.filter(workplace_supervisor=user)
+    if user.role == 'academic':
+        return Internship_Placement.objects.filter(academic_supervisor=user)
+    return Internship_Placement.objects.all()
     
 # Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
-    queryset= Weekly_Log.objects.all()
+    
     serializer_class = Weekly_LogSerializer 
     def get_queryset(self):
         user = self.request.user
         queryset = Weekly_Log.objects.all()
 
-        if user.role in ('workplace', 'academic'):
-            queryset = queryset.filter(supervisor=user)
+        if user.role == 'student':
+            queryset = Weekly_Log.objects.filter(placement__student=user)
+        elif user.role in ('workplace', 'academic'):
+            queryset = Weekly_Log.objects.filter(supervisor=user)
+        else:
+            queryset = Weekly_Log.objects.all()
 
         log_status = self.request.query_params.get('status')
         if log_status:
             queryset = queryset.filter(status=log_status)
         return queryset 
+    
+    def get_permissions(self):
+        if self.action == 'review':
+            return [IsSupervisorOrAdmin()]
+        return [IsAuthenticated()]    
 
     @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
@@ -45,6 +77,14 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         
         weekly_log.save()
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
+    
+    Notification.objects.create(
+        recipient=weekly_log.placement.student,
+        actor=request.user,
+        verb=f"reviewed your weekly log for week {weekly_log.week_number} — Status: {weekly_log.get_status_display()}",
+        target_id=weekly_log.id, target_type='weekly_log',
+    )    
+
     
 class Student_logViewSet(viewsets.ModelViewSet):
     queryset = Student_log.objects.all()
