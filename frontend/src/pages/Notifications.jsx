@@ -6,7 +6,7 @@ export default function Notifications() {
   const [error, setError] = useState(null);
 
   const fetchNotifications = () => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     fetch("/api/notifications/", {
       headers: {
         "Content-Type": "application/json",
