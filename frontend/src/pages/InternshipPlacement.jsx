@@ -12,7 +12,7 @@ export default function InternshipPlacement() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token")
     fetch("/api/placements/my/", {
       headers: {
         "Content-Type": "application/json",
