@@ -13,7 +13,7 @@ export default function InternshipPlacement() {
 
   useEffect(() => {
     const token = localStorage.getItem("token")
-    fetch("/api/placements/my/", {
+    fetch("/api/Internship-placements/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),
