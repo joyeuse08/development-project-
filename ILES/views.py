@@ -122,8 +122,7 @@ def register(request):
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
- # login view
+# login view
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
