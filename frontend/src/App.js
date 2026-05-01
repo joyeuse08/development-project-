@@ -4,6 +4,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Issues from './pages/Issues';
+import WeeklyLog from './pages/WeeklyLog';
+import AcademicFeedback from './pages/AcademicFeedback';
+import Notifications from './pages/Notifications';
 import {useAuth} from './context/AuthContext'; import './App.css';
 
 function PrivateRoute({ children }) {
@@ -17,6 +20,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/weekly-logs" element={<PrivateRoute><WeeklyLog /></PrivateRoute>}/>
+        <Route path="/academic-feedback" element={<PrivateRoute><AcademicFeedback /></PrivateRoute>}/>
+        <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>}/>
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>}/>
         <Route path="/issues" element={<PrivateRoute><Issues /></PrivateRoute>}/>
