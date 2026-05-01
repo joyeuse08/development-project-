@@ -21,7 +21,7 @@ class Internship_PlacementSerializer(serializers.ModelSerializer):
 class Weekly_LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weekly_Log
-        exclude = ['submitted_at', 'created_at']  
+       exclude = ['created_at']
 
 class Supervisor_FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
