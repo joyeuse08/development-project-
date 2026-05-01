@@ -95,7 +95,7 @@ export default function WeightedScore() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     fetch("/api/weighted-scores/", {
       headers: {
         "Content-Type": "application/json",
