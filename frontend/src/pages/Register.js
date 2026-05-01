@@ -10,12 +10,14 @@ const Register = () => {
   const [error, setError] = useState('');
   const [department, setDepartment] = useState('');
   const [role, setRole] = useState('student');
+  const [studentNumber, setStudentNumber] = useState('');
+  const [staffNumber, setStaffNumber] = useState('');
   const navigate = useNavigate();
   const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   const success = await register(username, email, password, department, role);
+    const success = await register(username, email, password, department, role, studentNumber, staffNumber);
     if (success) {
       navigate('/login');
     } else {
@@ -23,9 +25,6 @@ const Register = () => {
     }
   };
 
-
-
-   
   return (
     <form onSubmit={handleSubmit}>
       <h2>Register</h2>
@@ -51,6 +50,34 @@ const Register = () => {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
+      <input
+        type="text"
+        placeholder="Department"
+        value={department}
+        onChange={(e) => setDepartment(e.target.value)}
+      />
+      <select value={role} onChange={(e) => setRole(e.target.value)}>
+        <option value="student">Student</option>
+        <option value="workplace">Workplace Supervisor</option>
+        <option value="academic">Academic Supervisor</option>
+        <option value="admin">Administrator</option>
+      </select>
+      {role === 'student' && (
+        <input
+          type="text"
+          placeholder="Student Number"
+          value={studentNumber}
+          onChange={(e) => setStudentNumber(e.target.value)}
+        />
+      )}
+      {role !== 'student' && (
+        <input
+          type="text"
+          placeholder="Staff Number"
+          value={staffNumber}
+          onChange={(e) => setStaffNumber(e.target.value)}
+        />
+      )}
       <button type="submit">Register</button>
     </form>
   );

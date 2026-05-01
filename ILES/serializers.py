@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue,Student_log)
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -18,10 +19,31 @@ class Internship_PlacementSerializer(serializers.ModelSerializer):
         model = Internship_Placement
         fields = "__all__"
 
+    def validate(self, data):
+        instance = self.instance
+        student = data.get('student', getattr(instance, 'student', None))
+        start_date = data.get('start_date', getattr(instance, 'start_date', None))
+        end_date = data.get('end_date', getattr(instance, 'end_date', None))
+        if student and start_date and end_date:
+            if end_date <= start_date:
+                raise serializers.ValidationError("End date must be after start date.")
+            overlapping = Internship_Placement.objects.filter(
+                student=student,
+                start_date__lt=end_date,
+                end_date__gt=start_date,
+            )
+            if instance:
+                overlapping = overlapping.exclude(pk=instance.pk)
+            if overlapping.exists():
+                raise serializers.ValidationError(
+                    "This student already has an overlapping internship placement during that period."
+                )
+        return data
+
 class Weekly_LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weekly_Log
-        exclude = ['submitted_at', 'created_at']  
+        exclude = ['created_at']
 
 class Supervisor_FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
