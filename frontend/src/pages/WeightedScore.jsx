@@ -96,7 +96,7 @@ export default function WeightedScore() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("/api/weighted-scores/", {
+    fetch("/api/Weighted_Score/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),
