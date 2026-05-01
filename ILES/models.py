@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.db import models
  
@@ -20,6 +21,22 @@ class CustomUser(AbstractUser):
     staff_number = models.CharField(max_length=20, blank=True, null=True)
     student_number = models.CharField(max_length=20, blank=True, null=True)
 
+    def clean(self):
+    if self.start_date and self.end_date:
+        if self.end_date <= self.start_date:
+            raise ValidationError("End date must be after start date.")
+        overlapping = Internship_Placement.objects.filter(
+            student=self.student,
+            start_date__lt=self.end_date,
+            end_date__gt=self.start_date,
+        ).exclude(pk=self.pk)
+        if overlapping.exists():
+            raise ValidationError("This student already has an overlapping internship placement during that period.")
+
+    def save(self, *args, **kwargs):
+         self.full_clean()
+         super().save(*args, **kwargs)
+ 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
     
