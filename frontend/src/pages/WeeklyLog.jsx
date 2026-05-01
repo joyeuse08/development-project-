@@ -85,6 +85,7 @@ function LogModal({ log, onClose }) {
 
 function SubmitLogForm({ onSuccess }) {
   const [form, setForm] = useState({
+    placement: "",
     week_number: "",
     activities: "",
     challenges: "",
