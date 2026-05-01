@@ -72,7 +72,7 @@ function SubmitFeedbackForm({ onSuccess }) {
     setMessage(null);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/api/academic-feedback/", {
+      const res = await fetch("/api/Academic_Supervisor_Feedback/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
