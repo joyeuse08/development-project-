@@ -41,10 +41,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
   };
- const register = async (username, email, password, department = '', role = 'student') => {
+ const register = async (username, email, password, department = '', role = 'student', student_number = '', staff_number = '') => {
     try {
       setLoading(true);
-      await api.post('/api/register/', { username, email, password, department, role });
+      await api.post('/api/register/', { username, email, password, department, role, student_number, staff_number });
       return true;
     } catch {
       return false;
