@@ -46,26 +46,29 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
         return Internship_Placement.objects.all()
     
 # Weekly log views
-class Weekly_LogViewSet(viewsets.ModelViewSet): 
-    
-    serializer_class = Weekly_LogSerializer 
+class Weekly_LogViewSet(viewsets.ModelViewSet):
+    serializer_class = Weekly_LogSerializer
+
     def get_queryset(self):
         user = self.request.user
         queryset = Weekly_Log.objects.all()
-
         if user.role == 'student':
             queryset = Weekly_Log.objects.filter(placement__student=user)
-        elif user.role in ('workplace', 'academic'):
-            queryset = Weekly_Log.objects.filter(supervisor=user)
-        else:
-            queryset = Weekly_Log.objects.all()
-
+        elif user.role == 'workplace':
+            queryset = Weekly_Log.objects.filter(placement__workplace_supervisor=user)
+        elif user.role == 'academic':
+            queryset = Weekly_Log.objects.filter(placement__academic_supervisor=user)
         log_status = self.request.query_params.get('status')
         if log_status:
             queryset = queryset.filter(status=log_status)
-        return queryset 
+        return queryset
 
-        @action(detail=True, methods=['post'])
+    def get_permissions(self):
+        if self.action == 'review':
+            return [IsSupervisorOrAdmin()]
+        return [IsAuthenticated()]
+
+    @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
         weekly_log = self.get_object()
         user = request.user
@@ -73,15 +76,6 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
             return Response({'error': 'You are not assigned to this student.'}, status=status.HTTP_403_FORBIDDEN)
         if user.role == 'academic' and weekly_log.placement.academic_supervisor != user:
             return Response({'error': 'You are not assigned to this student.'}, status=status.HTTP_403_FORBIDDEN)
-    
-    def get_permissions(self):
-        if self.action == 'review':
-            return [IsSupervisorOrAdmin()]
-        return [IsAuthenticated()]    
-
-        @action(detail=True, methods=['post'])
-    def review(self, request, pk=None):
-        weekly_log = self.get_object()
         weekly_log.status = request.data.get('status', weekly_log.status)
         weekly_log.save()
         Notification.objects.create(
@@ -92,6 +86,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
             target_type='weekly_log',
         )
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
+
     def perform_update(self, serializer):
         if serializer.instance.status == 'approved':
             from rest_framework.exceptions import PermissionDenied
