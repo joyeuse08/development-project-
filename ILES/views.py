@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import api_view, permission_classes,action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -64,26 +64,39 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         if log_status:
             queryset = queryset.filter(status=log_status)
         return queryset 
+
+        @action(detail=True, methods=['post'])
+    def review(self, request, pk=None):
+        weekly_log = self.get_object()
+        user = request.user
+        if user.role == 'workplace' and weekly_log.placement.workplace_supervisor != user:
+            return Response({'error': 'You are not assigned to this student.'}, status=status.HTTP_403_FORBIDDEN)
+        if user.role == 'academic' and weekly_log.placement.academic_supervisor != user:
+            return Response({'error': 'You are not assigned to this student.'}, status=status.HTTP_403_FORBIDDEN)
     
     def get_permissions(self):
         if self.action == 'review':
             return [IsSupervisorOrAdmin()]
         return [IsAuthenticated()]    
 
-    @action(detail=True, methods=['post'])
+       @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
         weekly_log = self.get_object()
         weekly_log.status = request.data.get('status', weekly_log.status)
-        
         weekly_log.save()
+        Notification.objects.create(
+            recipient=weekly_log.placement.student,
+            actor=request.user,
+            verb=f"reviewed your weekly log for week {weekly_log.week_number} — Status: {weekly_log.get_status_display()}",
+            target_id=weekly_log.id,
+            target_type='weekly_log',
+        )
         return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
-    
-    Notification.objects.create(
-        recipient=weekly_log.placement.student,
-        actor=request.user,
-        verb=f"reviewed your weekly log for week {weekly_log.week_number} — Status: {weekly_log.get_status_display()}",
-        target_id=weekly_log.id, target_type='weekly_log',
-    )    
+    def perform_update(self, serializer):
+        if serializer.instance.status == 'approved':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Cannot edit a log that has been approved.")
+        serializer.save()
 
     
 class Student_logViewSet(viewsets.ModelViewSet):
