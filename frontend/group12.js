@@ -147,6 +147,14 @@ function login(username, password, role) {
   }
   return { success: false, message: "Invalid credentials" };
 }
+function togglePassword() {
+  const input = document.getElementById("loginPassword");
+  input.type = input.type === "password" ? "text" : "password";
+}
+function toggleRegPassword(id) {
+  const input = document.getElementById(id);
+  input.type = input.type === "password" ? "text" : "password";
+}
 function register(data) {
   if (getUsers().some((u) => u.username === data.username))
     return { success: false, message: "Username exists" };
