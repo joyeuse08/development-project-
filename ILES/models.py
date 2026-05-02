@@ -21,22 +21,6 @@ class CustomUser(AbstractUser):
     staff_number = models.CharField(max_length=20, blank=True, null=True)
     student_number = models.CharField(max_length=20, blank=True, null=True)
 
-    def clean(self):
-    if self.start_date and self.end_date:
-        if self.end_date <= self.start_date:
-            raise ValidationError("End date must be after start date.")
-        overlapping = Internship_Placement.objects.filter(
-            student=self.student,
-            start_date__lt=self.end_date,
-            end_date__gt=self.start_date,
-        ).exclude(pk=self.pk)
-        if overlapping.exists():
-            raise ValidationError("This student already has an overlapping internship placement during that period.")
-
-    def save(self, *args, **kwargs):
-         self.full_clean()
-         super().save(*args, **kwargs)
- 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
     
@@ -60,8 +44,25 @@ class Internship_Placement(models.Model):
         null= True, blank=True, related_name="academic_supervised",limit_choices_to={'role': 'academic'},
     )                                     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+ 
     def __str__(self):
         return f"Placement for {self.student.username} at {self.company_name}"
+
+    def clean(self):
+       if self.start_date and self.end_date:
+           if self.end_date <= self.start_date:
+               raise ValidationError("End date must be after start date.")
+           overlapping = Internship_Placement.objects.filter(
+               student=self.student,
+               start_date__lt=self.end_date,
+               end_date__gt=self.start_date,
+           ).exclude(pk=self.pk)
+           if overlapping.exists():
+               raise ValidationError("This student already has an overlapping internship placement during that period.")
+
+    def save(self, *args, **kwargs):
+         self.full_clean()
+         super().save(*args, **kwargs)
 
 # Weekly Log
 class Weekly_Log(models.Model):
