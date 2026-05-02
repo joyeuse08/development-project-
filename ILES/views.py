@@ -36,14 +36,14 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
     serializer_class = Internship_PlacementSerializer
     
     def get_queryset(self):
-    user = self.request.user
-    if user.role == 'student':
-        return Internship_Placement.objects.filter(student=user)
-    if user.role == 'workplace':
-        return Internship_Placement.objects.filter(workplace_supervisor=user)
-    if user.role == 'academic':
-        return Internship_Placement.objects.filter(academic_supervisor=user)
-    return Internship_Placement.objects.all()
+        user = self.request.user
+        if user.role == 'student':
+            return Internship_Placement.objects.filter(student=user)
+        if user.role == 'workplace':
+            return Internship_Placement.objects.filter(workplace_supervisor=user)
+        if user.role == 'academic':
+            return Internship_Placement.objects.filter(academic_supervisor=user)
+        return Internship_Placement.objects.all()
     
 # Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet): 
@@ -79,7 +79,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
             return [IsSupervisorOrAdmin()]
         return [IsAuthenticated()]    
 
-       @action(detail=True, methods=['post'])
+        @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
         weekly_log = self.get_object()
         weekly_log.status = request.data.get('status', weekly_log.status)
