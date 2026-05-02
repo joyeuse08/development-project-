@@ -103,7 +103,7 @@ function SubmitLogForm({ onSuccess }) {
     setMessage(null);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/api/Weekly-Log/", {
+      const res = await fetch("/api/Weekly_Log/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -184,7 +184,7 @@ export default function WeeklyLog() {
 
   const fetchLogs = () => {
     const token = localStorage.getItem("token");
-    fetch("/api/Weekly-Log/", {
+    fetch("/api/Weekly_Log/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),
