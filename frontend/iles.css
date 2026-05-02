@@ -2206,6 +2206,31 @@ input::placeholder {
   border-bottom: 1px solid #f0f0f0;
   color: #555;
 }
+<-- eye icon-->
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 12px 40px 12px 12px; /* right padding for icon space */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+}
+
 
 .users-table tr:hover {
   background: #f8f4ff;ss
