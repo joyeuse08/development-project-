@@ -100,6 +100,14 @@ class Student_logViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Student_log.objects.all()
+         if user.role == 'student':
+            queryset = queryset.filter(student__student=user)   # ← ADD THIS
+        elif user.role in ('workplace', 'academic'):
+            queryset = queryset.filter(supervisor=user)
+        log_status = self.request.query_params.get('status')
+        if log_status:
+            queryset = queryset.filter(status=log_status)
+        return queryset
 
         if user.role in ('workplace', 'academic'):
             queryset = queryset.filter(supervisor=user)
@@ -118,20 +126,50 @@ class Student_logViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Student Log updated', 'status': student_log.status})
 
 class Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
-    queryset = Supervisor_Feedback.objects.all()
-    serializer_class = Supervisor_FeedbackSerializer    
+    serializer_class = Supervisor_FeedbackSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'student':
+            return Supervisor_Feedback.objects.filter(placement__student=user)
+        if user.role == 'workplace':
+            return Supervisor_Feedback.objects.filter(supervisor=user)
+        if user.role == 'academic':
+            return Supervisor_Feedback.objects.filter(placement__academic_supervisor=user)
+        return Supervisor_Feedback.objects.all()
 
 class Academic_Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
-    queryset = Academic_Supervisor_Feedback.objects.all()
     serializer_class = Academic_Supervisor_FeedbackSerializer
 
-class Weighted_ScoreViewSet(viewsets.ModelViewSet): 
-    queryset = Weighted_Score.objects.all()
-    serializer_class = Weighted_ScoreSerializer   
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'student':
+            return Academic_Supervisor_Feedback.objects.filter(placement__student=user)
+        if user.role == 'academic':
+            return Academic_Supervisor_Feedback.objects.filter(academic_supervisor=user)
+        return Academic_Supervisor_Feedback.objects.all()
+
+class Weighted_ScoreViewSet(viewsets.ModelViewSet):
+    serializer_class = Weighted_ScoreSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'student':
+            return Weighted_Score.objects.filter(placement__student=user)
+        return Weighted_Score.objects.all()
 
 class IssueViewSet(viewsets.ModelViewSet):
-    queryset = Issue.objects.all()
-    serializer_class = IssueSerializer     
+    serializer_class = IssueSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'student':
+            return Issue.objects.filter(placement__student=user)
+        if user.role == 'workplace':
+            return Issue.objects.filter(placement__workplace_supervisor=user)
+        if user.role == 'academic':
+            return Issue.objects.filter(placement__academic_supervisor=user)
+        return Issue.objects.all()     
 
 # Registration view
 @api_view(['POST'])
@@ -206,11 +244,11 @@ def login(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def logout(request):
-    #delete the users token so they can nolonger access the api
-    request.user.auth_token.delete()
-    return Response(
-        {"message": "Logged out succesfully"},
-        status=status.HTTP_200_OK)
+    try:
+        request.user.auth_token.delete()
+    except Token.DoesNotExist:
+        pass
+    return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
 
 # Me view
 @api_view(["GET"])
