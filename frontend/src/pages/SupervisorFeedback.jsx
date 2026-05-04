@@ -4,13 +4,7 @@ function FeedbackCard({ feedback, onView }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
-      style={{
-        ...styles.card,
-        transform: hovered ? "translateY(-3px)" : "translateY(0)",
-        boxShadow: hovered ? "0 8px 30px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.06)",
-        cursor: "pointer",
-        borderLeft: "4px solid #f39c12",
-      }}
+      style={{ ...styles.card, transform: hovered ? "translateY(-3px)" : "translateY(0)", boxShadow: hovered ? "0 8px 30px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", borderLeft: "4px solid #f39c12" }}
       onClick={() => onView(feedback)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -20,11 +14,7 @@ function FeedbackCard({ feedback, onView }) {
         <span style={styles.scoreBadge}>Score: {feedback.supervisor_score ?? "—"}</span>
       </div>
       <p style={styles.preview}>{feedback.comments || "No comments provided."}</p>
-      <p style={styles.date}>
-        {feedback.evaluated_at
-          ? new Date(feedback.evaluated_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
-          : "—"}
-      </p>
+      <p style={styles.date}>{feedback.evaluated_at ? new Date(feedback.evaluated_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</p>
     </div>
   );
 }
@@ -34,9 +24,7 @@ function FeedbackModal({ feedback, onClose }) {
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button onClick={onClose} style={styles.closeBtn}>✕</button>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#1a1a2e", margin: "0 0 20px" }}>
-          Supervisor Feedback — Week {feedback.weekly_log_week || "—"}
-        </h2>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#1a1a2e", margin: "0 0 20px" }}>Supervisor Feedback — Week {feedback.weekly_log_week || "—"}</h2>
         <div style={styles.detailSection}>
           <strong style={styles.detailLabel}>Comments</strong>
           <p style={styles.detailValue}>{feedback.comments || "—"}</p>
@@ -44,15 +32,11 @@ function FeedbackModal({ feedback, onClose }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 4 }}>
           <div style={styles.detailSection}>
             <strong style={styles.detailLabel}>Score</strong>
-            <p style={{ ...styles.detailValue, fontSize: 24, fontWeight: 800, color: "#f39c12" }}>
-              {feedback.supervisor_score ?? "—"}
-            </p>
+            <p style={{ ...styles.detailValue, fontSize: 24, fontWeight: 800, color: "#f39c12" }}>{feedback.supervisor_score ?? "—"}</p>
           </div>
           <div style={styles.detailSection}>
             <strong style={styles.detailLabel}>Evaluated At</strong>
-            <p style={styles.detailValue}>
-              {feedback.evaluated_at ? new Date(feedback.evaluated_at).toLocaleString() : "—"}
-            </p>
+            <p style={styles.detailValue}>{feedback.evaluated_at ? new Date(feedback.evaluated_at).toLocaleString() : "—"}</p>
           </div>
         </div>
       </div>
@@ -70,14 +54,11 @@ function SubmitFeedbackForm({ onSuccess }) {
   const handleSubmit = async () => {
     setSubmitting(true);
     setMessage(null);
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     try {
-      const res = await fetch("/api/Supervisor_Feedback/", {
+      const res = await fetch("/Supervisor_Feedback/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Token ${token}` }),
-        },
+        headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error("Failed to submit feedback");
@@ -93,15 +74,9 @@ function SubmitFeedbackForm({ onSuccess }) {
 
   return (
     <div style={{ ...styles.card, marginBottom: 28 }}>
-      <h3 style={{ margin: "0 0 20px", fontFamily: "'Playfair Display', serif", color: "#1a1a2e" }}>
-        Submit Feedback
-      </h3>
+      <h3 style={{ margin: "0 0 20px", fontFamily: "'Playfair Display', serif", color: "#1a1a2e" }}>Submit Feedback</h3>
       {message && (
-        <div style={{
-          padding: "10px 16px", borderRadius: 8, marginBottom: 16, fontSize: 13,
-          background: message.type === "success" ? "#edfaf3" : "#fdf0ef",
-          color: message.type === "success" ? "#27ae60" : "#e74c3c",
-        }}>
+        <div style={{ padding: "10px 16px", borderRadius: 8, marginBottom: 16, fontSize: 13, background: message.type === "success" ? "#edfaf3" : "#fdf0ef", color: message.type === "success" ? "#27ae60" : "#e74c3c" }}>
           {message.text}
         </div>
       )}
@@ -119,9 +94,7 @@ function SubmitFeedbackForm({ onSuccess }) {
         <label style={styles.formLabel}>Comments</label>
         <textarea name="comments" value={form.comments} onChange={handleChange} style={styles.textarea} placeholder="Write your feedback..." />
       </div>
-      <button onClick={handleSubmit} disabled={submitting} style={styles.submitBtn}>
-        {submitting ? "Submitting..." : "Submit Feedback"}
-      </button>
+      <button onClick={handleSubmit} disabled={submitting} style={styles.submitBtn}>{submitting ? "Submitting..." : "Submit Feedback"}</button>
     </div>
   );
 }
@@ -134,25 +107,13 @@ export default function SupervisorFeedback() {
   const [showForm, setShowForm] = useState(false);
 
   const fetchFeedbacks = () => {
-    const token = localStorage.getItem("token");
-    fetch("/api/Supervisor_Feedback/", {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Token ${token}` }),
-      },
+    const token = localStorage.getItem("access_token");
+    fetch("/Supervisor_Feedback/", {
+      headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
     })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setFeedbacks(Array.isArray(data) ? data : data.results || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      .then((res) => { if (!res.ok) throw new Error(`Error ${res.status}`); return res.json(); })
+      .then((data) => { setFeedbacks(Array.isArray(data) ? data : data.results || []); setLoading(false); })
+      .catch((err) => { setError(err.message); setLoading(false); });
   };
 
   useEffect(() => { fetchFeedbacks(); }, []);
@@ -166,31 +127,14 @@ export default function SupervisorFeedback() {
             <h1 style={styles.title}>Supervisor Feedback</h1>
             <p style={styles.subtitle}>ILES — Internship Logging & Evaluation System</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)} style={styles.newBtn}>
-            {showForm ? "Cancel" : "+ Give Feedback"}
-          </button>
+          <button onClick={() => setShowForm(!showForm)} style={styles.newBtn}>{showForm ? "Cancel" : "+ Give Feedback"}</button>
         </div>
-
         {showForm && <SubmitFeedbackForm onSuccess={() => { fetchFeedbacks(); setShowForm(false); }} />}
-
         {loading && <div style={styles.loader}>Loading feedback...</div>}
-        {error && (
-          <div style={styles.errorBox}>
-            <span>⚠️</span>
-            <strong>Could not load feedback</strong>
-            <p style={{ color: "#e74c3c", fontSize: 13 }}>{error}</p>
-          </div>
-        )}
-        {!loading && !error && feedbacks.length === 0 && (
-          <div style={styles.emptyBox}>
-            <span style={{ fontSize: 40 }}>💬</span>
-            <p>No feedback submitted yet.</p>
-          </div>
-        )}
+        {error && <div style={styles.errorBox}><span>⚠️</span><strong>Could not load feedback</strong><p style={{ color: "#e74c3c", fontSize: 13 }}>{error}</p></div>}
+        {!loading && !error && feedbacks.length === 0 && <div style={styles.emptyBox}><span style={{ fontSize: 40 }}>💬</span><p>No feedback submitted yet.</p></div>}
         {!loading && !error && feedbacks.length > 0 && (
-          <div style={styles.grid}>
-            {feedbacks.map((fb) => <FeedbackCard key={fb.id} feedback={fb} onView={setSelected} />)}
-          </div>
+          <div style={styles.grid}>{feedbacks.map((fb) => <FeedbackCard key={fb.id} feedback={fb} onView={setSelected} />)}</div>
         )}
       </div>
       {selected && <FeedbackModal feedback={selected} onClose={() => setSelected(null)} />}

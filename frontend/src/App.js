@@ -4,14 +4,15 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Issues from './pages/Issues';
-import WeeklyLog from './pages/WeeklyLog';
-import AcademicFeedback from './pages/AcademicFeedback';
-import SupervisorFeedback from './pages/SupervisorFeedback';
 import InternshipPlacement from './pages/InternshipPlacement';
+import WeeklyLog from './pages/WeeklyLog';
+import SupervisorFeedback from './pages/SupervisorFeedback';
+import AcademicFeedback from './pages/AcademicFeedback';
 import WeightedScore from './pages/WeightedScore';
 import Notifications from './pages/Notifications';
-import { useAuth } from './context/AuthContext';
-import './App.css';
+import {useAuth} from './context/AuthContext'; import './App.css';
+import { Navigate } from 'react-router-dom';
+
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -31,8 +32,14 @@ function App() {
         <Route path="/weighted-score" element={<PrivateRoute><WeightedScore /></PrivateRoute>}/>
         <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>}/>
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>}/>
-        <Route path="/issues" element={<PrivateRoute><Issues /></PrivateRoute>}/>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/issues" element={<Issues />} />
+        <Route path="/internship_placement" element={<InternshipPlacement />} />
+        <Route path="/weekly_log" element={<WeeklyLog />} />
+        <Route path="/supervisor_feedback" element={<SupervisorFeedback />} />
+        <Route path="/academic_feedback" element={<AcademicFeedback />} />
+        <Route path="/weighted_score" element={<WeightedScore />} />
+        <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </Router>
   );

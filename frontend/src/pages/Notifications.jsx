@@ -6,7 +6,7 @@ export default function Notifications() {
   const [error, setError] = useState(null);
 
   const fetchNotifications = () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     fetch("/api/notifications/", {
       headers: {
         "Content-Type": "application/json",
@@ -28,10 +28,10 @@ export default function Notifications() {
   };
 
   const markAsRead = async (id) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     try {
-      await fetch(`/api/notifications/${id}/read/`, {
-        method: "POST",
+      await fetch(`/api/notifications/${id}/mark-read/`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Token ${token}` }),

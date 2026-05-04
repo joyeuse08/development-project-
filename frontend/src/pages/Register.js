@@ -15,15 +15,30 @@ const Register = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await register(username, email, password, department, role);
-    if (result.success) {
+    const success = await register(username, email, password);
+    if (success) {
+      alert("Registered successfully")
       navigate('/login');
     } else {
       setError(JSON.stringify(result.errors || 'Registration failed.'));
     }
-  };
-
-
+  
+    try{
+    const response = await axios.post(
+"http://127.0.0.1:8000/api/register/",
+          {
+            username,
+            email,
+            password
+          }
+    );
+  
+     console.log(response.data);
+     alert("Registered successfully");
+  } catch (error) {
+    console.error(error);
+  }
+};
 
    
   return (

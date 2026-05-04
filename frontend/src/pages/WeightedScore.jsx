@@ -7,31 +7,19 @@ function ScoreCard({ score, onView }) {
 
   return (
     <div
-      style={{
-        ...styles.card,
-        transform: hovered ? "translateY(-3px)" : "translateY(0)",
-        boxShadow: hovered ? "0 8px 30px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.06)",
-        cursor: "pointer",
-        borderLeft: `4px solid ${scoreColor}`,
-      }}
+      style={{ ...styles.card, transform: hovered ? "translateY(-3px)" : "translateY(0)", boxShadow: hovered ? "0 8px 30px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", borderLeft: `4px solid ${scoreColor}` }}
       onClick={() => onView(score)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
         <h3 style={styles.cardTitle}>{score.student_name || "Student"}</h3>
-        <span style={{ fontSize: 28, fontWeight: 800, color: scoreColor }}>
-          {finalScore !== null ? finalScore.toFixed(1) : "—"}
-        </span>
+        <span style={{ fontSize: 28, fontWeight: 800, color: scoreColor }}>{finalScore !== null ? finalScore.toFixed(1) : "—"}</span>
       </div>
       <p style={styles.company}>{score.company_name || "—"}</p>
       <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-        <span style={styles.miniStat}>
-          Supervisor: <strong>{score.supervisor_score ?? "—"}</strong>
-        </span>
-        <span style={styles.miniStat}>
-          Academic: <strong>{score.academic_score ?? "—"}</strong>
-        </span>
+        <span style={styles.miniStat}>Supervisor: <strong>{score.supervisor_score ?? "—"}</strong></span>
+        <span style={styles.miniStat}>Academic: <strong>{score.academic_score ?? "—"}</strong></span>
       </div>
     </div>
   );
@@ -45,41 +33,26 @@ function ScoreModal({ score, onClose }) {
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button onClick={onClose} style={styles.closeBtn}>✕</button>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#1a1a2e", margin: "0 0 6px" }}>
-          Weighted Score
-        </h2>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#1a1a2e", margin: "0 0 6px" }}>Weighted Score</h2>
         <p style={{ margin: "0 0 24px", fontSize: 13, color: "#888" }}>{score.student_name} — {score.company_name}</p>
-
-        {/* Big score display */}
         <div style={{ textAlign: "center", marginBottom: 24, padding: "24px", background: "#f8f9fb", borderRadius: 12 }}>
-          <div style={{ fontSize: 56, fontWeight: 800, color: scoreColor, fontFamily: "'Playfair Display', serif" }}>
-            {finalScore !== null ? finalScore.toFixed(1) : "—"}
-          </div>
+          <div style={{ fontSize: 56, fontWeight: 800, color: scoreColor, fontFamily: "'Playfair Display', serif" }}>{finalScore !== null ? finalScore.toFixed(1) : "—"}</div>
           <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>Final Score</div>
         </div>
-
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div style={styles.detailSection}>
             <strong style={styles.detailLabel}>Supervisor Score (60%)</strong>
-            <p style={{ ...styles.detailValue, fontSize: 20, fontWeight: 700, color: "#f39c12" }}>
-              {score.supervisor_score ?? "—"}
-            </p>
+            <p style={{ ...styles.detailValue, fontSize: 20, fontWeight: 700, color: "#f39c12" }}>{score.supervisor_score ?? "—"}</p>
           </div>
           <div style={styles.detailSection}>
             <strong style={styles.detailLabel}>Academic Score (40%)</strong>
-            <p style={{ ...styles.detailValue, fontSize: 20, fontWeight: 700, color: "#8e44ad" }}>
-              {score.academic_score ?? "—"}
-            </p>
+            <p style={{ ...styles.detailValue, fontSize: 20, fontWeight: 700, color: "#8e44ad" }}>{score.academic_score ?? "—"}</p>
           </div>
         </div>
-
         <div style={{ ...styles.detailSection, marginTop: 12 }}>
           <strong style={styles.detailLabel}>Calculated At</strong>
-          <p style={styles.detailValue}>
-            {score.calculated_at ? new Date(score.calculated_at).toLocaleString() : "—"}
-          </p>
+          <p style={styles.detailValue}>{score.calculated_at ? new Date(score.calculated_at).toLocaleString() : "—"}</p>
         </div>
-
         <div style={{ marginTop: 16, padding: "12px 16px", background: "#f8f9fb", borderRadius: 8, fontSize: 12, color: "#888" }}>
           Formula: Final Score = (Supervisor Score × 0.6) + (Academic Score × 0.4)
         </div>
@@ -95,30 +68,16 @@ export default function WeightedScore() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch("/api/Weighted_Score/", {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Token ${token}` }),
-      },
+    const token = localStorage.getItem("access_token");
+    fetch("/Weighted_Score/", {
+      headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
     })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setScores(Array.isArray(data) ? data : data.results || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      .then((res) => { if (!res.ok) throw new Error(`Error ${res.status}`); return res.json(); })
+      .then((data) => { setScores(Array.isArray(data) ? data : data.results || []); setLoading(false); })
+      .catch((err) => { setError(err.message); setLoading(false); });
   }, []);
 
-  const avg = scores.length
-    ? (scores.reduce((sum, s) => sum + (s.final_score || 0), 0) / scores.length).toFixed(1)
-    : null;
+  const avg = scores.length ? (scores.reduce((sum, s) => sum + (s.final_score || 0), 0) / scores.length).toFixed(1) : null;
 
   return (
     <>
@@ -136,25 +95,11 @@ export default function WeightedScore() {
             </div>
           )}
         </div>
-
         {loading && <div style={styles.loader}>Loading scores...</div>}
-        {error && (
-          <div style={styles.errorBox}>
-            <span>⚠️</span>
-            <strong>Could not load scores</strong>
-            <p style={{ color: "#e74c3c", fontSize: 13 }}>{error}</p>
-          </div>
-        )}
-        {!loading && !error && scores.length === 0 && (
-          <div style={styles.emptyBox}>
-            <span style={{ fontSize: 40 }}>📊</span>
-            <p>No scores available yet.</p>
-          </div>
-        )}
+        {error && <div style={styles.errorBox}><span>⚠️</span><strong>Could not load scores</strong><p style={{ color: "#e74c3c", fontSize: 13 }}>{error}</p></div>}
+        {!loading && !error && scores.length === 0 && <div style={styles.emptyBox}><span style={{ fontSize: 40 }}>📊</span><p>No scores available yet.</p></div>}
         {!loading && !error && scores.length > 0 && (
-          <div style={styles.grid}>
-            {scores.map((s) => <ScoreCard key={s.id} score={s} onView={setSelected} />)}
-          </div>
+          <div style={styles.grid}>{scores.map((s) => <ScoreCard key={s.id} score={s} onView={setSelected} />)}</div>
         )}
       </div>
       {selected && <ScoreModal score={selected} onClose={() => setSelected(null)} />}
