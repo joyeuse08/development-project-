@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
 import axios from 'axios';
-=======
 import { useAuth } from '../context/AuthContext';
-
->>>>>>> 7988d038061275bf0c59bfd791e61960b93a7a08
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -19,16 +15,13 @@ const Register = () => {
     e.preventDefault();
     const success = await register(username, email, password);
     if (success) {
+      alert("Registered successfully")
       navigate('/login');
     } else {
       setError('Registration failed. Please try again.');
     }
-  };
-
-const handleSubmit = async(e) => {
-  e.preventDefault();
   
-  try{
+    try{
     const response = await axios.post(
 "http://127.0.0.1:8000/api/register/",
           {

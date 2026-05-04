@@ -107,7 +107,6 @@ def register(request):
 
         #create a token for the user
         token, _ = Token.objects.get_or_create(user=user)
-    
         return Response({
             "message": "Registration successful",
             "token": token.key,
