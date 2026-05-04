@@ -36,11 +36,14 @@ def notify_on_student_log(sender, instance, created, **kwargs):
 def notify_on_placement_update(sender, instance, created, **kwargs):
     if not created:
         subject = f"Internship Placement Update for {instance.student.username}"
-        message = f"{instance.student.username} your internship placement at {instance.company_name} has been updated. Current status: {instance.get_status_display()}."
+        message = (
+            f"{instance.student.username} your internship placement at {instance.company_name} has been updated. "
+            f"Current status: {instance.get_status_display()}."
+        )
         recipient = [instance.student.email]
         send_notification_email(subject, message, recipient)
         actor = instance.workplace_supervisor or instance.academic_supervisor
-        if actor:                                         
+        if actor:
             Notification.objects.create(
                 recipient=instance.student,
                 actor=actor,
@@ -48,23 +51,3 @@ def notify_on_placement_update(sender, instance, created, **kwargs):
                 target_id=instance.id,
                 target_type='placement',
             )
-        
-
-@receiver(post_save, sender=Internship_Placement)        
-def notify_on_placement_update (sender, instance, created, **kwargs):
-    if not created:
-        subject = f"Internship Placement Update for {instance.student.username}"
-        message = (
-            f"{instance.student.username} your internship placement at {instance.company_name} has been updated. Current status: {instance.get_status_display()}."
-        )
-        recipient = [instance.student.email]
-        send_notification_email(subject, message, recipient)
-        actor = instance.workplace_supervisor or instance.academic_supervisor
-    if actor:
-        Notification.objects.create(
-            recipient=instance.student,
-            actor=actor,
-            verb=f"updated your internship placement at {instance.company_name} — Status: {instance.get_status_display()}",
-            target_id=instance.id,
-            target_type='placement',
-        )
