@@ -181,7 +181,7 @@ def register(request):
         user = serializer.save()
 
         # assign user to group based on role
-        role = request.data.get("role", "student")
+        role = user.role
         group_name = {
             "student": "Student",
             "workplace": "Workplace Supervisor",
