@@ -12,7 +12,7 @@ import WeightedScore from './pages/WeightedScore';
 import Notifications from './pages/Notifications';
 import {useAuth} from './context/AuthContext'; import './App.css';
 import { Navigate } from 'react-router-dom';
-import 
+
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
