@@ -13,20 +13,13 @@ const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   
-  const result = await register(username, email, password, department, role);
-  if (result.success) {
-    navigate('/login');
-  } else {
-    setError(JSON.stringify(result.errors));
-  }
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-   const success = await register(username, email, password, department, role);
-    if (success) {
+    const result = await register(username, email, password, department, role);
+    if (result.success) {
       navigate('/login');
     } else {
-      setError('Registration failed. Please try again.');
+      setError(JSON.stringify(result.errors || 'Registration failed.'));
     }
   };
 
