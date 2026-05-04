@@ -45,13 +45,13 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       await api.post('/api/register/', { username, email, password, department, role, student_number, staff_number });
-      return true;
-    } catch {
-      return false;
+      return { success: true };
+    } catch (err) {
+      return { success: false, errors: err.response?.data || {} };
     } finally {
       setLoading(false);
     }
-}; 
+};
   
   return (
     <AuthContext.Provider value={{ user, login, logout, register, loading }}>
