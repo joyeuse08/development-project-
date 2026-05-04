@@ -119,9 +119,10 @@ class Student_logViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
+        if request.user.role not in ('workplace', 'admin'):
+            return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
         student_log = self.get_object()
         student_log.status = request.data.get('status', student_log.status)
-        
         student_log.save()
         return Response({'message': 'Student Log updated', 'status': student_log.status})
 
@@ -268,17 +269,31 @@ def me(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def search_items(request):
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_items(request):
     query = request.query_params.get('q', '')
-    placements = Internship_Placement.objects.filter(company_name__icontains=query)
-    logs = Weekly_Log.objects.filter(activities__icontains=query)
-    feedbacks = Supervisor_Feedback.objects.filter(comments__icontains=query)
-    academic_feedbacks = Academic_Supervisor_Feedback.objects.filter(comments__icontains=query)
-    issues = Issue.objects.filter(issue_type__icontains=query)
-    placement_serializer = Internship_PlacementSerializer(placements, many=True)
-    log_serializer = Weekly_LogSerializer(logs, many=True)
-    feedback_serializer = Supervisor_FeedbackSerializer(feedbacks, many=True)
-    academic_serializer = Academic_Supervisor_FeedbackSerializer(academic_feedbacks, many=True)
-    issue_serializer = IssueSerializer(issues, many=True)
+    user = request.user
+
+    if user.role == 'student':
+        placements = Internship_Placement.objects.filter(student=user, company_name__icontains=query)
+        logs = Weekly_Log.objects.filter(placement__student=user, activities__icontains=query)
+        feedbacks = Supervisor_Feedback.objects.filter(placement__student=user, comments__icontains=query)
+        academic_feedbacks = Academic_Supervisor_Feedback.objects.filter(placement__student=user, comments__icontains=query)
+        issues = Issue.objects.filter(placement__student=user, issue_type__icontains=query)
+    elif user.role == 'workplace':
+        placements = Internship_Placement.objects.filter(workplace_supervisor=user, company_name__icontains=query)
+        logs = Weekly_Log.objects.filter(supervisor=user, activities__icontains=query)
+        feedbacks = Supervisor_Feedback.objects.filter(supervisor=user, comments__icontains=query)
+        academic_feedbacks = Academic_Supervisor_Feedback.objects.none()
+        issues = Issue.objects.filter(placement__workplace_supervisor=user, issue_type__icontains=query)
+    else:  # academic / admin
+        placements = Internship_Placement.objects.filter(company_name__icontains=query)
+        logs = Weekly_Log.objects.filter(activities__icontains=query)
+        feedbacks = Supervisor_Feedback.objects.filter(comments__icontains=query)
+        academic_feedbacks = Academic_Supervisor_Feedback.objects.filter(comments__icontains=query)
+        issues = Issue.objects.filter(issue_type__icontains=query)
+  
 
     return Response({
         "placements": placement_serializer.data,
