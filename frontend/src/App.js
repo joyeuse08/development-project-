@@ -1,8 +1,8 @@
 import React from 'react';
-import{ BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dash.board';
+import Dashboard from './pages/Dashboard';
 import Issues from './pages/Issues';
 import InternshipPlacement from './pages/InternshipPlacement';
 import WeeklyLog from './pages/WeeklyLog';
@@ -25,6 +25,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/weekly-logs" element={<PrivateRoute><WeeklyLog /></PrivateRoute>}/>
+        <Route path="/academic-feedback" element={<PrivateRoute><AcademicFeedback /></PrivateRoute>}/>
+        <Route path="/supervisor-feedback" element={<PrivateRoute><SupervisorFeedback /></PrivateRoute>}/>
+        <Route path="/internship-placement" element={<PrivateRoute><InternshipPlacement /></PrivateRoute>}/>
+        <Route path="/weighted-score" element={<PrivateRoute><WeightedScore /></PrivateRoute>}/>
+        <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>}/>
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/issues" element={<Issues />} />

@@ -4,13 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ILES - Academic Supervisor Dashboard</title>
-    <script src="group12.js" defer></script>
+    <script src="group12.js"></script>
     <link rel="stylesheet" href="iles.css" />
   </head>
   <body>
-    <div class="header">
-      <div class="logo">
-        <div class="logo-icon">🎓</div>
+      <div class="header">>
         <div>
           <h1>Academic Supervisor Dashboard</h1>
         </div>
@@ -19,6 +17,7 @@
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
     </div>
+
     <div class="container">
       <!-- Welcome Banner -->
       <div class="welcome-banner">
@@ -28,14 +27,18 @@
           student progress
         </p>
       </div>
+
+      <!-- Stats Cards -->
       <div class="stats-grid">
         <div class="stat-card">
+          <div class="stat-icon">👨‍🎓</div>
           <div class="stat-info">
             <div class="stat-number" id="totalStudents">0</div>
             <div class="stat-label">Total Students</div>
           </div>
         </div>
         <div class="stat-card">
+          <div class="stat-icon">⏳</div>
           <div class="stat-info">
             <div class="stat-number" id="pendingReviews">0</div>
             <div class="stat-label">Pending Approval</div>
@@ -49,13 +52,17 @@
           </div>
         </div>
         <div class="stat-card">
+          <div class="stat-icon">📊</div>
           <div class="stat-info">
             <div class="stat-number" id="avgScore">0</div>
             <div class="stat-label">Average Score</div>
           </div>
         </div>
       </div>
+
+      <!-- Two Column Layout -->
       <div class="two-columns">
+        <!-- Left Column: Review Form -->
         <div class="card review-card">
           <div class="card-header">
             <h3>Review Student Log</h3>
@@ -110,29 +117,37 @@
             </form>
           </div>
         </div>
+
+        <!-- Right Column: Pending Approvals -->
         <div class="card">
           <div class="card-header">
             <h3>Pending Final Approval</h3>
             <span class="count" id="pendingCount">0</span>
           </div>
           <div id="pendingLogsList" class="pending-list">
+            <!-- Pending logs will be loaded here -->
             <div class="empty-state">
               <p>No pending approvals</p>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Evaluation Summary Section -->
       <div class="card evaluation-summary">
         <div class="card-header">
           <h3>Academic Evaluation Summary</h3>
         </div>
         <div id="evaluationSummary">
+          <!-- Evaluation summary will be loaded here -->
           <div class="empty-state">
             <p>No evaluations yet</p>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Review Modal -->
     <div id="reviewModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">

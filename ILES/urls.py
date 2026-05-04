@@ -4,7 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'users', views.CustomUserViewSet, basename='users')
-router.register(r'Internship_Placement', views.Internship_PlacementViewSet, basename='internship placement')
+router.register(r'Internship_Placement', views.Internship_PlacementViewSet, basename='internship-placement')
 router.register(r'Weekly_Log', views.Weekly_LogViewSet, basename='weeklylog')
 router.register(r'Student_log', views.Student_logViewSet, basename='studentlog')
 router.register(r'Supervisor_Feedback', views.Supervisor_FeedbackViewSet, basename='supervisorfeedback')
@@ -20,5 +20,6 @@ urlpatterns = [
     path('me/', views.me, name="me"),
     path('notifications/', views.get_notifications, name="notifications"),
     path('notifications/<int:id>/read/', views.mark_notification_read, name="notification-read"),
+    path('search/', views.search_items, name="search"),
     path('', include(router.urls)),
 ]

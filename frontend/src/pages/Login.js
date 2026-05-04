@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     const success = await login(username, password);
     if (success) {
-      navigate('/');
+      navigate('/');   
     } else {
       setError('Invalid username or password');
     }

@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue,Student_log)
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,7 +24,7 @@ class Internship_PlacementSerializer(serializers.ModelSerializer):
 class Weekly_LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weekly_Log
-        exclude = ['submitted_at', 'created_at']  
+        exclude = ['created_at']
 
 class Supervisor_FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,9 +42,11 @@ class Weighted_ScoreSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class IssueSerializer(serializers.ModelSerializer):
+    reported_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    
     class Meta:
         model = Issue
-        exclude = ['created_at']
+        fields = '__all__'
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,7 +56,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = CustomUser(**validated_data)
-        user.password = make_password(password)
+        try:
+            validate_password(password, user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError({'password': list(e.messages)})
+        user.set_password(password)
         user.save()
         return user
     
@@ -61,7 +70,7 @@ class Student_logSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['student', 'created_at']
 
-    def validate_hours_spent(self,value):
+    def validate_hours(self, value):
         if value <= 0:
             raise serializers.ValidationError("Must be greater that 0")
         return value    

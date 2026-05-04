@@ -8,9 +8,11 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [department, setDepartment] = useState('');
+  const [role, setRole] = useState('student');
   const navigate = useNavigate();
   const { register } = useAuth();
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const success = await register(username, email, password);
@@ -18,7 +20,7 @@ const Register = () => {
       alert("Registered successfully")
       navigate('/login');
     } else {
-      setError('Registration failed. Please try again.');
+      setError(JSON.stringify(result.errors || 'Registration failed.'));
     }
   
     try{
