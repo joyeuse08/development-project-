@@ -143,9 +143,9 @@ class Weighted_Score(models.Model):
     final_score = models.FloatField()
     calculated_at = models.DateTimeField(auto_now_add=True)
 
-    def compute(self):
+    def save(self, *args, **kwargs):
         self.final_score = (self.supervisor_score * 0.6) + (self.academic_score * 0.4)
-        self.save()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Weighted Score for {self.placement.student.username}: {self.final_score}"    
