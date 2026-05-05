@@ -70,7 +70,7 @@ const Register = () => {
         <div className="auth-logo">
           <div className="auth-logo-icon">📋</div>
           <h1 className="auth-logo-title">ILES</h1>
-          <p className="auth-logo-subtitle">Internship Log &amp; Evaluation System</p>
+          <p className="auth-logo-subtitle">Internship Log & Evaluation System</p>
         </div>
 
         <h2 className="auth-heading">Create Account</h2>

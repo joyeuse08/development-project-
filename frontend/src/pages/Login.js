@@ -28,7 +28,7 @@ const Login = () => {
         <div className="auth-logo">
           <div className="auth-logo-icon">📋</div>
           <h1 className="auth-logo-title">ILES</h1>
-          <p className="auth-logo-subtitle">Internship Log &amp; Evaluation System</p>
+          <p className="auth-logo-subtitle">Internship Log & Evaluation System</p>
         </div>
 
         <h2 className="auth-heading">Welcome Back</h2>
@@ -81,7 +81,7 @@ const Login = () => {
         </form>
 
         <p className="auth-footer">
-          Don&apos;t have an account?{' '}
+          Don't have an account?{' '}
           <Link to="/register" className="auth-link">Create one here</Link>
         </p>
       </div>
