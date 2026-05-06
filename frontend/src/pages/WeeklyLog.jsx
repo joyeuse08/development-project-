@@ -36,7 +36,7 @@ function LogModal({ log, onClose }) {
         <button onClick={onClose} style={styles.closeBtn}>✕</button>
         <span style={{ ...styles.badge, color: status.color, background: status.bg, marginBottom: 12, display: "inline-block" }}>{status.label}</span>
         <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#1a1a2e", margin: "0 0 20px" }}>Week {log.week_number} Log</h2>
-        {[{ label: "Activities", value: log.activities }, { label: "Challenges", value: log.challenges }, { label: "Learnings", value: log.learnings }, { label: "Feedback", value: log.feedback }].map(({ label, value }) => (
+        {[{ label: "Activities", value: log.activities }, { label: "Challenges", value: log.challenges }, { label: "Learnings", value: log.learnings }].map(({ label, value }) => (
           <div key={label} style={styles.detailSection}>
             <strong style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</strong>
             <p style={{ margin: "6px 0 0", color: "#444", lineHeight: 1.7, fontSize: 14 }}>{value || "—"}</p>
@@ -47,10 +47,7 @@ function LogModal({ log, onClose }) {
             <strong style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase" }}>Hours</strong>
             <p style={{ margin: "6px 0 0", color: "#1a1a2e", fontWeight: 600 }}>{log.hours || "—"}</p>
           </div>
-          <div style={styles.detailSection}>
-            <strong style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase" }}>Submitted</strong>
-            <p style={{ margin: "6px 0 0", color: "#444", fontSize: 13 }}>{log.submitted_at ? new Date(log.submitted_at).toLocaleString() : "Not yet"}</p>
-          </div>
+          
         </div>
       </div>
     </div>
@@ -67,9 +64,9 @@ function SubmitLogForm({ onSuccess }) {
   const handleSubmit = async () => {
     setSubmitting(true);
     setMessage(null);
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/Weekly_Log/", {
+      const res = await fetch("/api/Weekly_Log/", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
         body: JSON.stringify(form),
@@ -129,8 +126,8 @@ export default function WeeklyLog() {
   const [showForm, setShowForm] = useState(false);
 
   const fetchLogs = () => {
-    const token = localStorage.getItem("access_token");
-    fetch("/Weekly_Log/", {
+    const token = localStorage.getItem("token");
+    fetch("/api/Weekly_Log/", {
       headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
     })
       .then((res) => { if (!res.ok) throw new Error(`Error ${res.status}`); return res.json(); })
