@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import{ BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -10,29 +10,51 @@ import SupervisorFeedback from './pages/SupervisorFeedback';
 import AcademicFeedback from './pages/AcademicFeedback';
 import WeightedScore from './pages/WeightedScore';
 import Notifications from './pages/Notifications';
-import {useAuth} from './context/AuthContext'; import './App.css';
-import { Navigate } from 'react-router-dom';
+import StudentDashboard from './pages/StudentDashboard';
+import WorkplaceSupervisorDashboard from './pages/WorkplaceSupervisorDashboard';
+import AcademicSupervisorDashboard from './pages/AcademicSupervisorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import {useAuth} from './context/AuthContext';
+import './App.css';
 
-
-function PrivateRoute({ children }) {
+//opening dashboard based on roale of user
+function RoleBasedRedirect() {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === 'student') return <Navigate to="/student_dashboard" replace />;
+  if (user.role === 'workplace_supervisor') return <Navigate to="/workplace_supervisor_dashboard" replace />;
+  if (user.role === 'academic_supervisor') return <Navigate to="/academic_supervisor_dashboard" replace />;
+  if (user.role === 'admin') return <Navigate to="/admin_dashboard" replace />;
+  return <Navigate to="/login" replace />;
+}
+
+//protecting routes
+function PrivateRoute({ children, allowedRoles }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/login" replace />;
+  return children;
 }
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/weekly-logs" element={<PrivateRoute><WeeklyLog /></PrivateRoute>}/>
-        <Route path="/academic-feedback" element={<PrivateRoute><AcademicFeedback /></PrivateRoute>}/>
-        <Route path="/supervisor-feedback" element={<PrivateRoute><SupervisorFeedback /></PrivateRoute>}/>
-        <Route path="/internship-placement" element={<PrivateRoute><InternshipPlacement /></PrivateRoute>}/>
-        <Route path="/weighted-score" element={<PrivateRoute><WeightedScore /></PrivateRoute>}/>
-        <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>}/>
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Role redirect */}
+        <Route path="/dashboard" element={<RoleBasedRedirect />} />
+        {/* Student only */}
+        <Route path="/student_dashboard" element={<PrivateRoute allowedRoles={['student']}><StudentDashboard /></PrivateRoute>} />
+        {/* Workplace Supervisor only */}
+        <Route path="/workplace_supervisor_dashboard" element={<PrivateRoute allowedRoles={['workplace_supervisor']}><WorkplaceSupervisorDashboard /></PrivateRoute>} />
+        {/* Academic Supervisor only */}
+        <Route path="/academic_supervisor_dashboard" element={<PrivateRoute allowedRoles={['academic_supervisor']}><AcademicSupervisorDashboard /></PrivateRoute>} />
+        {/* Admin only */}
+        <Route path="/admin_dashboard" element={<PrivateRoute allowedRoles={['admin']}><AdminDashboard /></PrivateRoute>} />
+        {/* Common routes for all authenticated users */}
         <Route path="/issues" element={<Issues />} />
         <Route path="/internship_placement" element={<InternshipPlacement />} />
         <Route path="/weekly_log" element={<WeeklyLog />} />
