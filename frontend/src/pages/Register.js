@@ -12,17 +12,29 @@ const Register = () => {
   const navigate = useNavigate();
   const { register, loading } = useAuth();
   
-   
-    const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setFieldErrors({});
-  const { success, errors } = await register(formData);
-  if (success) {
-    navigate('/login');
-  } else {
-    setFieldErrors(errors || {});
-    setError(errors?.non_field_errors?.[0] || 'Registration failed.');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try{
+    const response = await axios.post(
+"http://127.0.0.1:8000/api/register/",
+          {
+            username,
+            email,
+            password,
+            role,
+          }
+    );
+  
+    if (response.data){
+     alert("Registered successfully");
+     navigate('/login');
+    } 
+  } catch (error) {
+    setError(
+      error.response?.data?.message ||
+      JSON.stringify(error.response?.data) ||
+      'Registration failed. Please try again.'
+    );
   }
 };
 

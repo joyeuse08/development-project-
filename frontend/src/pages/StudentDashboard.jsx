@@ -11,15 +11,17 @@ function StudentDashboard() {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
+    // Fetch student's placements
     axios.get('/api/Internship_Placement/')
       .then(res => setPlacements(res.data))
       .catch(err => console.log(err));
 
-    
+    // Fetch student's weekly logs
     axios.get('/api/Weekly_Log/')
       .then(res => setLogs(res.data))
       .catch(err => console.log(err));
-    
+
+    // Fetch notifications
     axios.get('/api/notifications/')
       .then(res => setNotifications(res.data))
       .catch(err => console.log(err));
