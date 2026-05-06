@@ -15,28 +15,27 @@ const Register = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await register(username, email, password);
-    if (success) {
-      alert("Registered successfully")
-      navigate('/login');
-    } else {
-      setError(JSON.stringify(result.errors || 'Registration failed.'));
-    }
-  
     try{
     const response = await axios.post(
 "http://127.0.0.1:8000/api/register/",
           {
             username,
             email,
-            password
+            password,
+            role,
           }
     );
   
-     console.log(response.data);
+    if (response.data){
      alert("Registered successfully");
+     navigate('/login');
+    } 
   } catch (error) {
-    console.error(error);
+    setError(
+      error.response?.data?.message ||
+      JSON.stringify(error.response?.data) ||
+      'Registration failed. Please try again.'
+    );
   }
 };
 
