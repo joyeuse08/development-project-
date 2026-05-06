@@ -55,7 +55,7 @@ return (
               className="toggle-password"
               onClick={() => setShowPassword((s) => !s)}
             >
-              {showPassword ? '🙈' : '👁️'}
+              {showPassword ? '👁️' : '👁️'}
             </button>
           </div>
         </div>
