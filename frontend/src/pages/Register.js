@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
-  const [formDate, setFoamDate] = useState({
-    username: '', email:'', password:'', confirm password:'', role:'student', department:'', student_number:'',staff_number:''
+  const [formData, setFormData] = useState({
+    username: '', email: '', password: '', confirmPassword: '', role: 'student', department: '', student_number: '', staff_number: ''
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -116,5 +116,6 @@ return (
     </div>
   </div>
 ); 
+};
 
 export default Register;
