@@ -14,22 +14,38 @@ function AdminDashboard() {
   useEffect(() => {
     // Fetch all users
     axios.get('/api/users/')
-      .then(res => setUsers(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setUsers(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch all placements
     axios.get('/api/Internship_Placement/')
-      .then(res => setPlacements(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setPlacements(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch all weekly logs
     axios.get('/api/Weekly_Log/')
-      .then(res => setLogs(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setLogs(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch all issues
     axios.get('/api/issues/')
-      .then(res => setIssues(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setIssues(data);
+      })
       .catch(err => console.log(err));
   }, []);
 
