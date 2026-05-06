@@ -13,17 +13,29 @@ function AcademicSupervisorDashboard() {
   useEffect(() => {
     // Fetch all internship placements
     axios.get('/api/Internship_Placement/')
-      .then(res => setPlacements(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setPlacements(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch academic feedbacks given by this supervisor
     axios.get('/api/Academic_Supervisor_Feedback/')
-      .then(res => setAcademicFeedbacks(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setAcademicFeedbacks(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch weighted scores
     axios.get('/api/Weighted_Score/')
-      .then(res => setWeightedScores(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setWeightedScores(data);
+      })
       .catch(err => console.log(err));
   }, []);
 

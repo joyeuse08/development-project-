@@ -13,17 +13,29 @@ function WorkplaceSupervisorDashboard() {
   useEffect(() => {
     // Fetch weekly logs assigned to this supervisor
     axios.get('/api/Weekly_Log/')
-      .then(res => setWeeklyLogs(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : []; 
+        setWeeklyLogs(data);                         
+      })
       .catch(err => console.log(err));
 
     // Fetch student daily logs
     axios.get('/api/Student_log/')
-      .then(res => setStudentLogs(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data:
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setStudentLogs(data);             
+     })
       .catch(err => console.log(err));
 
     // Fetch feedbacks given by this supervisor
     axios.get('/api/Supervisor_Feedback/')
-      .then(res => setFeedbacks(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setFeedbacks(data);
+      })
       .catch(err => console.log(err));
   }, []);
 

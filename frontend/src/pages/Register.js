@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -9,9 +10,12 @@ const Register = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('student');
   const navigate = useNavigate();
   const { register, loading } = useAuth();
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
