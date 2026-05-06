@@ -117,7 +117,7 @@ function StudentDashboard() {
           ) : (
             notifications.slice(0, 5).map(n => (
               <div key={n.id}>
-                <p>{n.message}</p>
+                <p>{n.verb}</p>
               </div>
             ))
           )}
