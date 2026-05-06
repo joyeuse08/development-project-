@@ -23,8 +23,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to ="/Login" replace />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to ="/login" replace />} />
+        <Route path="/login" element={<login />} />
         <Route path="/weekly-logs" element={<PrivateRoute><WeeklyLog /></PrivateRoute>}/>
         <Route path="/academic-feedback" element={<PrivateRoute><AcademicFeedback /></PrivateRoute>}/>
         <Route path="/supervisor-feedback" element={<PrivateRoute><SupervisorFeedback /></PrivateRoute>}/>
