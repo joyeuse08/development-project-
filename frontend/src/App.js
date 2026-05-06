@@ -35,7 +35,7 @@ function App() {
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/issues" element={<PrivateRoute><Issues /></PrivateRoute>} />
         <Route path="/internship_placement" element={<PrivateRoute><InternshipPlacement /></PrivateRoute>} />
-        <Route path="/weekly_log" element={<PrivateRoute><WeeklyLog /></PrivateRoute>} />
+        
         <Route path="/supervisor_feedback" element={<PrivateRoute><SupervisorFeedback /></PrivateRoute>} />
         <Route path="/academic_feedback" element={<PrivateRoute><AcademicFeedback /></PrivateRoute>} />
         <Route path="/weighted_score" element={<PrivateRoute><WeightedScore /></PrivateRoute>} />
