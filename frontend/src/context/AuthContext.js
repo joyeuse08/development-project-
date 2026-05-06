@@ -41,11 +41,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
   };
- const register = async (formData) => {
+ const register = async (username, email, password, department = '', role = 'student', student_number = '', staff_number = '') => {
     try {
       setLoading(true);
-      const { confirmPassword, ...payload } = formData;
-      await api.post('/api/register/', payload);
+      await api.post('/api/register/', { username, email, password, department, role, student_number, staff_number });
       return { success: true };
     } catch (err) {
       return { success: false, errors: err.response?.data || {} };
