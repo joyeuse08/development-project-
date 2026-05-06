@@ -10,8 +10,8 @@ import SupervisorFeedback from './pages/SupervisorFeedback';
 import AcademicFeedback from './pages/AcademicFeedback';
 import WeightedScore from './pages/WeightedScore';
 import Notifications from './pages/Notifications';
-import { useAuth } from './context/AuthContext';
-import './App.css';
+import {useAuth} from './context/AuthContext'; import './App.css';
+import { Navigate } from 'react-router-dom';
 
 
 function PrivateRoute({ children }) {
