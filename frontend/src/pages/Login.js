@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -69,5 +69,6 @@ return (
     </div>
   </div>
 );
+};
 
 export default Login;
