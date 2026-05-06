@@ -4,8 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    username: '', email:'', password:'', confirmpassword:'', role:'student', department:'', student_number:'',staff_number:''
-  });
+    username: '', email: '', password: '', confirmPassword: '', role: 'student', department: '', student_number: '', staff_number: ''
+});
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
