@@ -22,8 +22,8 @@ function RoleBasedRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === 'student') return <Navigate to="/student_dashboard" replace />;
-  if (user.role === 'workplace_supervisor') return <Navigate to="/workplace_supervisor_dashboard" replace />;
-  if (user.role === 'academic_supervisor') return <Navigate to="/academic_supervisor_dashboard" replace />;
+  if (user.role === 'workplace') return <Navigate to="/workplace_supervisor_dashboard" replace />;
+  if (user.role === 'academic') return <Navigate to="/academic_supervisor_dashboard" replace />;
   if (user.role === 'admin') return <Navigate to="/admin_dashboard" replace />;
   return <Navigate to="/login" replace />;
 }
