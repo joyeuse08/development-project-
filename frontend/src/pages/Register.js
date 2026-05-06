@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from '../axiosConfig';
+
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -10,37 +10,26 @@ const Register = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student');
+  
   const navigate = useNavigate();
   const { register, loading } = useAuth();
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-    const response = await axios.post(
-"http://127.0.0.1:8000/api/register/",
-          {
-            username,
-            email,
-            password,
-            role,
-          }
-    );
-  
-    if (response.data){
-     alert("Registered successfully");
-     navigate('/login');
-    } 
-  } catch (error) {
-    setError(
-      error.response?.data?.message ||
-      JSON.stringify(error.response?.data) ||
-      'Registration failed. Please try again.'
-    );
-  }
-};
+    const result = await register(formData);
+    if (result.success) {
+      alert('Registered successfully');
+      navigate('/login');
+    } else {
+      setFieldErrors(result.errors || {});
+      setError(
+        result.errors?.non_field_errors?.[0] ||
+        (typeof result.errors === 'string' ? result.errors : '') ||
+        'Registration failed. Please try again.'
+      );
+    }
+  };
 
    const set = (field) => (e) =>
   setFormData((prev) => ({ ...prev, [field]: e.target.value }));
@@ -72,8 +61,8 @@ return (
           <label className="form-label">Role</label>
           <select className="form-select" value={formData.role} onChange={set('role')}>
             <option value="student">Student</option>
-            <option value="academic_supervisor">Academic Supervisor</option>
-            <option value="workplace_supervisor">Workplace Supervisor</option>
+            <option value="academic">Academic Supervisor</option>
+            <option value="workplace">Workplace Supervisor</option>
             <option value="admin">Admin</option>
           </select>
         </div>
