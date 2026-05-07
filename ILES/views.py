@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import api_view, permission_classes,action
+from rest_framework.decorators import api_view, permission_classes,action,authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -167,6 +167,7 @@ class IssueViewSet(viewsets.ModelViewSet):
 
 # Registration view
 @api_view(['POST'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
@@ -203,6 +204,7 @@ def register(request):
 
 # login view
 @api_view(['POST'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def login(request):
     username = request.data.get("username")

@@ -55,7 +55,11 @@ MIDDLEWARE = [
     
 ]
 
-CORS_ALLOWED_ORIGINS = [ "http://localhost:3000",]
+CORS_ALLOWED_ORIGINS = [
+   origin.strip()
+    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
+]
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -79,17 +83,16 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'iles_db_7g8x',
-        'USER': 'iles_db_7g8x_user',
-        'PASSWORD': 'vg0Q3UyKUxmVolD8E3kCFLgpxvTDuiPP',
-        'HOST': 'dpg-d7uehjreo5us73e0ok90-a.oregon-postgres.render.com',
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
-}    
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

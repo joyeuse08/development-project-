@@ -57,6 +57,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
         }
+        
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value    
+        
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = CustomUser(**validated_data)
