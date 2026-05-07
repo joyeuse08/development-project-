@@ -17,7 +17,7 @@ class CustomUser(AbstractUser):
         ("admin","Internship Administrator"),
     ]
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default = "student")
-    department = models.CharField(max_length=100,)
+    department = models.CharField(max_length=100, blank=True, default='')
     staff_number = models.CharField(max_length=20, blank=True, null=True)
     student_number = models.CharField(max_length=20, blank=True, null=True)
 

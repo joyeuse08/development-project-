@@ -12,8 +12,8 @@ const Login = () => {
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     const success = await login(username, password);
-  setError('');
     if (success) {
       navigate('/dashboard');   
     } else {
@@ -55,7 +55,7 @@ return (
               className="toggle-password"
               onClick={() => setShowPassword((s) => !s)}
             >
-              {showPassword ? '👁️' : '👁️'}
+             {showPassword ? '🙈' : '👁️'}
             </button>
           </div>
         </div>

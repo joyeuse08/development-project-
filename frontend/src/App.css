@@ -22,7 +22,7 @@ body {
 /* Header */
 .dashboard-header {
   background: linear-gradient(135deg, var(--primary), #2a4f7c);
-  color: black;
+  color: white;
   padding: 15px 30px;
   display: flex;
   justify-content: space-between;
@@ -42,7 +42,7 @@ body {
 
 .dashboard-header button {
   background-color: #e53935;
-  color: black;
+  color: white;
   border: none;
   padding: 8px 18px;
   border-radius: 20px;
@@ -90,7 +90,7 @@ body {
 
 .stat-card {
   background: linear-gradient(135deg, var(--primary), #2a4f7c);
-  color: black;
+  color: white;
   padding: 20px;
   border-radius: 12px;
   min-width: 150px;
@@ -154,7 +154,7 @@ body {
 
 .dashboard-card button {
   background: linear-gradient(135deg, var(--secondary), #006666);
-  color: black;
+  color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 20px;
@@ -212,76 +212,7 @@ tr:last-child td {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
 }
 
-.auth-form {
-  background-color: var(--white);
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  width: 100%;
-  max-width: 400px;
-}
 
-.auth-form h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #2c3e50;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.auth-form input,
-.auth-form select {
-  width: 100%;
-  padding: 12px 15px;
-  margin-bottom: 15px;
-  border: 2px solid var(--light-border);
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border 0.3s;
-  outline: none;
-  color: var(--text);
-}
-
-.auth-form input:focus,
-.auth-form select:focus {
-  border-color: var(--secondary);
-}
-
-.auth-form button {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: black;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-weight: 600;
-}
-
-.auth-form button:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.auth-form p {
-  text-align: center;
-  margin-top: 15px;
-  font-size: 14px;
-  color: #666;
-}
-
-.auth-form a {
-  color: var(--secondary);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.auth-form a:hover {
-  text-decoration: underline;
-}
 
 /* Error messages */
 .error {
@@ -458,7 +389,7 @@ tr:last-child td {
   width: 100%;
   padding: 12px;
   background: linear-gradient(135deg, #1e3a5f, #008080);
-  color: black;
+  color: white;
   border: none;
   border-radius: 8px;
   font-size: 16px;
