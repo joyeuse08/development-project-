@@ -54,9 +54,9 @@ function SubmitFeedbackForm({ onSuccess }) {
   const handleSubmit = async () => {
     setSubmitting(true);
     setMessage(null);
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/Supervisor_Feedback/", {
+      const res = await fetch("/apiSupervisor_Feedback/", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
         body: JSON.stringify(form),
