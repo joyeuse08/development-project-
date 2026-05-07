@@ -75,7 +75,7 @@ return (
           </div>
         )}
 
-        {(formData.role === 'academic_supervisor' || formData.role === 'workplace_supervisor') && (
+        {(formData.role === 'academic' || formData.role === 'workplace') && (
           <div className="form-group">
             <label className="form-label">Staff Number</label>
             <input className="form-input" type="text" placeholder="e.g. STAFF001"
