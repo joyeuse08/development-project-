@@ -48,10 +48,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
   };
- const register = async (username, email, password, department = '', role = 'student', student_number = '', staff_number = '') => {
-    try {
-      setLoading(true);
-      await api.post('/api/register/', { username, email, password, department, role, student_number, staff_number });
+ const register = async (formData) => {
+  try {
+    setLoading(true);
+    const { confirmPassword, ...payload } = formData;   // strip frontend-only field
+    await api.post('/api/register/', payload);
       return { success: true };
     } catch (err) {
       return { success: false, errors: err.response?.data || {} };

@@ -26,8 +26,8 @@ function RoleBasedRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === 'student') return <Navigate to="/student_dashboard" replace />;
-  if (user.role === 'workplace_supervisor') return <Navigate to="/workplace_supervisor_dashboard" replace />;
-  if (user.role === 'academic_supervisor') return <Navigate to="/academic_supervisor_dashboard" replace />;
+  if (user.role === 'workplace') return <Navigate to="/workplace_supervisor_dashboard" replace />;
+  if (user.role === 'academic') return <Navigate to="/academic_supervisor_dashboard" replace />;
   if (user.role === 'admin') return <Navigate to="/admin_dashboard" replace />;
   return <Navigate to="/login" replace />;
 }
@@ -53,9 +53,9 @@ function App() {
         {/* Student only */}
         <Route path="/student_dashboard" element={<PrivateRoute allowedRoles={['student']}><StudentDashboard /></PrivateRoute>} />
         {/* Workplace Supervisor only */}
-        <Route path="/workplace_supervisor_dashboard" element={<PrivateRoute allowedRoles={['workplace_supervisor']}><WorkplaceSupervisorDashboard /></PrivateRoute>} />
+        <Route path="/workplace_supervisor_dashboard" element={<PrivateRoute allowedRoles={['workplace']}><WorkplaceSupervisorDashboard /></PrivateRoute>} />
         {/* Academic Supervisor only */}
-        <Route path="/academic_supervisor_dashboard" element={<PrivateRoute allowedRoles={['academic_supervisor']}><AcademicSupervisorDashboard /></PrivateRoute>} />
+        <Route path="/academic_supervisor_dashboard" element={<PrivateRoute allowedRoles={['academic']}><AcademicSupervisorDashboard /></PrivateRoute>} />
         {/* Admin only */}
         <Route path="/admin_dashboard" element={<PrivateRoute allowedRoles={['admin']}><AdminDashboard /></PrivateRoute>} />
         {/* Common routes for all authenticated users */}

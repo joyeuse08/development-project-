@@ -146,7 +146,7 @@ function AdminDashboard() {
             <tbody>
               {placements.map(p => (
                 <tr key={p.id}>
-                  <td>{p.student}</td>
+                  <td>{p.student_name || p.student}</td>
                   <td>{p.company_name}</td>
                   <td>{p.status}</td>
                   <td>{p.start_date}</td>
@@ -173,7 +173,7 @@ function AdminDashboard() {
                 <tr key={i.id}>
                   <td>{i.issue_type}</td>
                   <td>{i.status}</td>
-                  <td>{i.student}</td>
+                  <td>{i.reported_by_name || '—'}</td>
                 </tr>
               ))}
             </tbody>

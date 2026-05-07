@@ -110,7 +110,7 @@ function AcademicSupervisorDashboard() {
               <tbody>
                 {placements.map(p => (
                   <tr key={p.id}>
-                    <td>{p.student}</td>
+                    <td>{p.student_name || p.student}</td>
                     <td>{p.company_name}</td>
                     <td>{p.start_date}</td>
                     <td>{p.end_date}</td>
@@ -161,7 +161,7 @@ function AcademicSupervisorDashboard() {
               <tbody>
                 {weightedScores.map(s => (
                   <tr key={s.id}>
-                    <td>{s.student}</td>
+                    <td>{s.placement}</td>
                     <td>{s.final_score}</td>
                   </tr>
                 ))}
