@@ -19,6 +19,8 @@ import AcademicSupervisorDashboard from './pages/AcademicSupervisorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LogSubmission from './pages/StudentLogSubmission';
 import {useAuth} from './context/AuthContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 //opening dashboard based on roale of user
@@ -43,6 +45,7 @@ function PrivateRoute({ children, allowedRoles }) {
 function App() {
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light"/> 
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Login />} />
