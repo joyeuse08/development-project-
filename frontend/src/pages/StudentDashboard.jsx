@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { notify } from '../utils/toastUtils';
+import 'react-toastify/dist/ReactToastify.css';
 
 function StudentDashboard() {
   const { user, logout } = useAuth();
@@ -28,7 +31,9 @@ function StudentDashboard() {
                      Array.isArray(res.data.results) ? res.data.results : [];
         setLogs(data);
       })
-      .catch(err => console.log(err));
+      .catch(err => {console.log(err);
+      toast.error('Failed to load daily logs. Check console for details.');
+      });
 
     // Fetch weekly logs
     axios.get('/api/Weekly_Log/')
@@ -37,7 +42,9 @@ function StudentDashboard() {
                      Array.isArray(res.data.results) ? res.data.results : [];
         setWeeklyLogs(data);
       })
-      .catch(err => console.log(err));
+      .catch(err => {console.log(err);
+      toast.error('Failed to load weekly logs. Check console for details.');
+      });
 
     // Fetch notifications
     axios.get('/api/notifications/')
@@ -46,12 +53,15 @@ function StudentDashboard() {
                      Array.isArray(res.data.results) ? res.data.results : [];
         setNotifications(data);
       })
-      .catch(err => console.log(err));
+      .catch(err => {console.log(err);
+      toast.error('Failed to load notifications. Check console for details.');
+      });
   }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+    notify('Logged out successfully!');
   };
 
   // Status badge color
