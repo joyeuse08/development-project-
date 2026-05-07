@@ -107,7 +107,7 @@ export default function AcademicFeedback() {
   const [showForm, setShowForm] = useState(false);
 
   const fetchFeedbacks = () => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     fetch("/api/Academic_Supervisor_Feedback/", {
       headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
     })
