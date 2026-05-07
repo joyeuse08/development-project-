@@ -6,6 +6,9 @@ import Dashboard from './pages/Dashboard';
 import Issues from './pages/Issues';
 import InternshipPlacement from './pages/InternshipPlacement';
 import WeeklyLog from './pages/WeeklyLog';
+import WeeklyLogSubmission from './pages/WeeklyLogSubmission';
+import StudentLog from './pages/StudentLog';
+import StudentLogSubmission from './pages/StudentLogSubmission';
 import SupervisorFeedback from './pages/SupervisorFeedback';
 import AcademicFeedback from './pages/AcademicFeedback';
 import WeightedScore from './pages/WeightedScore';
@@ -14,6 +17,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import WorkplaceSupervisorDashboard from './pages/WorkplaceSupervisorDashboard';
 import AcademicSupervisorDashboard from './pages/AcademicSupervisorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import LogSubmission from './pages/StudentLogSubmission';
 import {useAuth} from './context/AuthContext';
 import './App.css';
 
@@ -58,11 +62,14 @@ function App() {
         <Route path="/issues" element={<Issues />} />
         <Route path="/internship_placement" element={<InternshipPlacement />} />
         <Route path="/weekly_log" element={<WeeklyLog />} />
+        <Route path="/submit_weeklylog" element={<PrivateRoute allowedRoles={['student']}><WeeklyLogSubmission /></PrivateRoute>} />
         <Route path="/supervisor_feedback" element={<SupervisorFeedback />} />
         <Route path="/academic_feedback" element={<AcademicFeedback />} />
         <Route path="/weighted_score" element={<WeightedScore />} />
         <Route path="/notifications" element={<Notifications />} />
-      </Routes>
+        <Route path="/submit_studentlog" element={<PrivateRoute allowedRoles={['student']}><StudentLogSubmission /></PrivateRoute>} />
+        <Route path= "/student_log" element={<StudentLog/>}/>
+      </Routes>  
     </Router>
   );
 }
