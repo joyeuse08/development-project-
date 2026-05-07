@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -89,12 +90,15 @@ if db_engine == 'django.db.backends.sqlite3':
         }
     }
 else:
+    db_password = os.environ.get('DJANGO_DB_PASSWORD')
+    if not db_password:
+        raise ImproperlyConfigured('DJANGO_DB_PASSWORD must be set for non-SQLite databases.')
     DATABASES = {
         'default': {
             'ENGINE': db_engine,
             'NAME': os.environ.get('DJANGO_DB_NAME', 'postgres'),
             'USER': os.environ.get('DJANGO_DB_USER', 'postgres'),
-            'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
+            'PASSWORD': db_password,
             'HOST': os.environ.get('DJANGO_DB_HOST', 'localhost'),
             'PORT': os.environ.get('DJANGO_DB_PORT', '5432'),
         }
