@@ -17,6 +17,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class Internship_PlacementSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='student.username', read_only=True)
+
     class Meta:
         model = Internship_Placement
         fields = "__all__"
@@ -52,7 +54,17 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'password', 'role', 'department', 'staff_number', 'student_number']
-
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+        
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value    
+        
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = CustomUser(**validated_data)

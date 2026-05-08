@@ -15,7 +15,11 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (saved) setUser(JSON.parse(saved));
       if (token) api.defaults.headers.common['Authorization'] = `Token ${token}`;
-    } catch {}
+    } catch (err) {
+      console.error('Failed to load user from localStorage:', err);
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    }
   }, []);
 
   const login = async (username, password) => {
@@ -27,7 +31,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
       api.defaults.headers.common['Authorization'] = `Token ${data.token}`;
       return true;
-    } catch {
+    } catch (error) {
+      console.error('Login failed:', error.response?.data || error.message);
       return false;
     } finally {
       setLoading(false);
@@ -35,16 +40,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-        try { await api.post('/api/logout/'); } catch {}
+        try { await api.post('/api/logout/'); } catch (error) {
+      console.error('Logout failed:', error.response?.data || error.message);
+    }
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
   };
- const register = async (username, email, password, department = '', role = 'student', student_number = '', staff_number = '') => {
-    try {
-      setLoading(true);
-      await api.post('/api/register/', { username, email, password, department, role, student_number, staff_number });
+ const register = async (formData) => {
+  try {
+    setLoading(true);
+    const { confirmPassword, ...payload } = formData;   // strip frontend-only field
+    await api.post('/api/register/', payload);
       return { success: true };
     } catch (err) {
       return { success: false, errors: err.response?.data || {} };

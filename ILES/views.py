@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import api_view, permission_classes,action
+from rest_framework.decorators import api_view, permission_classes,action,authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -167,6 +167,7 @@ class IssueViewSet(viewsets.ModelViewSet):
 
 # Registration view
 @api_view(['POST'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
@@ -203,6 +204,7 @@ def register(request):
 
 # login view
 @api_view(['POST'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def login(request):
     username = request.data.get("username")
@@ -228,7 +230,7 @@ def login(request):
             }
         }, status=status.HTTP_200_OK)
     
-    # if authentification fails
+    # if authentication fails
     return Response({
         "error": "Invalid credentials"
     }, status=status.HTTP_401_UNAUTHORIZED)
@@ -263,19 +265,37 @@ def me(request):
 def search_items(request):
     query = request.query_params.get('q', '')
     user = request.user
-    ...
-    placement_serializer = Internship_PlacementSerializer(placements, many=True)
-    log_serializer = Weekly_LogSerializer(logs, many=True)
-    feedback_serializer = Supervisor_FeedbackSerializer(feedbacks, many=True)
-    academic_serializer = Academic_Supervisor_FeedbackSerializer(academic_feedbacks, many=True)
-    issue_serializer = IssueSerializer(issues, many=True)
+
+    placements = Internship_Placement.objects.filter(
+        Q(company_name__icontains=query) | Q(student__username__icontains=query)
+    )
+    logs = Weekly_Log.objects.filter(
+        Q(activities__icontains=query) | Q(challenges__icontains=query)
+    )
+    feedbacks = Supervisor_Feedback.objects.filter(comments__icontains=query)
+    academic_feedbacks = Academic_Supervisor_Feedback.objects.filter(comments__icontains=query)
+    issues = Issue.objects.filter(
+        Q(title__icontains=query) | Q(issue_type__icontains=query)
+    )
+
+    # Filter by role
+    if user.role == 'student':
+        placements = placements.filter(student=user)
+        logs = logs.filter(placement__student=user)
+        issues = issues.filter(placement__student=user)
+    elif user.role == 'workplace':
+        placements = placements.filter(workplace_supervisor=user)
+        feedbacks = feedbacks.filter(supervisor=user)
+    elif user.role == 'academic':
+        placements = placements.filter(academic_supervisor=user)
+        academic_feedbacks = academic_feedbacks.filter(academic_supervisor=user)
 
     return Response({
-        "placements": placement_serializer.data,
-        "logs": log_serializer.data,
-        "feedbacks": feedback_serializer.data,
-        "academic_feedbacks": academic_serializer.data,
-        "issues": issue_serializer.data,
+        "placements": Internship_PlacementSerializer(placements, many=True).data,
+        "logs": Weekly_LogSerializer(logs, many=True).data,
+        "feedbacks": Supervisor_FeedbackSerializer(feedbacks, many=True).data,
+        "academic_feedbacks": Academic_Supervisor_FeedbackSerializer(academic_feedbacks, many=True).data,
+        "issues": IssueSerializer(issues, many=True).data,
     }, status=status.HTTP_200_OK)
 
 

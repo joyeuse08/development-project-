@@ -14,22 +14,38 @@ function AdminDashboard() {
   useEffect(() => {
     // Fetch all users
     axios.get('/api/users/')
-      .then(res => setUsers(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setUsers(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch all placements
     axios.get('/api/Internship_Placement/')
-      .then(res => setPlacements(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setPlacements(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch all weekly logs
     axios.get('/api/Weekly_Log/')
-      .then(res => setLogs(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setLogs(data);
+      })
       .catch(err => console.log(err));
 
     // Fetch all issues
     axios.get('/api/issues/')
-      .then(res => setIssues(res.data))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data :
+                     Array.isArray(res.data.results) ? res.data.results : [];
+        setIssues(data);
+      })
       .catch(err => console.log(err));
   }, []);
 
@@ -130,7 +146,7 @@ function AdminDashboard() {
             <tbody>
               {placements.map(p => (
                 <tr key={p.id}>
-                  <td>{p.student}</td>
+                  <td>{p.student_name || p.student}</td>
                   <td>{p.company_name}</td>
                   <td>{p.status}</td>
                   <td>{p.start_date}</td>
@@ -157,7 +173,7 @@ function AdminDashboard() {
                 <tr key={i.id}>
                   <td>{i.issue_type}</td>
                   <td>{i.status}</td>
-                  <td>{i.student}</td>
+                  <td>{i.reported_by_name || '—'}</td>
                 </tr>
               ))}
             </tbody>
