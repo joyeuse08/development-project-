@@ -1,8 +1,5 @@
 """
 WSGI config for ILES project.
-=======
-WSGI config for backend project.
->>>>>>> b56bb247aa50598bcfeceeb1d964a13359ed384d
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +8,13 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/wsgi/
 """
 
 import os
+import sys
+from pathlib import Path
+
+# Add the backend package directory to sys.path
+backend_dir = Path(__file__).resolve().parent.parent
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
 
 from django.core.wsgi import get_wsgi_application
 
