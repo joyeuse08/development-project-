@@ -347,6 +347,12 @@ function setupWorkplace() {
   }
   document.getElementById("welcomeName").innerHTML =
     user.fullName.split(" ")[0];
+  let students = getUsers().filter((u) => u.role === "student");
+  document.getElementById("totalStudents").innerHTML = students.length;
+  let pending = getLogs().filter((l) => l.status === "pending");
+  document.getElementById("pendingReviews").innerHTML = pending.length;
+  let approved = getLogs().filter((l) => l.status === "approved");
+  document.getElementById("approvedCount").innerHTML = approved.length;
   displayPendingWorkplaceLogs();
 }
 function displayPendingWorkplaceLogs() {
@@ -363,17 +369,25 @@ function displayPendingWorkplaceLogs() {
 function openReviewModal(id) {
   let log = getLogs().find((l) => l.id === id);
   let student = getUsers().find((u) => u.id === log.studentId);
-  document.getElementById("reviewLogId").value = log.id;
-  document.getElementById("reviewStudentName").value = student?.fullName;
-  document.getElementById("reviewWeek").value = `Week ${log.week}`;
-  document.getElementById("reviewActivities").value = log.activities;
+  document.getElementById("modalLogId").value = log.id;
+  document.getElementById("modalStudentName").value = student?.fullName;
+  document.getElementById("modalWeek").value = `Week ${log.week}`;
+  document.getElementById("modalActivities").value = log.activities;
+  document.querySelector("#reviewModal .modal-header h3").textContent =
+    "Workplace Review";
+  document.getElementById("modalWorkplaceFeedback").style.display = "none";
+  document.querySelector("label[for='modalAcademicFeedback']").textContent =
+    "Workplace Feedback";
+  document.querySelector("label[for='modalAcademicScore']").textContent =
+    "Workplace Score (0-10)";
   document.getElementById("reviewModal").classList.add("active");
+  document.getElementById("modalReviewForm").onsubmit = submitWorkplaceReview;
 }
 function submitWorkplaceReview(e) {
   e.preventDefault();
-  let id = parseInt(reviewLogId.value);
-  let fb = feedback.value.trim();
-  let sc = parseFloat(score.value);
+  let id = parseInt(document.getElementById("modalLogId").value);
+  let fb = document.getElementById("modalAcademicFeedback").value.trim();
+  let sc = parseFloat(document.getElementById("modalAcademicScore").value);
   if (fb.length < 5) {
     showMessage("Provide meaningful feedback", "error");
     return;
@@ -407,6 +421,18 @@ function setupAcademic() {
   }
   document.getElementById("welcomeName").innerHTML =
     user.fullName.split(" ")[0];
+  let students = getUsers().filter((u) => u.role === "student");
+  document.getElementById("totalStudents").innerHTML = students.length;
+  let pending = getLogs().filter((l) => l.status === "reviewed_by_workplace");
+  document.getElementById("pendingReviews").innerHTML = pending.length;
+  let approved = getLogs().filter((l) => l.status === "approved");
+  document.getElementById("approvedCount").innerHTML = approved.length;
+  let scores = getLogs()
+    .filter((l) => l.academicScore)
+    .map((l) => l.academicScore);
+  document.getElementById("avgScore").innerHTML = scores.length
+    ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+    : "0";
   displayPendingAcademicLogs();
 }
 function displayPendingAcademicLogs() {
@@ -427,13 +453,23 @@ function openAcademicModal(id) {
   document.getElementById("modalStudentName").value = student?.fullName;
   document.getElementById("modalWeek").value = `Week ${log.week}`;
   document.getElementById("modalActivities").value = log.activities;
+  document.getElementById("modalWorkplaceText").textContent =
+    log.workplaceFeedback || "No feedback";
+  document.querySelector("#reviewModal .modal-header h3").textContent =
+    "Academic Review & Approval";
+  document.getElementById("modalWorkplaceFeedback").style.display = "block";
+  document.querySelector("label[for='modalAcademicFeedback']").textContent =
+    "Academic Feedback";
+  document.querySelector("label[for='modalAcademicScore']").textContent =
+    "Academic Score (0-10)";
   document.getElementById("reviewModal").classList.add("active");
+  document.getElementById("modalReviewForm").onsubmit = submitAcademicReview;
 }
 function submitAcademicReview(e) {
   e.preventDefault();
-  let id = parseInt(modalLogId.value);
-  let fb = modalAcademicFeedback.value.trim();
-  let sc = parseFloat(modalAcademicScore.value);
+  let id = parseInt(document.getElementById("modalLogId").value);
+  let fb = document.getElementById("modalAcademicFeedback").value.trim();
+  let sc = parseFloat(document.getElementById("modalAcademicScore").value);
   if (fb.length < 5) {
     showMessage("Provide feedback", "error");
     return;
