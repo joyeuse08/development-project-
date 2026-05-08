@@ -1,0 +1,19 @@
+
+#byte
+__pycache__/
+*.pyc
+*$py.class
+#IDE
+.idea/
+
+#virtualenv
+venv/
+.venv/
+env/
+.env/
+#macOS
+
+#Distribution/ packaging
+build/
+dist
+*.egg-info/
