@@ -632,5 +632,5 @@ document.addEventListener("DOMContentLoaded", function () {
   else if (page === "workplace_supervisor.html") setupWorkplace();
   else if (page === "academic_supervisor.html") setupAcademic();
   else if (page === "admin.html") setupAdmin();
-  else if (page.includes("application")) setupApplicationForm();
+  else if (page ==="application.html" || page.includes("application")) setupApplicationForm();
 });
