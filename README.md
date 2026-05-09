@@ -51,5 +51,20 @@ Intern:
 Logs → New Entry → Fill form → Save Draft/Submit
 
 Supervisor:
-Dashboard → Select Intern → View Week 3 → Add Rating & Comment → Approve
+Dashboard → Select Intern → View Week 3 → Add Rating & Comment → Approve 
+
+
+Database Schema Overview
+
+Highlight the main tables and relationships:
+
+Table Columns (simplified)
+users id, role (intern/supervisor/admin), name, email
+internships id, intern_id, supervisor_id, start_date, end_date
+log_entries id, intern_id, date, task_description, hours, challenges, status
+weekly_reports id, intern_id, week_number, submitted_at, status
+evaluations id, weekly_report_id, score, comments, approved_by
+
+Helps new developers understand data flow.
+
 
