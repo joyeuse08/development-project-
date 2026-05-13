@@ -715,6 +715,7 @@ input::placeholder {
   color: #555;
   font-size: 19px;
   user-select: none;
+  fontweight: 300
 }
 
 .forgot-link {
