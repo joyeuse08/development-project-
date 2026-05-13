@@ -39,7 +39,6 @@ function updateLog(id, updates) {
   }
   return false;
 }
-
 // ========== 2. HELPERS ==========
 function showMessage(msg, type) {
   let d = document.createElement("div");
@@ -256,6 +255,52 @@ function setupWelcome() {
       loginTab.click();
     } else showMessage(result.message, "error");
   };
+  // ==============================
+  // REMEMBER ME FEATURE
+  // ==============================
+
+  const rememberMe = document.getElementById("rememberMe");
+
+  const savedUser = localStorage.getItem("rememberedUser");
+
+  if (savedUser) {
+    rememberMe.checked = true;
+    document.getElementById("loginUsername").value = savedUser;
+  }
+
+  document.getElementById("loginFormElement").addEventListener("submit", () => {
+    const username = document.getElementById("loginUsername").value.trim();
+
+    if (rememberMe.checked && username) {
+      localStorage.setItem("rememberedUser", username);
+    } else {
+      localStorage.removeItem("rememberedUser");
+    }
+  });
+
+  // ==============================
+  // FORGOT PASSWORD FEATURE
+  // ==============================
+
+  const forgotLink = document.querySelector(".forgot-link");
+
+  if (forgotLink) {
+    forgotLink.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const email = prompt(
+        "Enter your registered email to reset your password:",
+      );
+
+      if (!email) return;
+
+      if (email.includes("@")) {
+        alert(`Reset link sent to ${email}`);
+      } else {
+        alert("Please enter a valid registered email address");
+      }
+    });
+  }
 }
 
 // ========== 7. STUDENT DASHBOARD ==========
@@ -347,6 +392,12 @@ function setupWorkplace() {
   }
   document.getElementById("welcomeName").innerHTML =
     user.fullName.split(" ")[0];
+  let students = getUsers().filter((u) => u.role === "student");
+  document.getElementById("totalStudents").innerHTML = students.length;
+  let pending = getLogs().filter((l) => l.status === "pending");
+  document.getElementById("pendingReviews").innerHTML = pending.length;
+  let approved = getLogs().filter((l) => l.status === "approved");
+  document.getElementById("approvedCount").innerHTML = approved.length;
   displayPendingWorkplaceLogs();
 }
 function displayPendingWorkplaceLogs() {
@@ -363,17 +414,25 @@ function displayPendingWorkplaceLogs() {
 function openReviewModal(id) {
   let log = getLogs().find((l) => l.id === id);
   let student = getUsers().find((u) => u.id === log.studentId);
-  document.getElementById("reviewLogId").value = log.id;
-  document.getElementById("reviewStudentName").value = student?.fullName;
-  document.getElementById("reviewWeek").value = `Week ${log.week}`;
-  document.getElementById("reviewActivities").value = log.activities;
+  document.getElementById("modalLogId").value = log.id;
+  document.getElementById("modalStudentName").value = student?.fullName;
+  document.getElementById("modalWeek").value = `Week ${log.week}`;
+  document.getElementById("modalActivities").value = log.activities;
+  document.querySelector("#reviewModal .modal-header h3").textContent =
+    "Workplace Review";
+  document.getElementById("modalWorkplaceFeedback").style.display = "none";
+  document.querySelector("label[for='modalAcademicFeedback']").textContent =
+    "Workplace Feedback";
+  document.querySelector("label[for='modalAcademicScore']").textContent =
+    "Workplace Score (0-10)";
   document.getElementById("reviewModal").classList.add("active");
+  document.getElementById("modalReviewForm").onsubmit = submitWorkplaceReview;
 }
 function submitWorkplaceReview(e) {
   e.preventDefault();
-  let id = parseInt(reviewLogId.value);
-  let fb = feedback.value.trim();
-  let sc = parseFloat(score.value);
+  let id = parseInt(document.getElementById("modalLogId").value);
+  let fb = document.getElementById("modalAcademicFeedback").value.trim();
+  let sc = parseFloat(document.getElementById("modalAcademicScore").value);
   if (fb.length < 5) {
     showMessage("Provide meaningful feedback", "error");
     return;
@@ -407,6 +466,18 @@ function setupAcademic() {
   }
   document.getElementById("welcomeName").innerHTML =
     user.fullName.split(" ")[0];
+  let students = getUsers().filter((u) => u.role === "student");
+  document.getElementById("totalStudents").innerHTML = students.length;
+  let pending = getLogs().filter((l) => l.status === "reviewed_by_workplace");
+  document.getElementById("pendingReviews").innerHTML = pending.length;
+  let approved = getLogs().filter((l) => l.status === "approved");
+  document.getElementById("approvedCount").innerHTML = approved.length;
+  let scores = getLogs()
+    .filter((l) => l.academicScore)
+    .map((l) => l.academicScore);
+  document.getElementById("avgScore").innerHTML = scores.length
+    ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+    : "0";
   displayPendingAcademicLogs();
 }
 function displayPendingAcademicLogs() {
@@ -427,13 +498,23 @@ function openAcademicModal(id) {
   document.getElementById("modalStudentName").value = student?.fullName;
   document.getElementById("modalWeek").value = `Week ${log.week}`;
   document.getElementById("modalActivities").value = log.activities;
+  document.getElementById("modalWorkplaceText").textContent =
+    log.workplaceFeedback || "No feedback";
+  document.querySelector("#reviewModal .modal-header h3").textContent =
+    "Academic Review & Approval";
+  document.getElementById("modalWorkplaceFeedback").style.display = "block";
+  document.querySelector("label[for='modalAcademicFeedback']").textContent =
+    "Academic Feedback";
+  document.querySelector("label[for='modalAcademicScore']").textContent =
+    "Academic Score (0-10)";
   document.getElementById("reviewModal").classList.add("active");
+  document.getElementById("modalReviewForm").onsubmit = submitAcademicReview;
 }
 function submitAcademicReview(e) {
   e.preventDefault();
-  let id = parseInt(modalLogId.value);
-  let fb = modalAcademicFeedback.value.trim();
-  let sc = parseFloat(modalAcademicScore.value);
+  let id = parseInt(document.getElementById("modalLogId").value);
+  let fb = document.getElementById("modalAcademicFeedback").value.trim();
+  let sc = parseFloat(document.getElementById("modalAcademicScore").value);
   if (fb.length < 5) {
     showMessage("Provide feedback", "error");
     return;
@@ -513,8 +594,9 @@ function updateStep() {
   }
   document.getElementById(`section${step}`).classList.add("active");
   document.getElementById(`step${step}`).classList.add("active");
-  for (let i = 1; i < step; i++)
+  for (let i = 1; i < step; i++) {
     document.getElementById(`step${i}`).classList.add("completed");
+  }
   document.getElementById("prevBtn").style.display =
     step === 1 ? "none" : "inline-flex";
   document.getElementById("nextBtn").style.display =
@@ -596,5 +678,5 @@ document.addEventListener("DOMContentLoaded", function () {
   else if (page === "workplace_supervisor.html") setupWorkplace();
   else if (page === "academic_supervisor.html") setupAcademic();
   else if (page === "admin.html") setupAdmin();
-  else if (page.includes("application")) setupApplicationForm();
+  else if (page === "application.html" || page.includes("application"))setupApplicationForm();
 });
