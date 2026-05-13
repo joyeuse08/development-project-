@@ -74,7 +74,7 @@ class Weekly_Log(models.Model):
         ("rejected", "Rejected"),
     ]
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='weekly_logs')
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='weekly_logs', limit_choices_to={'role': 'workplace'}) 
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='weekly_logs', limit_choices_to={'role': 'workplace'}) 
     week_number = models.PositiveIntegerField()
     activities = models.TextField()
     challenges = models.TextField(blank = True)
@@ -97,7 +97,7 @@ class Student_log(models.Model):
         ('rejected', 'Rejected'),   
     ] 
     student = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='logs')
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null =True, blank =True, related_name='student_logs', limit_choices_to={'role': 'workplace'})
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,null =True, blank =True, related_name='student_logs', limit_choices_to={'role': 'workplace'})
     title = models.CharField(max_length=255,null=True, blank=True)
     date=models.DateField()
     description = models.TextField()
