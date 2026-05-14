@@ -655,29 +655,29 @@ function updateStep() {
 }
 function validate(s) {
   if (s === 1) {
-    if (!studentName.value) {
+    if (!document.getElementById("studentName").value) {
       alert("Enter name");
       return false;
     }
-    if (!regNumber.value) {
+    if (!document.getElementById("regNumber").value) {
       alert("Enter registration");
       return false;
     }
-    if (!email.value.includes("@")) {
+    if (!document.getElementById("email").value.includes("@")) {
       alert("Valid email");
       return false;
     }
     return true;
   }
   if (s === 2) {
-    if (!academicProgram.value) {
+    if (!document.getElementById("academicProgram").value) {
       alert("Enter program");
       return false;
     }
     return true;
   }
   if (s === 3) {
-    if (!organization.value) {
+    if (!document.getElementById("organization").value) {
       alert("Enter organization");
       return false;
     }
@@ -698,8 +698,13 @@ function prevStep() {
   }
 }
 function populateReview() {
-  document.getElementById("reviewContainer").innerHTML =
-    `<div>Name: ${studentName.value}</div><div>Registration: ${regNumber.value}</div><div>Email: ${email.value}</div><div>Program: ${academicProgram.value}</div><div>Organization: ${organization.value}</div>`;
+  document.getElementById("reviewContainer").innerHTML = `
+  <div>Name: ${document.getElementById("studentName").value}</div>
+  <div>Registration: ${document.getElementById("regNumber").value}</div>
+  <div>Email: ${document.getElementById("email").value}</div>
+  <div>Program: ${document.getElementById("academicProgram").value}</div>
+  <div>Organization: ${document.getElementById("organization").value}</div>
+  `;
 }
 function submitApp(e) {
   e.preventDefault();
@@ -726,5 +731,5 @@ document.addEventListener("DOMContentLoaded", function () {
   else if (page === "workplace_supervisor.html") setupWorkplace();
   else if (page === "academic_supervisor.html") setupAcademic();
   else if (page === "admin.html") setupAdmin();
-  else if (page === "application.html") setupApplicationForm();
+  else if (page === "Application.html") setupApplicationForm();
 });
