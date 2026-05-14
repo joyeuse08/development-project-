@@ -236,52 +236,53 @@ function setupWelcome() {
       );
     } else showMessage(result.message, "error");
     // ==============================
-  // REMEMBER ME FEATURE
-  // ==============================
+    // REMEMBER ME FEATURE
+    // ==============================
 
-  const rememberMe = document.getElementById("rememberMe");
+    const rememberMe = document.getElementById("rememberMe");
 
-  const savedUser = localStorage.getItem("rememberedUser");
+    const savedUser = localStorage.getItem("rememberedUser");
 
-  if (savedUser) {
-    rememberMe.checked = true;
-    document.getElementById("loginUsername").value = savedUser;
-  }
-
-  document.getElementById("loginFormElement").addEventListener("submit", () => {
-    const username = document.getElementById("loginUsername").value.trim();
-
-    if (rememberMe.checked && username) {
-      localStorage.setItem("rememberedUser", username);
-    } else {
-      localStorage.removeItem("rememberedUser");
+    if (savedUser) {
+      rememberMe.checked = true;
+      document.getElementById("loginUsername").value = savedUser;
     }
-  });
 
-  // ==============================
-  // FORGOT PASSWORD FEATURE
-  // ==============================
+    document
+      .getElementById("loginFormElement")
+      .addEventListener("submit", () => {
+        const username = document.getElementById("loginUsername").value.trim();
 
-  const forgotLink = document.querySelector(".forgot-link");
+        if (rememberMe.checked && username) {
+          localStorage.setItem("rememberedUser", username);
+        } else {
+          localStorage.removeItem("rememberedUser");
+        }
+      });
 
-  if (forgotLink) {
-    forgotLink.addEventListener("click", (e) => {
-      e.preventDefault();
+    // ==============================
+    // FORGOT PASSWORD FEATURE
+    // ==============================
 
-      const email = prompt(
-        "Enter your registered email to reset your password:",
-      );
+    const forgotLink = document.querySelector(".forgot-link");
 
-      if (!email) return;
+    if (forgotLink) {
+      forgotLink.addEventListener("click", (e) => {
+        e.preventDefault();
 
-      if (email.includes("@")) {
-        alert(`Reset link sent to ${email}`);
-      } else {
-        alert("Please enter a valid registered email address");
-      }
-    });
-  }
+        const email = prompt(
+          "Enter your registered email to reset your password:",
+        );
 
+        if (!email) return;
+
+        if (email.includes("@")) {
+          alert(`Reset link sent to ${email}`);
+        } else {
+          alert("Please enter a valid registered email address");
+        }
+      });
+    }
   };
 
   document.getElementById("registerFormElement").onsubmit = (e) => {
@@ -725,5 +726,5 @@ document.addEventListener("DOMContentLoaded", function () {
   else if (page === "workplace_supervisor.html") setupWorkplace();
   else if (page === "academic_supervisor.html") setupAcademic();
   else if (page === "admin.html") setupAdmin();
-  else if (page.includes("application")) setupApplicationForm();
+  else if (page === "application.html") setupApplicationForm();
 });
