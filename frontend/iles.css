@@ -10,6 +10,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-size: 19px;
+  font-weight: 400;
 }
 header {
   text-align: center;
@@ -237,7 +239,7 @@ input::placeholder {
     align-items: flex-start;
   }
   .log-header h2 {
-    font-size: 1.2;
+    font-size: 1.2rem;
   }
 }
 <!--student dashboard --- > .header {
