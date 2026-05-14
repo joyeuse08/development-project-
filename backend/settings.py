@@ -28,7 +28,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -80,7 +79,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
