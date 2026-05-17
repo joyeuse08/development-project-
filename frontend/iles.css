@@ -11,7 +11,7 @@ body {
   display: flex;
   flex-direction: column;
   font-size: 19px;
-  font-weight: 400;
+  font-weight: 500;
 }
 header {
   text-align: center;
