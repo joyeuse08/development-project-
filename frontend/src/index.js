@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
@@ -9,7 +9,6 @@ root.render(
   <AuthProvider>
     <App />
   </AuthProvider>,
-=======
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -23,5 +22,5 @@ root.render(
       <App />
     </AuthProvider>
   </React.StrictMode>
->>>>>>> d17bf972fe18cdea2fddf9033789fb709e2190e0
+
 );
