@@ -5,6 +5,8 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -16,13 +18,14 @@ import AcademicFeedback from "./pages/AcademicFeedback";
 import WeightedScore from "./pages/WeightedScore";
 import Notifications from "./pages/Notifications";
 import { useAuth } from "./context/AuthContext";
+
 import "./App.css";
 
-function PrivateRoute({ children }) {
+function PrivateRoute({ children, allowedRoles }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   if (allowedRoles && !allowedRoles.includes(user.role))
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/dashboard" replace />;
   return children;
 }
 
@@ -44,10 +47,22 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/issues" element={<Issues />} />
+        <Route path="/submit_log" element={<WeeklyLog />} />
         <Route
           path="/weekly-logs"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["student"]}>
+              <WeeklyLog />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/submit_log"
+          element={
+            <PrivateRoute allowedRoles={["student"]}>
               <WeeklyLog />
             </PrivateRoute>
           }
@@ -55,7 +70,7 @@ function App() {
         <Route
           path="/academic-feedback"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["academic_supervisor", "student"]}>
               <AcademicFeedback />
             </PrivateRoute>
           }
@@ -63,7 +78,7 @@ function App() {
         <Route
           path="/supervisor-feedback"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["workplace_supervisor", "student"]}>
               <SupervisorFeedback />
             </PrivateRoute>
           }
@@ -71,7 +86,7 @@ function App() {
         <Route
           path="/internship-placement"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["student", "admin"]}>
               <InternshipPlacement />
             </PrivateRoute>
           }
@@ -79,7 +94,7 @@ function App() {
         <Route
           path="/weighted-score"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["admin", "academic_supervisor"]}>
               <WeightedScore />
             </PrivateRoute>
           }
@@ -92,15 +107,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/issues" element={<Issues />} />
-        <Route path="/internship_placement" element={<InternshipPlacement />} />
-        <Route path="/weekly_log" element={<WeeklyLog />} />
-        <Route path="/supervisor_feedback" element={<SupervisorFeedback />} />
-        <Route path="/academic_feedback" element={<AcademicFeedback />} />
-        <Route path="/weighted_score" element={<WeightedScore />} />
-        <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </Router>
   );
