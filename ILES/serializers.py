@@ -8,9 +8,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = [
-            'id', 'username', 'first_name', 'last_name', 'email', 'role' ,'department', 'is_active', 'is_staff', 'student_number', 'staff_number'
-        ]
+        fields = ['id', 
+                  'username', 'first_name', 'last_name', 'email', 'role','department', 'is_active', 'is_staff', 'student_number', 'staff_number']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -49,7 +48,7 @@ class IssueSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Issue
-        fields = '__all__'
+        fields = "__all__"
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -85,10 +84,10 @@ class Student_logSerializer(serializers.ModelSerializer):
 
     def validate_hours(self, value):
         if value <= 0:
-            raise serializers.ValidationError("Must be greater that 0")
+            raise serializers.ValidationError("Must be greater than 0")
         return value    
 
-from .models import Notification
+from .models import notification
 
 class NotificationSerializer(serializers.ModelSerializer):
     actor_name = serializers.CharField(source='actor.username', read_only=True)
