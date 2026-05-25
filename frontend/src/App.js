@@ -1,3 +1,4 @@
+import WeeklyLogSubmission from "./pages/WeeklyLogSubmission";
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -50,7 +51,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/issues" element={<Issues />} />
-        <Route path="/submit_log" element={<WeeklyLog />} />
+        <Route path="/submit_weekly_log" element={<WeeklyLogSubmission />} />
         <Route
           path="/weekly-logs"
           element={
@@ -60,10 +61,10 @@ function App() {
           }
         />
         <Route
-          path="/submit_log"
+          path="/submit_weekly_log"
           element={
             <PrivateRoute allowedRoles={["student"]}>
-              <WeeklyLog />
+              <WeeklyLogSubmission />
             </PrivateRoute>
           }
         />
