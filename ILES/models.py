@@ -35,6 +35,7 @@ class Internship_Placement(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='student_placements',limit_choices_to={'role': 'student'}
     )
     company_name = models.CharField(max_length=255)
+    description=models.TextField(blank=True)
     start_date = models.DateField()
     end_date = models.DateField()
     workplace_supervisor = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,
@@ -161,6 +162,7 @@ class Issue(models.Model):
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='issues')
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reported_issues')
     issue_type = models.TextField()
+    description = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -179,6 +181,7 @@ class Notification(models.Model):
     target_type = models.CharField(max_length=50, null=True, blank=True)  # 'report', 'comment', etc.
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    message = models.TextField()
     
     class Meta:
         ordering = ['-created_at']
