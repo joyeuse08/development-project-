@@ -162,7 +162,7 @@ class Issue(models.Model):
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='issues')
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reported_issues')
     issue_type = models.TextField()
-    description = models.TextField()
+    description = models.TextField(default="", blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
     created_at = models.DateTimeField(auto_now_add=True)
 
