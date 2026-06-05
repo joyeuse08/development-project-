@@ -63,14 +63,6 @@ function App() {
           }
         />
         <Route
-          path="/submit_weekly_log"
-          element={
-            <PrivateRoute allowedRoles={["student"]}>
-              <WeeklyLogSubmission />
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/academic-feedback"
           element={
             <PrivateRoute allowedRoles={["academic_supervisor", "student"]}>
