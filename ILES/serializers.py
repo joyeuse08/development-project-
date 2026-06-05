@@ -87,7 +87,7 @@ class Student_logSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Must be greater than 0")
         return value    
 
-from .models import notification
+from .models import Notification
 
 class NotificationSerializer(serializers.ModelSerializer):
     actor_name = serializers.CharField(source='actor.username', read_only=True)
