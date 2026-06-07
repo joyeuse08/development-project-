@@ -88,10 +88,10 @@ WSGI_APPLICATION = 'backend.wsgi'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'iles_db_7g8x',
-        'USER': 'iles_db_7g8x_user',
-        'PASSWORD': 'vg0Q3UyKUxmVolD8E3kCFLgpxvTDuiPP',
-        'HOST': 'dpg-d7uehjreo5us73e0ok90-a.oregon-postgres.render.com',
+        'NAME': 'iles_db2',
+        'USER': 'iles_db2_user',
+        'PASSWORD': 'xcIGyiuL7lUeqVmWejWrL6ddEVTZdlGd',
+        'HOST': 'dpg-d8ivaqrtqb8s73bk2tdg-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
 }
