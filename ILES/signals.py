@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -11,8 +12,8 @@ def send_notification_email(subject, message, recipient_list):
             message,
             settings.EMAIL_HOST_USER,
             recipient_list)
-    except Exception:
-        pass # or log the error: import logging; logging.exception("Email failed")
+    except Exception as e:
+        logging.exception("Email failed")
 
 @receiver(post_save, sender=Student_log)
 def notify_on_student_log(sender, instance, created, **kwargs):

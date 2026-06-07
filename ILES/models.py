@@ -35,6 +35,7 @@ class Internship_Placement(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='student_placements',limit_choices_to={'role': 'student'}
     )
     company_name = models.CharField(max_length=255)
+    description=models.TextField(blank=True)
     start_date = models.DateField()
     end_date = models.DateField()
     workplace_supervisor = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,
@@ -74,7 +75,7 @@ class Weekly_Log(models.Model):
         ("rejected", "Rejected"),
     ]
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='weekly_logs')
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='weekly_logs', limit_choices_to={'role': 'workplace'}) 
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='weekly_logs', limit_choices_to={'role': 'workplace'}) 
     week_number = models.PositiveIntegerField()
     activities = models.TextField()
     challenges = models.TextField(blank = True)
@@ -97,7 +98,7 @@ class Student_log(models.Model):
         ('rejected', 'Rejected'),   
     ] 
     student = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='logs')
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null =True, blank =True, related_name='student_logs', limit_choices_to={'role': 'workplace'})
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,null =True, blank =True, related_name='student_logs', limit_choices_to={'role': 'workplace'})
     title = models.CharField(max_length=255,null=True, blank=True)
     date=models.DateField()
     description = models.TextField()
@@ -161,6 +162,7 @@ class Issue(models.Model):
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='issues')
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reported_issues')
     issue_type = models.TextField()
+    description = models.TextField(default="", blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -179,6 +181,7 @@ class Notification(models.Model):
     target_type = models.CharField(max_length=50, null=True, blank=True)  # 'report', 'comment', etc.
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    message = models.TextField()
     
     class Meta:
         ordering = ['-created_at']

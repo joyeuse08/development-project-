@@ -4,20 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ILES - Academic Supervisor Dashboard</title>
-    <script src="group12.js"></script>
     <link rel="stylesheet" href="iles.css" />
   </head>
   <body>
-      <div class="header">>
+    <div class="header">
         <div>
           <h1>Academic Supervisor Dashboard</h1>
         </div>
-      </div>
-      <div class="user-info">
-        <button class="logout-btn" onclick="logout()">Logout</button>
-      </div>
+        <div class="user-info">
+         <button class="logout-btn" onclick="logout()">Logout</button>
+       </div>
     </div>
-
     <div class="container">
       <!-- Welcome Banner -->
       <div class="welcome-banner">
@@ -27,7 +24,6 @@
           student progress
         </p>
       </div>
-
       <!-- Stats Cards -->
       <div class="stats-grid">
         <div class="stat-card">
@@ -59,7 +55,6 @@
           </div>
         </div>
       </div>
-
       <!-- Two Column Layout -->
       <div class="two-columns">
         <!-- Left Column: Review Form -->
@@ -104,7 +99,7 @@
                 <input
                   type="number"
                   id="academicScore"
-                  placeholder="Enter score between 0 and 10"
+                  placeholder="Enter your score between 0 and 10"
                   step="0.1"
                   min="0"
                   max="10"
@@ -117,7 +112,6 @@
             </form>
           </div>
         </div>
-
         <!-- Right Column: Pending Approvals -->
         <div class="card">
           <div class="card-header">
@@ -132,7 +126,6 @@
           </div>
         </div>
       </div>
-
       <!-- Evaluation Summary Section -->
       <div class="card evaluation-summary">
         <div class="card-header">
@@ -146,7 +139,6 @@
         </div>
       </div>
     </div>
-
     <!-- Review Modal -->
     <div id="reviewModal" class="modal">
       <div class="modal-content">
@@ -215,4 +207,5 @@
       </div>
     </div>
   </body>
+   <script src="group12.js"></script>
 </html>

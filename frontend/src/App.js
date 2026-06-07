@@ -1,78 +1,108 @@
-import React from 'react';
-import{ BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Issues from './pages/Issues';
-import InternshipPlacement from './pages/InternshipPlacement';
-import WeeklyLog from './pages/WeeklyLog';
-import WeeklyLogSubmission from './pages/WeeklyLogSubmission';
-import StudentLog from './pages/StudentLog';
-import StudentLogSubmission from './pages/StudentLogSubmission';
-import SupervisorFeedback from './pages/SupervisorFeedback';
-import AcademicFeedback from './pages/AcademicFeedback';
-import WeightedScore from './pages/WeightedScore';
-import Notifications from './pages/Notifications';
-import StudentDashboard from './pages/StudentDashboard';
-import WorkplaceSupervisorDashboard from './pages/WorkplaceSupervisorDashboard';
-import AcademicSupervisorDashboard from './pages/AcademicSupervisorDashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import LogSubmission from './pages/StudentLogSubmission';
-import {useAuth} from './context/AuthContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
+import StudentLogSubmission from "./pages/StudentLogSubmission";
+import WeeklyLogSubmission from "./pages/WeeklyLogSubmission";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Issues from "./pages/Issues";
+import InternshipPlacement from "./pages/InternshipPlacement";
+import WeeklyLog from "./pages/WeeklyLog";
+import SupervisorFeedback from "./pages/SupervisorFeedback";
+import AcademicFeedback from "./pages/AcademicFeedback";
+import WeightedScore from "./pages/WeightedScore";
+import Notifications from "./pages/Notifications";
+import { useAuth } from "./context/AuthContext";
 
-//opening dashboard based on roale of user
-function RoleBasedRedirect() {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role === 'student') return <Navigate to="/student_dashboard" replace />;
-  if (user.role === 'workplace') return <Navigate to="/workplace_supervisor_dashboard" replace />;
-  if (user.role === 'academic') return <Navigate to="/academic_supervisor_dashboard" replace />;
-  if (user.role === 'admin') return <Navigate to="/admin_dashboard" replace />;
-  return <Navigate to="/login" replace />;
-}
+import "./App.css";
 
-//protecting routes
 function PrivateRoute({ children, allowedRoles }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role))
+    return <Navigate to="/dashboard" replace />;
   return children;
 }
 
 function App() {
   return (
     <Router>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light"/> 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
-        {/* Public routes */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* Role redirect */}
-        <Route path="/dashboard" element={<RoleBasedRedirect />} />
-        {/* Student only */}
-        <Route path="/student_dashboard" element={<PrivateRoute allowedRoles={['student']}><StudentDashboard /></PrivateRoute>} />
-        {/* Workplace Supervisor only */}
-        <Route path="/workplace_supervisor_dashboard" element={<PrivateRoute allowedRoles={['workplace']}><WorkplaceSupervisorDashboard /></PrivateRoute>} />
-        {/* Academic Supervisor only */}
-        <Route path="/academic_supervisor_dashboard" element={<PrivateRoute allowedRoles={['academic']}><AcademicSupervisorDashboard /></PrivateRoute>} />
-        {/* Admin only */}
-        <Route path="/admin_dashboard" element={<PrivateRoute allowedRoles={['admin']}><AdminDashboard /></PrivateRoute>} />
-        {/* Common routes for all authenticated users */}
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/issues" element={<Issues />} />
-        <Route path="/internship_placement" element={<InternshipPlacement />} />
-        <Route path="/weekly_log" element={<WeeklyLog />} />
-        <Route path="/submit_weeklylog" element={<PrivateRoute allowedRoles={['student']}><WeeklyLogSubmission /></PrivateRoute>} />
-        <Route path="/supervisor_feedback" element={<SupervisorFeedback />} />
-        <Route path="/academic_feedback" element={<AcademicFeedback />} />
-        <Route path="/weighted_score" element={<WeightedScore />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/submit_studentlog" element={<PrivateRoute allowedRoles={['student']}><StudentLogSubmission /></PrivateRoute>} />
-        <Route path= "/student_log" element={<StudentLog/>}/>
-      </Routes>  
+        <Route path="/submit_weekly_log" element={<WeeklyLogSubmission />} />
+        <Route path="/submit_log" element={<StudentLogSubmission />} />
+        <Route
+          path="/weekly-logs"
+          element={
+            <PrivateRoute allowedRoles={["student"]}>
+              <WeeklyLog />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/academic-feedback"
+          element={
+            <PrivateRoute allowedRoles={["academic_supervisor", "student"]}>
+              <AcademicFeedback />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/supervisor-feedback"
+          element={
+            <PrivateRoute allowedRoles={["workplace_supervisor", "student"]}>
+              <SupervisorFeedback />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/internship-placement"
+          element={
+            <PrivateRoute allowedRoles={["student", "admin"]}>
+              <InternshipPlacement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/weighted-score"
+          element={
+            <PrivateRoute allowedRoles={["admin", "academic_supervisor"]}>
+              <WeightedScore />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
     </Router>
   );
 }
