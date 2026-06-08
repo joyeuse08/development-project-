@@ -48,7 +48,7 @@ function WorkplaceSupervisorDashboard() {
   },[]);
 
   // Fetch all data
-  const fetchAllData = useBallback(async () => {
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
       const [weeklyRes, dailyRes, feedbackRes] = await Promise.all([
