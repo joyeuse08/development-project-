@@ -18,12 +18,13 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
+from ILES.views import dashboard_view
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('ILES.urls')),
-   
+    path('dashboard/', dashboard_view, name='dashboard'), 
 ]
 
 if settings.DEBUG:
