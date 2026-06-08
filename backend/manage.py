@@ -14,7 +14,7 @@ def main():
     if project_dir not in sys.path:
         sys.path.insert(0, project_dir)
     
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
