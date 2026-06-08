@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import api from "../axiosConfig";
 
 const STATUS_CONFIG = {
   pending: { label: "Pending", color: "#f39c12", bg: "#fef9ec" },
@@ -13,7 +14,7 @@ export default function InternshipPlacement() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("/api/Internship_Placement/", {
+    api.get("/api/Internship_Placement/", {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),
