@@ -58,7 +58,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
    origin.strip()
-    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000","https://iles-frontend-9nag.onrender.com").split(",")
     if origin.strip()
 ]
 
@@ -161,7 +161,7 @@ REST_FRAMEWORK = {
 }
 
 # CORS Settings (for development only)
-#CORS_ALLOW_ALL_ORIGINS = True  # Allows all domains - ONLY FOR DEVELOPMENT!
+#CORS_ALLOW_ALL_ORIGINS = True  
 
 # Email configuration (use console backend for local development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
