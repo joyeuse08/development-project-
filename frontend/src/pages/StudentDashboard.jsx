@@ -99,13 +99,13 @@ function StudentDashboard() {
         <button onClick={() => navigate('/submit_log')}>
           + Submit Daily Log
         </button>
-        <button onClick={() => navigate('/submit_weekly_log')}>
+        <button onClick={() => navigate('/submit-weekly-log')}>
           + Submit Weekly Log
         </button>
-        <button onClick={() => navigate('/student_logs')}>
+        <button onClick={() => navigate('/student-logs')}>
           My Logs
         </button>
-        <button onClick={() => navigate('/internship_placement')}>
+        <button onClick={() => navigate('/internship-placement')}>
           My Placement
         </button>
         <button onClick={() => navigate('/issues')}>
