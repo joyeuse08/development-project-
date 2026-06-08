@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,7 @@ function WorkplaceSupervisorDashboard() {
   const [feedbackInputs, setFeedbackInputs] = useState({});
   const [loading, setLoading] = useState(true);
 
-  const combineLogs = (weekly, daily) => {
+  const combineLogs = useCallback((weekly, daily) => {
     const weeklyItems = weekly.map(log => ({
       id: `weekly_${log.id}`,
       originalId: log.id,
@@ -45,10 +45,10 @@ function WorkplaceSupervisorDashboard() {
     }));
 
     return [...weeklyItems, ...dailyItems];
-  };
+  },[]);
 
   // Fetch all data
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
       const [weeklyRes, dailyRes, feedbackRes] = await Promise.all([
@@ -70,11 +70,11 @@ function WorkplaceSupervisorDashboard() {
     } finally {
       setLoading(false);
     }
-  };
-// eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    fetchAllData();
   }, []);
+  
+useEffect(() => {
+  fetchAllData();
+}, [fetchAllData]);
 
   // Client‑side filtering by status
   const filteredItems = statusFilter
