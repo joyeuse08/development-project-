@@ -3,6 +3,7 @@ import api from "../axiosConfig";
 
 export default function PlacementRequest() {
   const [formData, setFormData] = useState({
+    student_name: "",
     company_name: "",
     workplace_supervisor_name: "",
     start_date: "",
@@ -54,6 +55,21 @@ export default function PlacementRequest() {
                 setFormData({
                   ...formData,
                   workplace_supervisor_name: e.target.value,
+                })
+              }
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Student Name</label>
+            <input
+              type="text"
+              value={formData.student_name}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  student_name: e.target.value,
                 })
               }
               style={styles.input}
