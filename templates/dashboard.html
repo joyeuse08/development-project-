@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ILES Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; background: #f7f7f7; }
+        .card { background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        h1, h2 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <p>Welcome, {{ username }} ({{ role }})</p>
+
+    {% if role == 'student' %}
+        <div class="card">
+            <h2>Your Placements</h2>
+            <ul>
+                {% for p in placements %}
+                    <li>{{ p.company_name }} - {{ p.status }}</li>
+                {% empty %}
+                    <li>No placements found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Your Weekly Logs</h2>
+            <ul>
+                {% for log in weekly_logs %}
+                    <li>Week {{ log.week_number }} - {{ log.status }}</li>
+                {% empty %}
+                    <li>No weekly logs found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Your Student Logs</h2>
+            <ul>
+                {% for log in student_logs %}
+                    <li>{{ log.date }} - {{ log.status }}</li>
+                {% empty %}
+                    <li>No student logs found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if role == 'workplace' %}
+        <div class="card">
+            <h2>Assigned Placements</h2>
+            <ul>
+                {% for p in placements %}
+                    <li>{{ p.student.username }} - {{ p.company_name }}</li>
+                {% empty %}
+                    <li>No placements assigned.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if role == 'academic' %}
+        <div class="card">
+            <h2>Academic Placements</h2>
+            <ul>
+                {% for p in placements %}
+                    <li>{{ p.student.username }} - {{ p.company_name }}</li>
+                {% empty %}
+                    <li>No placements assigned.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if role == 'admin' %}
+        <div class="card">
+            <h2>System Summary</h2>
+            <p>Total users: {{ users_count }}</p>
+            <p>Total placements: {{ placements_count }}</p>
+            <p>Open issues: {{ open_issues_count }}</p>
+            <p>Pending weekly logs: {{ pending_weekly_logs_count }}</p>
+        </div>
+    {% endif %}
+</body>
+</html>
