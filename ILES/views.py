@@ -44,6 +44,31 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
         if user.role == 'academic':
             return Internship_Placement.objects.filter(academic_supervisor=user)
         return Internship_Placement.objects.all()
+
+    def perform_create(self, serializer):
+        instance = serializer.save(
+            student=self.request.user,
+            status='pending'
+        )
+
+        admins = CustomUser.objects.filter(role='admin')
+
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                actor=self.request.user,
+                verb=f"New internship placement submitted by {instance.student.username} at {instance.company_name}.",
+                target_id=instance.id,
+                target_type='internship_placement',
+            )
+
+        Notification.objects.create(
+            recipient=instance.student,
+            actor=self.request.user,
+            verb=f"Your internship placement at {instance.company_name} has been submitted.",
+            target_id=instance.id,
+            target_type='internship_placement',
+        )    
     
 # Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet):

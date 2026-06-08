@@ -105,6 +105,9 @@ function StudentDashboard() {
         <button onClick={() => navigate('/student-logs')}>
           My Logs
         </button>
+        <button onClick={() => navigate('/placement-request')}>
+          Request Placement
+        </button>
         <button onClick={() => navigate('/internship-placement')}>
           My Placement
         </button>
