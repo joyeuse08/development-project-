@@ -14,13 +14,20 @@ export default function PlacementRequest() {
     e.preventDefault();
 
     try {
-      await api.post("/api/Internship_Placement/", formData);
-      alert("Placement submitted successfully!");
+        await api.post("/api/Internship_Placement/", formData);
+        alert("Placement request submitted successfully!"); 
     } catch (err) {
-      console.error(err);
-      alert("Submission failed.");
-    }
-  };
+       console.error("Full error:",err);
+
+       if (err.response) {
+        console.log("Status: ", err.response.status);
+        console.log("Data: ", err.response.data);
+        alert( `Error ${err.response.status}: ${JSON.stringify(err.response.data)}`);
+       } else {
+        alert("An unexpected error occurred. Please try again later."); 
+        }  
+    
+    };
 
   return (
     <div style={styles.page}>
