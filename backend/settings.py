@@ -55,12 +55,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
 ]
-
 CORS_ALLOWED_ORIGINS = [
-   origin.strip()
-    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000","https://iles-frontend-9nag.onrender.com").split(",")
-    if origin.strip()
+    "http://localhost:3000",
+    "https://iles-frontend-9nag.onrender.com",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'backend.urls'
 
