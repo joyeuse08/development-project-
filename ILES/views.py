@@ -343,4 +343,7 @@ def mark_notification_read(request, id):
 
 
 def dashboard_view(request):
-    return HttpResponse("Dashboard page")
+    return render(request, 'dashboard.html', {
+        'username': getattr(request.user, 'username', 'Guest'),
+        'role': getattr(request.user, 'role', 'guest'),
+    })
