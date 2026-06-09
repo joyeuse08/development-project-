@@ -9,7 +9,7 @@ from django.contrib.auth.models import Group
 from django.db.models import Q
 from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log, Notification
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
-
+from django.http import HttpResponse
 
 class IsSupervisorOrAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -340,3 +340,7 @@ def mark_notification_read(request, id):
     notification.is_read = True
     notification.save()
     return Response({'status': 'read'})
+
+
+def dashboard_view(request):
+    return HttpResponse("Dashboard page")
