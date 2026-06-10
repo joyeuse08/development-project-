@@ -23,7 +23,7 @@ from ILES.views import dashboard_view
 
 
 urlpatterns = [
-    path('', lambda request: redirect('/dashboard/')),
+    path('', lambda request: redirect('/api/login/')),
     path('admin/', admin.site.urls),
     path('api/', include('ILES.urls')),
     path('dashboard/', dashboard_view, name='dashboard'), 
