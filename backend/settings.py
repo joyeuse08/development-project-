@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-for-d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'https://iles-backend-ltp6.onrender.com').split(',')
 
 
 # Application definition
@@ -91,10 +91,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'iles_db',
-        'USER': 'postgres',
-        'PASSWORD': 'food',
-        'HOST': 'localhost',
+        'NAME': 'iles_db_7g8x',
+        'USER': 'iles_db_7g8x_user',
+        'PASSWORD': 'vg0Q3UyKUxmVolD8E3kCFLgpxvTDuiPP',
+        'HOST': 'dpg-d7uehjreo5us73e0ok90-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
 }
