@@ -20,14 +20,15 @@ export default function PlacementRequest() {
        console.error("Full error:",err);
 
        if (err.response) {
-        console.log("Status: ", err.response.status);
-        console.log("Data: ", err.response.data);
-        alert( `Error ${err.response.status}: ${JSON.stringify(err.response.data)}`);
+         console.log("Status: ", err.response.status);
+         console.log("Data: ", err.response.data);
+         alert( `Error ${err.response.status}: ${JSON.stringify(err.response.data)}`);
        } else {
-        alert("An unexpected error occurred. Please try again later."); 
-        }  
-    
+         alert("An unexpected error occurred. Please try again later."); 
+       }  
+    }
     };
+
 
   return (
     <div style={styles.page}>
@@ -125,7 +126,7 @@ export default function PlacementRequest() {
 }
 
 const styles = {
-  page: {
+    page: {
     minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
@@ -194,4 +195,4 @@ const styles = {
     cursor: "pointer",
     marginTop: "10px",
   },
-};
+}
