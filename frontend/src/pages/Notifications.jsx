@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import api from '../axiosConfig'
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -7,12 +8,7 @@ export default function Notifications() {
 
   const fetchNotifications = () => {
     const token = localStorage.getItem("token");
-    fetch("/api/notifications/", {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Token ${token}` }),
-      },
-    })
+    api.get('/api/notifications/')
       .then((res) => {
         if (!res.ok) throw new Error(`Error ${res.status}`);
         return res.json();
@@ -28,15 +24,8 @@ export default function Notifications() {
   };
 
   const markAsRead = async (id) => {
-    const token = localStorage.getItem("token");
     try {
-      await fetch(`/api/notifications/${id}/read/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Token ${token}` }),
-        },
-      });
+      await api.post(`/api/notifications/${id}/read/`);
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
       );

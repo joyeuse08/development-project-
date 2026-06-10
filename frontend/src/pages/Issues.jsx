@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import api from '../axiosConfig';
 
 const STATUS_CONFIG = {
   open: { label: "Open", color: "#e74c3c", bg: "#fdf0ef", icon: "🔴" },
@@ -155,21 +156,17 @@ export default function IssuesList() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
+  
+useEffect(() => {
     const token = localStorage.getItem("token");
-
-    fetch("/api/issues/", {
+    
+    api.get('/api/issues/', {
       headers: {
-        "Content-Type": "application/json",
         ...(token && { Authorization: `Token ${token}` }),
       },
     })
       .then((res) => {
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-        return res.json();
-      })
-      .then((data) => {
-        setIssues(Array.isArray(data) ? data : data.results || []);
+        setIssues(Array.isArray(res.data) ? res.data : res.data.results || []);
         setLoading(false);
       })
       .catch((err) => {

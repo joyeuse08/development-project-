@@ -1,6 +1,6 @@
 
 import pytest
-from internship.models import CustomUser, WeeklyLog
+from ILES.models import CustomUser, Internship_Placement, Weekly_Log
 
 @pytest.mark.django_db
 def test_create_user():
@@ -19,11 +19,18 @@ def test_create_log():
         password="1234"
     )
 
-    log = WeeklyLog.objects.create(
-        student=user,
-        activities="Worked on React"
-    )
+placement = Internship_Placement.objects.create(
+    student=user,
+    company_name="Test Company",
+    position="Intern"
+)
 
+log = Weekly_Log.objects.create(
+    placement=placement,
+    week_number=1,
+    activities="Worked on React",
+    challenges="None"
+)
     assert log.status == "draft"
 
 
@@ -33,10 +40,17 @@ def test_week_number():
         username="joy"
     )
 
-    log = WeeklyLog.objects.create(
-        student=user,
-        week=1,
-        activities="Testing"
-    )
+placement = Internship_Placement.objects.create(
+    student=user,
+    company_name="Test Company",
+    position="Intern"
+)
 
-    assert log.week == 1
+log = Weekly_Log.objects.create(
+    placement=placement,
+    week_number=1,
+    activities="Testing",
+    challenges="None"
+)
+
+assert log.week_number == 1

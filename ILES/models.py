@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
  
@@ -30,7 +31,7 @@ class Internship_Placement(models.Model):
         ("pending", "Pending"),
         ("active", "Active"),
         ("completed", "Completed"),
-    ]
+    ] 
     student = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='student_placements',limit_choices_to={'role': 'student'}
     )
@@ -102,7 +103,7 @@ class Student_log(models.Model):
     title = models.CharField(max_length=255,null=True, blank=True)
     date=models.DateField()
     description = models.TextField()
-    hours=models.PositiveIntegerField()
+    hours=models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(24)])
     challenges = models.TextField(blank=True)
     attachment = models.FileField(upload_to='log_attachments/', blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
@@ -118,7 +119,7 @@ class Supervisor_Feedback(models.Model):
     student_log = models.ForeignKey(Student_log, on_delete=models.CASCADE, related_name='supervisor_feedbacks', null=True, blank=True)
     supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='feedback_given',limit_choices_to={'role': 'workplace'})
     comments = models.TextField()
-    supervisor_score = models.PositiveIntegerField()
+    supervisor_score = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     evaluated_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -130,7 +131,7 @@ class Academic_Supervisor_Feedback(models.Model):
     academic_supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
         related_name='academic_feedback_given', limit_choices_to={'role': 'academic'})
     comments = models.TextField()
-    academic_score = models.PositiveIntegerField()
+    academic_score = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     evaluated_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -181,7 +182,7 @@ class Notification(models.Model):
     target_type = models.CharField(max_length=50, null=True, blank=True)  # 'report', 'comment', etc.
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-    message = models.TextField()
+    message = models.TextField(blank=True, default="")
     
     class Meta:
         ordering = ['-created_at']

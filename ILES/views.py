@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import api_view, permission_classes,action,authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,7 +10,7 @@ from django.contrib.auth.models import Group
 from django.db.models import Q
 from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log, Notification
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
-
+from django.http import HttpResponse
 
 class IsSupervisorOrAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -44,6 +45,40 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
         if user.role == 'academic':
             return Internship_Placement.objects.filter(academic_supervisor=user)
         return Internship_Placement.objects.all()
+
+    def perform_create(self, serializer):
+        if self.request.user.role == 'student':
+            instance = serializer.save(
+                student=self.request.user,
+                status='pending'
+            )
+        elif self.request.user.role == 'admin':
+            instance = serializer.save()
+        else:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only students or admins can create internship placements.")
+
+        admins = CustomUser.objects.filter(role='admin')
+
+        for admin in admins:
+            if admin != self.request.user:
+                Notification.objects.create(
+                    recipient=admin,
+                    actor=self.request.user,
+                    verb=f"New internship placement submitted by {instance.student.username} at {instance.company_name}.",
+                    target_id=instance.id,
+                    target_type='internship_placement',
+                    message=f"Placement submitted for {instance.student.username} at {instance.company_name}",
+                )
+    
+        Notification.objects.create(
+            recipient=instance.student,
+            actor=self.request.user,
+            verb=f"Your internship placement at {instance.company_name} has been submitted.",
+            target_id=instance.id,
+            target_type='internship_placement',
+            message=f"Your internship placement at {instance.company_name} has been submitted.",
+        )  
     
 # Weekly log views
 class Weekly_LogViewSet(viewsets.ModelViewSet):
@@ -101,10 +136,16 @@ class Student_logViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Student_log.objects.all()
+    
         if user.role == 'student':
             queryset = queryset.filter(student__student=user)
-        elif user.role in ('workplace', 'academic'):
-            queryset = queryset.filter(supervisor=user)
+        elif user.role == 'workplace':
+            queryset = queryset.filter(student__workplace_supervisor=user)
+        elif user.role == 'academic':
+            queryset = queryset.filter(student__academic_supervisor=user)
+        elif user.role != 'admin':
+            queryset = queryset.none()
+            
         log_status = self.request.query_params.get('status')
         if log_status:
             queryset = queryset.filter(status=log_status)
@@ -114,9 +155,29 @@ class Student_logViewSet(viewsets.ModelViewSet):
     def review(self, request, pk=None):
         if request.user.role not in ('workplace', 'admin'):
             return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
         student_log = self.get_object()
-        student_log.status = request.data.get('status', student_log.status)
+    
+        if request.user.role == 'workplace' and student_log.student.workplace_supervisor != request.user:
+            return Response({'error': 'You are not assigned to this student.'}, status=status.HTTP_403_FORBIDDEN)
+    
+        new_status = request.data.get('status')
+        if new_status not in ('submitted', 'approved', 'rejected'):
+            return Response({'error': 'Invalid status.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+        student_log.status = new_status
+        student_log.supervisor = request.user if request.user.role == 'workplace' else student_log.supervisor
         student_log.save()
+    
+        Notification.objects.create(
+            recipient=student_log.student.student,
+            actor=request.user,
+            verb=f"reviewed your student log for {student_log.date} — Status: {student_log.get_status_display()}",
+            target_id=student_log.id,
+            target_type='student_log',
+            message=f"Your student log for {student_log.date} was reviewed and marked as {student_log.get_status_display()}.",
+        )
+    
         return Response({'message': 'Student Log updated', 'status': student_log.status})
 
 class Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
@@ -282,13 +343,21 @@ def search_items(request):
     if user.role == 'student':
         placements = placements.filter(student=user)
         logs = logs.filter(placement__student=user)
+        feedbacks = feedbacks.filter(placement__student=user)
+        academic_feedbacks = academic_feedbacks.filter(placement__student=user)
         issues = issues.filter(placement__student=user)
     elif user.role == 'workplace':
         placements = placements.filter(workplace_supervisor=user)
+        logs = logs.filter(placement__workplace_supervisor=user)
         feedbacks = feedbacks.filter(supervisor=user)
+        academic_feedbacks = academic_feedbacks.filter(placement__workplace_supervisor=user)
+        issues = issues.filter(placement__workplace_supervisor=user)
     elif user.role == 'academic':
         placements = placements.filter(academic_supervisor=user)
+        logs = logs.filter(placement__academic_supervisor=user)
+        feedbacks = feedbacks.filter(placement__academic_supervisor=user)
         academic_feedbacks = academic_feedbacks.filter(academic_supervisor=user)
+        issues = issues.filter(placement__academic_supervisor=user)
 
     return Response({
         "placements": Internship_PlacementSerializer(placements, many=True).data,
@@ -315,3 +384,47 @@ def mark_notification_read(request, id):
     notification.is_read = True
     notification.save()
     return Response({'status': 'read'})
+
+@login_required
+def dashboard_view(request):
+    user = request.user
+    context = {
+        'role': user.role,
+        'username': user.username,
+    }
+
+    if user.role == 'student':
+        context['placements'] = Internship_Placement.objects.filter(student=user)
+        context['weekly_logs'] = Weekly_Log.objects.filter(placement__student=user).order_by('-created_at')[:10]
+        context['student_logs'] = Student_log.objects.filter(student__student=user).order_by('-created_at')[:10]
+        context['issues'] = Issue.objects.filter(placement__student=user).order_by('-created_at')[:10]
+        context['notifications'] = Notification.objects.filter(recipient=user)[:10]
+
+    elif user.role == 'workplace':
+        context['placements'] = Internship_Placement.objects.filter(workplace_supervisor=user)
+        context['weekly_logs'] = Weekly_Log.objects.filter(placement__workplace_supervisor=user).order_by('-created_at')[:10]
+        context['student_logs'] = Student_log.objects.filter(student__workplace_supervisor=user).order_by('-created_at')[:10]
+        context['issues'] = Issue.objects.filter(placement__workplace_supervisor=user).order_by('-created_at')[:10]
+        context['notifications'] = Notification.objects.filter(recipient=user)[:10]
+
+    elif user.role == 'academic':
+        context['placements'] = Internship_Placement.objects.filter(academic_supervisor=user)
+        context['weekly_logs'] = Weekly_Log.objects.filter(placement__academic_supervisor=user).order_by('-created_at')[:10]
+        context['academic_feedbacks'] = Academic_Supervisor_Feedback.objects.filter(academic_supervisor=user).order_by('-evaluated_at')[:10]
+        context['issues'] = Issue.objects.filter(placement__academic_supervisor=user).order_by('-created_at')[:10]
+        context['notifications'] = Notification.objects.filter(recipient=user)[:10]
+
+    elif user.role == 'admin':
+        context['users_count'] = CustomUser.objects.count()
+        context['placements_count'] = Internship_Placement.objects.count()
+        context['open_issues_count'] = Issue.objects.filter(status='open').count()
+        context['pending_weekly_logs_count'] = Weekly_Log.objects.filter(status='submitted').count()
+        context['recent_notifications'] = Notification.objects.filter(recipient=user)[:10]
+
+    return render(request, 'dashboard.html', context)
+
+def dashboard_view(request):
+    return render(request, 'dashboard.html', {
+        'username': getattr(request.user, 'username', 'Guest'),
+        'role': getattr(request.user, 'role', 'guest'),
+    })
