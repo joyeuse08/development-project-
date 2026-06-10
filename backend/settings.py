@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -57,6 +58,7 @@ MIDDLEWARE = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
     "https://iles-frontend-9nag.onrender.com",
 ]
 
@@ -67,7 +69,8 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates',
+                BASE_DIR / 'frontend' / 'build'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,10 +91,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'iles_db2',
-        'USER': 'iles_db2_user',
-        'PASSWORD': 'xcIGyiuL7lUeqVmWejWrL6ddEVTZdlGd',
-        'HOST': 'dpg-d8ivaqrtqb8s73bk2tdg-a.oregon-postgres.render.com',
+        'NAME': 'iles_db',
+        'USER': 'postgres',
+        'PASSWORD': 'food',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -141,9 +144,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'build',]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 AUTH_USER_MODEL = "ILES.CustomUser"
+LOGIN_URL = '/api/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/api/login/'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -159,6 +166,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
+
 
 # CORS Settings (for development only)
 #CORS_ALLOW_ALL_ORIGINS = True  
