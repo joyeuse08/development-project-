@@ -67,6 +67,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         password = validated_data.pop('password')
+        validated_data['role'] = 'student'
         user = CustomUser(**validated_data)
         try:
             validate_password(password, user)
@@ -80,7 +81,7 @@ class Student_logSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student_log
         fields = '__all__'
-        read_only_fields = ['student', 'created_at']
+        read_only_fields = ['student', 'created_at', 'supervisor', 'status', 'feedback']
 
     def validate_hours(self, value):
         if value <= 0:
