@@ -1,5 +1,13 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+ 
+from django.conf import settings
+from django.utils import timezone
+from django.utils.timezone import now
+
+
     
 #CustomUser
 class CustomUser(AbstractUser):
@@ -10,11 +18,11 @@ class CustomUser(AbstractUser):
         ("admin","Internship Administrator"),
     ]
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default = "student")
-    department = models.CharField(max_length=100,)
+    department = models.CharField(max_length=100, blank=True, default='')
     staff_number = models.CharField(max_length=20, blank=True, null=True)
     student_number = models.CharField(max_length=20, blank=True, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
     
 # Internship Placement
@@ -23,22 +31,40 @@ class Internship_Placement(models.Model):
         ("pending", "Pending"),
         ("active", "Active"),
         ("completed", "Completed"),
-    ]
+    ] 
     student = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='student_placements',limit_choices_to={'role': 'student'}
     )
     company_name = models.CharField(max_length=255)
+    description=models.TextField(blank=True)
     start_date = models.DateField()
     end_date = models.DateField()
-    workplace_supervisor = models.ForeignKey(CustomUser,max_length=255,on_delete=models.SET_NULL,
-        null=True, blank=True, related_name="workplace_supervised",limit_choices_to={'role': 'workplace_supervisor'},
+    workplace_supervisor = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,
+        null=True, blank=True, related_name="workplace_supervised",limit_choices_to={'role': 'workplace'},
     )    
-    academic_supervisor = models.ForeignKey(CustomUser, max_length=255, on_delete=models.SET_NULL,
-        null= True, blank=True, related_name="academic_supervised",limit_choices_to={'role': 'academic_supervisor'},
+    academic_supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
+        null= True, blank=True, related_name="academic_supervised",limit_choices_to={'role': 'academic'},
     )                                     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
-    def _str_(self):
+ 
+    def __str__(self):
         return f"Placement for {self.student.username} at {self.company_name}"
+
+    def clean(self):
+       if self.start_date and self.end_date:
+           if self.end_date <= self.start_date:
+               raise ValidationError("End date must be after start date.")
+           overlapping = Internship_Placement.objects.filter(
+               student=self.student,
+               start_date__lt=self.end_date,
+               end_date__gt=self.start_date,
+           ).exclude(pk=self.pk)
+           if overlapping.exists():
+               raise ValidationError("This student already has an overlapping internship placement during that period.")
+
+    def save(self, *args, **kwargs):
+         self.full_clean()
+         super().save(*args, **kwargs)
 
 # Weekly Log
 class Weekly_Log(models.Model):
@@ -46,41 +72,69 @@ class Weekly_Log(models.Model):
         ("draft", "Draft"),
         ("submitted", "Submitted"),
         ("reviewed", "Reviewed"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
     ]
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='weekly_logs')
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='weekly_logs', limit_choices_to={'role': 'workplace'}) 
     week_number = models.PositiveIntegerField()
     activities = models.TextField()
     challenges = models.TextField(blank = True)
     learnings = models.TextField(blank = True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
-    submitted_at = models.DateTimeField()
+    submitted_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together=('placement', 'week_number')
 
-    def _str_(self):
-        return f"Week{self.week_number} for {self.placement.student.username}"      
+    def __str__(self):
+        return f"Week{self.week_number} for {self.placement.student.username}"   
+
+# log model
+class Student_log(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),   
+    ] 
+    student = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='logs')
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,null =True, blank =True, related_name='student_logs', limit_choices_to={'role': 'workplace'})
+    title = models.CharField(max_length=255,null=True, blank=True)
+    date=models.DateField()
+    description = models.TextField()
+    hours=models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(24)])
+    challenges = models.TextField(blank=True)
+    attachment = models.FileField(upload_to='log_attachments/', blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    feedback = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=now)
+    def __str__(self):
+        return f"Log for {self.student} on {self.date}  {self.get_status_display()}"      
 
 # Supervisor Feedback
 class Supervisor_Feedback(models.Model):
+    placement=models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='supervisor_feedbacks', null =True, blank=True)
     weekly_log = models.OneToOneField(Weekly_Log, on_delete=models.CASCADE, related_name='feedbacks')
-    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
-         related_name='feedback_given',limit_choices_to={'role': ['workplace_supervisor']})
+    student_log = models.ForeignKey(Student_log, on_delete=models.CASCADE, related_name='supervisor_feedbacks', null=True, blank=True)
+    supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='feedback_given',limit_choices_to={'role': 'workplace'})
     comments = models.TextField()
-    supervisor_score = models.PositiveIntegerField()
+    supervisor_score = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     evaluated_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Feedback by {self.supervisor.username} for {self.weekly_log}"    
     
 #Academic Supervisor Feedback
 class Academic_Supervisor_Feedback(models.Model):
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='academic_feedbacks')
     academic_supervisor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
-        related_name='academic_feedback_given',limit_choices_to={'role': ['academic_supervisor']})
+        related_name='academic_feedback_given', limit_choices_to={'role': 'academic'})
     comments = models.TextField()
-    academic_score = models.PositiveIntegerField()
+    academic_score = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     evaluated_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Feedback by {self.academic_supervisor.username} for {self.placement.student.username}"    
     
 # Weighted score
@@ -91,11 +145,11 @@ class Weighted_Score(models.Model):
     final_score = models.FloatField()
     calculated_at = models.DateTimeField(auto_now_add=True)
 
-    def compute(self):
+    def save(self, *args, **kwargs):
         self.final_score = (self.supervisor_score * 0.6) + (self.academic_score * 0.4)
-        self.save()
+        super().save(*args, **kwargs)
 
-    def _str_(self):
+    def __str__(self):
         return f"Weighted Score for {self.placement.student.username}: {self.final_score}"    
     
 # Issues
@@ -109,9 +163,30 @@ class Issue(models.Model):
     placement = models.ForeignKey(Internship_Placement, on_delete=models.CASCADE, related_name='issues')
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reported_issues')
     issue_type = models.TextField()
+    description = models.TextField(default="", blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Issue for {self.placement.student.username} reported by {self.created_by.username}"
+
+
+
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_notifications')
+    actor     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_notifications')
+    verb = models.CharField(max_length=200)
+    target_id = models.IntegerField(null=True, blank=True)  # ID of the object (report, comment, etc.)
+    target_type = models.CharField(max_length=50, null=True, blank=True)  # 'report', 'comment', etc.
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    message = models.TextField(blank=True, default="")
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.actor} {self.verb} -> {self.recipient}"
 

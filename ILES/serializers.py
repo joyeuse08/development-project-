@@ -1,18 +1,23 @@
 from rest_framework import serializers
-from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue)
+from django.contrib.auth.hashers import make_password
+from .models import (CustomUser,Internship_Placement,Weekly_Log,Supervisor_Feedback,Academic_Supervisor_Feedback,Weighted_Score,Issue,Student_log)
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = [
-            'id', 'username', 'first_name', 'last_name', 'email', 'role' ,'department', 'is_active', 'is_staff', 'student_number', 'staff_number',
-        ]
+        fields = ['id', 
+                  'username', 'first_name', 'last_name', 'email', 'role','department', 'is_active', 'is_staff', 'student_number', 'staff_number']
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
 
 class Internship_PlacementSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='student.username', read_only=True)
+
     class Meta:
         model = Internship_Placement
         fields = "__all__"
@@ -20,7 +25,8 @@ class Internship_PlacementSerializer(serializers.ModelSerializer):
 class Weekly_LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weekly_Log
-        exclude = ['submitted_at', 'created_at']  
+        exclude = ['created_at']
+        read_only_fields = ['student', 'created_at']
 
 class Supervisor_FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +44,56 @@ class Weighted_ScoreSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class IssueSerializer(serializers.ModelSerializer):
+    reported_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    
     class Meta:
         model = Issue
-        exclude = ['created_at']
+        fields = "__all__"
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'password', 'role', 'department', 'staff_number', 'student_number']
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+        
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value    
+        
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        validated_data['role'] = 'student'
+        user = CustomUser(**validated_data)
+        try:
+            validate_password(password, user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError({'password': list(e.messages)})
+        user.set_password(password)
+        user.save()
+        return user
+    
+class Student_logSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student_log
+        fields = '__all__'
+        read_only_fields = ['student', 'created_at', 'supervisor', 'status', 'feedback']
+
+    def validate_hours(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Must be greater than 0")
+        return value    
+
+from .models import Notification
+
+class NotificationSerializer(serializers.ModelSerializer):
+    actor_name = serializers.CharField(source='actor.username', read_only=True)
+    
+    class Meta:
+        model = Notification
+        fields = ['id', 'actor_name', 'verb', 'created_at', 'is_read', 'target_id', 'target_type']
         
