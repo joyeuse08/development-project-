@@ -14,7 +14,14 @@ export default function PlacementRequest() {
     e.preventDefault();
 
     try {
-        await api.post("/api/Internship_Placement/", formData);
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        const payload = {
+          ...formData,
+          student: user.id,  // add this!
+        };
+
+        await api.post("/api/Internship_Placement/", payload);
         alert("Placement request submitted successfully!"); 
     } catch (err) {
        console.error("Full error:",err);
