@@ -67,16 +67,16 @@ function AdminDashboard() {
 
       {/* Navigation */}
       <div className="dashboard-nav">
-        <button onClick={() => navigate('/internship_placement')}>
+        <button onClick={() => navigate('/internship-placement')}>
           Placements
         </button>
-        <button onClick={() => navigate('/weekly_log')}>
+        <button onClick={() => navigate('/weekly-log')}>
           Weekly Logs
         </button>
         <button onClick={() => navigate('/issues')}>
           Issues
         </button>
-        <button onClick={() => navigate('/weighted_score')}>
+        <button onClick={() => navigate('/weighted-score')}>
           Weighted Scores
         </button>
         <button onClick={() => navigate('/notifications')}>
