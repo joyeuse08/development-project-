@@ -1,4 +1,4 @@
-import SubmitLog from "./pages/SubmitLog";
+
 import StudentLogSubmission from "./pages/StudentLogSubmission";
 import WeeklyLogSubmission from "./pages/WeeklyLogSubmission";
 import React from "react";
@@ -54,7 +54,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/issues" element={<Issues />} />
-        <Route path="/submit_log" element={<SubmitLog />} />
         <Route path="/submit_weekly_log" element={<WeeklyLogSubmission />} />
         <Route path="/submit_log" element={<StudentLogSubmission />} />
         <Route path="/placement-request" element={<PlacementRequest />} />
