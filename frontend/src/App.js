@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import SubmitLog from "./pages/SubmitLog";
-=======
 import StudentLogSubmission from "./pages/StudentLogSubmission";
->>>>>>> 9ae71fad93c9d009176871c9f3d213bc0690a98a
 import WeeklyLogSubmission from "./pages/WeeklyLogSubmission";
 import React from "react";
 import {
