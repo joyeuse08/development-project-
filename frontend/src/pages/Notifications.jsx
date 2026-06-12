@@ -7,22 +7,16 @@ export default function Notifications() {
   const [error, setError] = useState(null);
 
   const fetchNotifications = () => {
-    const token = localStorage.getItem("token");
-    api.get('/api/notifications/')
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setNotifications(Array.isArray(data) ? data : data.results || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+  api.get('/api/notifications/')
+    .then((res) => {
+      setNotifications(Array.isArray(res.data) ? res.data : res.data.results || []);
+      setLoading(false);
+    })
+    .catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
   };
-
   const markAsRead = async (id) => {
     try {
       await api.post(`/api/notifications/${id}/read/`);
