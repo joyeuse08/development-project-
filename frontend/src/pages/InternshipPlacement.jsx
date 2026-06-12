@@ -13,27 +13,30 @@ export default function InternshipPlacement() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    api.get("/api/Internship_Placement/", {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Token ${token}` }),
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setPlacement(Array.isArray(data) ? data[0] : data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+  const fetchPlacement = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
+      const res = await api.get("/api/Internship_Placement/", {
+        headers: {
+          ...(token && { Authorization: `Token ${token}` }),
+        },
+      });
+
+      setPlacement(
+        Array.isArray(res.data)
+          ? res.data[0]
+          : res.data
+      );
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.detail || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchPlacement();
+  }, []);
   const status = placement ? STATUS_CONFIG[placement.status] || STATUS_CONFIG.pending : null;
 
   return (
