@@ -108,9 +108,9 @@ const Register = () => {
             </div>
           )}
 
-          {(formData.role === "academic_supervisor" ||
-            formData.role === "workplace_supervisor") && (
-            <div className="form-group">
+          {(formData.role === "academic" ||
+           formData.role === "workplace") && (
+           <div className="form-group">
               <label className="form-label">Staff Number</label>
               <input
                 className="form-input"
@@ -119,7 +119,7 @@ const Register = () => {
                 value={formData.staff_number}
                 onChange={set("staff_number")}
               />
-            </div>
+           </div>
           )}
 
           <div className="form-group">
