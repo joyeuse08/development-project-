@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import api from '../axiosConfig';
 
 function ScoreCard({ score, onView }) {
   const [hovered, setHovered] = useState(false);
@@ -68,13 +69,15 @@ export default function WeightedScore() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch("/api/Weighted_Score/", {
-      headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
+  api.get('/api/Weighted_Score/')
+    .then((res) => {
+      setScores(Array.isArray(res.data) ? res.data : res.data.results || []);
+      setLoading(false);
     })
-      .then((res) => { if (!res.ok) throw new Error(`Error ${res.status}`); return res.json(); })
-      .then((data) => { setScores(Array.isArray(data) ? data : data.results || []); setLoading(false); })
-      .catch((err) => { setError(err.message); setLoading(false); });
+    .catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
   }, []);
 
   const avg = scores.length ? (scores.reduce((sum, s) => sum + (s.final_score || 0), 0) / scores.length).toFixed(1) : null;
