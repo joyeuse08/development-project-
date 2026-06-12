@@ -67,7 +67,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         password = validated_data.pop('password')
-        validated_data['role'] = 'student'
         user = CustomUser(**validated_data)
         try:
             validate_password(password, user)
