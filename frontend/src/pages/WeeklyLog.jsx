@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from '../axiosConfig';
 
 const STATUS_CONFIG = {
   draft: { label: "Draft", color: "#7f8c8d", bg: "#f4f4f4" },
@@ -64,14 +65,8 @@ function SubmitLogForm({ onSuccess }) {
   const handleSubmit = async () => {
     setSubmitting(true);
     setMessage(null);
-    const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/api/Weekly_Log/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error("Failed to submit log");
+      await api.post('/api/Weekly_Log/', form);
       setMessage({ type: "success", text: "Log submitted successfully!" });
       setForm({ week_number: "", activities: "", challenges: "", learnings: "", hours: "", status: "draft" });
       onSuccess();
@@ -126,13 +121,15 @@ export default function WeeklyLog() {
   const [showForm, setShowForm] = useState(false);
 
   const fetchLogs = () => {
-    const token = localStorage.getItem("token");
-    fetch("/api/Weekly_Log/", {
-      headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
-    })
-      .then((res) => { if (!res.ok) throw new Error(`Error ${res.status}`); return res.json(); })
-      .then((data) => { setLogs(Array.isArray(data) ? data : data.results || []); setLoading(false); })
-      .catch((err) => { setError(err.message); setLoading(false); });
+    api.get('/api/Weekly_Log/')
+      .then((res) => { 
+        setLogs(Array.isArray(res.data) ? res.data : res.data.results || []); 
+        setLoading(false); 
+      })
+      .catch((err) => { 
+        setError(err.message); 
+        setLoading(false); 
+      });
   };
 
   useEffect(() => { fetchLogs(); }, []);
