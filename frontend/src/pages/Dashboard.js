@@ -13,8 +13,8 @@ const Dashboard = () => {
   switch (user.role) {
     case 'student':               return <StudentDashboard />;
     case 'admin':                 return <AdminDashboard />;
-    case 'academic-supervisor':   return <AcademicSupervisorDashboard />;
-    case 'workplace-supervisor':  return <WorkplaceSupervisorDashboard />;
+    case 'academic_supervisor':   return <AcademicSupervisorDashboard />;
+    case 'workplace_supervisor':  return <WorkplaceSupervisorDashboard />;
     default:                      return <Navigate to="/login" replace />;
   }
 };
