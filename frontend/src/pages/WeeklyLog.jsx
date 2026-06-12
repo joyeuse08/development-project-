@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from '../axiosConfig';
+import api from '../axiosConfig';
 
 const STATUS_CONFIG = {
   draft: { label: "Draft", color: "#7f8c8d", bg: "#f4f4f4" },
