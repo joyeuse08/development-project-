@@ -9,17 +9,14 @@ import WorkplaceSupervisorDashboard from './WorkplaceSupervisorDashboard';
 
 const Dashboard = () => {
   const { user } = useAuth();
-
-  if (user?.role === "academic") {
-    return <AcademicDashboardView />;
+  if (!user) return <Navigate to="/login" replace />;
+  switch (user.role) {
+    case 'student':               return <StudentDashboard />;
+    case 'admin':                 return <AdminDashboard />;
+    case 'academic_supervisor':   return <AcademicSupervisorDashboard />;
+    case 'workplace_supervisor':  return <WorkplaceSupervisorDashboard />;
+    default:                      return <Navigate to="/login" replace />;
   }
-  if (user?.role === "workplace") {
-    return <WorkplaceDashboardView />;
-  }
-  if (user?.role === "admin") {
-    return <AdminDashboardView />;
-  }
-  return <StudentDashboardView />;
 };
 
 export default Dashboard;
