@@ -116,7 +116,7 @@ function AcademicSupervisorDashboard() {
                     <td>{p.end_date}</td>
                     <td>{p.status}</td>
                     <td>
-                      <button onClick={() => navigate('/academic_feedback')}>
+                      <button onClick={() => navigate('/academic-feedback')}>
                         Give Feedback
                       </button>
                     </td>
@@ -140,7 +140,7 @@ function AcademicSupervisorDashboard() {
               </div>
             ))
           )}
-          <button onClick={() => navigate('/academic_feedback')}>
+          <button onClick={() => navigate('/academic-feedback')}>
             Add New Feedback
           </button>
         </div>
@@ -168,7 +168,7 @@ function AcademicSupervisorDashboard() {
               </tbody>
             </table>
           )}
-          <button onClick={() => navigate('/weighted_score')}>
+          <button onClick={() => navigate('/weighted-score')}>
             Add Score
           </button>
         </div>
