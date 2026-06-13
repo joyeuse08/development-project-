@@ -68,7 +68,7 @@ function App() {
         <Route
           path="/academic-feedback"
           element={
-            <PrivateRoute allowedRoles={["academic_supervisor", "student"]}>
+            <PrivateRoute allowedRoles={["academic", "student"]}>
               <AcademicFeedback />
             </PrivateRoute>
           }
@@ -76,7 +76,7 @@ function App() {
         <Route
           path="/supervisor-feedback"
           element={
-            <PrivateRoute allowedRoles={["workplace_supervisor", "student"]}>
+            <PrivateRoute allowedRoles={["workplace", "student"]}>
               <SupervisorFeedback />
             </PrivateRoute>
           }
@@ -84,7 +84,7 @@ function App() {
         <Route
           path="/internship-placement"
           element={
-            <PrivateRoute allowedRoles={["student", "admin"]}>
+            <PrivateRoute allowedRoles={["student", "admin","academic", "workplace"]}>
               <InternshipPlacement />
             </PrivateRoute>
           }
@@ -92,7 +92,7 @@ function App() {
         <Route
           path="/weighted-score"
           element={
-            <PrivateRoute allowedRoles={["admin", "academic_supervisor"]}>
+            <PrivateRoute allowedRoles={["admin", "academic"]}>
               <WeightedScore />
             </PrivateRoute>
           }
