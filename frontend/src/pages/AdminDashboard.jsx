@@ -17,7 +17,7 @@ function AdminDashboard() {
 
   useEffect(() => {
     // Fetch all users
-    axios.get('/api/users/')
+    axios.get('/api/users/?page_size=1000')
       .then(res => {
         const data = Array.isArray(res.data) ? res.data :
                      Array.isArray(res.data.results) ? res.data.results : [];
