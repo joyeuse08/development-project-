@@ -17,6 +17,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class Internship_PlacementSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.username', read_only=True)
+    workplace_supervisor_username = serializers.CharField(source='workplace_supervisor.username', read_only=True, default=None)
+    academic_supervisor_username = serializers.CharField(source='academic_supervisor.username', read_only=True, default=None)
 
     class Meta:
         model = Internship_Placement
