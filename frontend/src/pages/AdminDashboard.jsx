@@ -10,6 +10,10 @@ function AdminDashboard() {
   const [placements, setPlacements] = useState([]);
   const [logs, setLogs] = useState([]);
   const [issues, setIssues] = useState([]);
+  const [assigningId, setAssigningId] = useState(null);
+  const [workplaceSupervisor, setWorkplaceSupervisor] = useState('');
+  const [academicSupervisor, setAcademicSupervisor] = useState('');
+  const [placementStatus, setPlacementStatus] = useState('pending');
 
   useEffect(() => {
     // Fetch all users
@@ -48,6 +52,40 @@ function AdminDashboard() {
       })
       .catch(err => console.log(err));
   }, []);
+
+  const refetchPlacements = () => {
+  axios.get('/api/Internship_Placement/')
+    .then(res => {
+      const data = Array.isArray(res.data) ? res.data :
+                   Array.isArray(res.data.results) ? res.data.results : [];
+      setPlacements(data);
+    })
+    .catch(err => console.log(err));
+  };
+
+  const openAssign = (p) => {
+  setAssigningId(p.id);
+  setWorkplaceSupervisor(p.workplace_supervisor || '');
+  setAcademicSupervisor(p.academic_supervisor || '');
+  setPlacementStatus(p.status || 'pending');
+  };
+
+  const cancelAssign = () => setAssigningId(null);
+
+  const submitAssign = async () => {
+    try {
+      await axios.patch(`/api/Internship_Placement/${assigningId}/`, {
+        workplace_supervisor: workplaceSupervisor || null,
+        academic_supervisor: academicSupervisor || null,
+        status: placementStatus,
+      });
+      setAssigningId(null);
+      refetchPlacements();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update placement: ' + JSON.stringify(err.response?.data));
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -141,17 +179,64 @@ function AdminDashboard() {
                 <th>Status</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Workplace Supervisor</th>
+                <th>Academic Supervisor</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {placements.map(p => (
-                <tr key={p.id}>
-                  <td>{p.student_name || p.student}</td>
-                  <td>{p.company_name}</td>
-                  <td>{p.status}</td>
-                  <td>{p.start_date}</td>
-                  <td>{p.end_date}</td>
-                </tr>
+                <React.Fragment key={p.id}>
+                  <tr>
+                    <td>{p.student_name || p.student}</td>
+                    <td>{p.company_name}</td>
+                    <td>{p.status}</td>
+                    <td>{p.start_date}</td>
+                    <td>{p.end_date}</td>
+                    <td>{p.workplace_supervisor_username || 'Not assigned'}</td>
+                    <td>{p.academic_supervisor_username || 'Not assigned'}</td>
+                    <td>
+                      <button onClick={() => openAssign(p)}>Assign</button>
+                    </td>
+                  </tr>
+                  {assigningId === p.id && (
+                    <tr>
+                      <td colSpan="8">
+                        <div style={{ padding: '12px', background: '#f4f7fb', borderRadius: '8px' }}>
+                          <p><strong>Hint from student:</strong> Workplace supervisor name = "{p.workplace_supervisor_name || '—'}"</p>
+
+                          <label>Workplace Supervisor: </label>
+                          <select value={workplaceSupervisor} onChange={(e) => setWorkplaceSupervisor(e.target.value)}>
+                            <option value="">-- None --</option>
+                            {users.filter(u => u.role === 'workplace').map(u => (
+                              <option key={u.id} value={u.id}>{u.username}</option>
+                           ))}
+                          </select>
+
+                          <label style={{ marginLeft: '12px' }}>Academic Supervisor: </label>
+                          <select value={academicSupervisor} onChange={(e) => setAcademicSupervisor(e.target.value)}>
+                            <option value="">-- None --</option>
+                            {users.filter(u => u.role === 'academic').map(u => (
+                              <option key={u.id} value={u.id}>{u.username}</option>
+                            ))}
+                          </select>
+
+                          <label style={{ marginLeft: '12px' }}>Status: </label>
+                          <select value={placementStatus} onChange={(e) => setPlacementStatus(e.target.value)}>
+                            <option value="pending">Pending</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                          </select>
+
+                          <div style={{ marginTop: '10px' }}>
+                            <button onClick={submitAssign}>Save</button>
+                            <button onClick={cancelAssign} style={{ marginLeft: '8px' }}>Cancel</button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>

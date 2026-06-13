@@ -39,6 +39,10 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 class Internship_PlacementViewSet(viewsets.ModelViewSet):
    
     serializer_class = Internship_PlacementSerializer
+    def get_permissions(self):
+        if self.action in ('update', 'partial_update', 'destroy'):
+            return [IsAdminRole()]
+        return [IsAuthenticated()]
     
     def get_queryset(self):
         user = self.request.user
