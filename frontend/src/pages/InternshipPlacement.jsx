@@ -25,8 +25,8 @@ export default function InternshipPlacement() {
 
       setPlacement(
         Array.isArray(res.data)
-          ? res.data[0]
-          : res.data
+        ? res.data[0]
+        : (res.data.results?.[0] || null)
       );
     } catch (err) {
       console.error(err);
