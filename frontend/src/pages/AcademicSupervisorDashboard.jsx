@@ -57,13 +57,13 @@ function AcademicSupervisorDashboard() {
 
       {/* Navigation */}
       <div className="dashboard-nav">
-        <button onClick={() => navigate('/internship_placement')}>
+        <button onClick={() => navigate('/internship-placement')}>
           Placements
         </button>
-        <button onClick={() => navigate('/academic_feedback')}>
+        <button onClick={() => navigate('/academic-feedback')}>
           Give Feedback
         </button>
-        <button onClick={() => navigate('/weighted_score')}>
+        <button onClick={() => navigate('/weighted-score')}>
           Weighted Scores
         </button>
         <button onClick={() => navigate('/notifications')}>
