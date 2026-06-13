@@ -84,11 +84,11 @@ export default function InternshipPlacement() {
               </div>
               <div style={styles.infoBox}>
                 <span style={styles.label}>Workplace Supervisor</span>
-                <span style={styles.value}>{placement.workplace_supervisor_name || "Not assigned"}</span>
+                <span style={styles.value}>{placement.workplace_supervisor_username || placement.workplace_supervisor_name || "Not assigned"}</span>
               </div>
               <div style={styles.infoBox}>
                 <span style={styles.label}>Academic Supervisor</span>
-                <span style={styles.value}>{placement.academic_supervisor_name || "Not assigned"}</span>
+                <span style={styles.value}>{placement.academic_supervisor_username || placement.academic_supervisor_name || "Not assigned"}</span>
               </div>
               <div style={styles.infoBox}>
                 <span style={styles.label}>Student</span>
