@@ -44,6 +44,18 @@ const LogSubmission = () => {
     }
     return true;
   };
+  const placementRes = await axios.get('/api/Internship_Placement/');
+  const placementData = Array.isArray(placementRes.data)
+    ? placementRes.data
+    : placementRes.data.results || [];
+
+  if (placementData.length === 0) {
+    setError('No internship placement found. Contact your coordinator.');
+    setLoading(false);
+    return;
+  }
+
+  const placementId = placementData[0].id;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,6 +70,7 @@ const LogSubmission = () => {
     try {
       // Use FormData to handle file upload
       const data = new FormData();
+      data.append('student', placementId);
       data.append('date', formData.date);
       data.append('description', formData.description);
       data.append('hours', formData.hours);
