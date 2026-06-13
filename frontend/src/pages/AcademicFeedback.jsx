@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import api from '../axiosConfig';
 
 function FeedbackCard({ feedback, onView }) {
   const [hovered, setHovered] = useState(false);
@@ -52,24 +53,18 @@ function SubmitFeedbackForm({ onSuccess }) {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async () => {
-    setSubmitting(true);
-    setMessage(null);
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch("/api/Academic_Supervisor_Feedback/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error("Failed to submit feedback");
-      setMessage({ type: "success", text: "Academic feedback submitted!" });
-      setForm({ placement: "", comments: "", academic_score: "" });
-      onSuccess();
-    } catch (err) {
-      setMessage({ type: "error", text: err.message });
-    } finally {
-      setSubmitting(false);
-    }
+  setSubmitting(true);
+  setMessage(null);
+  try {
+    await api.post('/api/Academic_Supervisor_Feedback/', form);
+    setMessage({ type: "success", text: "Academic feedback submitted!" });
+    setForm({ placement: "", comments: "", academic_score: "" });
+    onSuccess();
+  } catch (err) {
+    setMessage({ type: "error", text: err.message });
+  } finally {
+    setSubmitting(false);
+  }
   };
 
   return (
@@ -107,15 +102,16 @@ export default function AcademicFeedback() {
   const [showForm, setShowForm] = useState(false);
 
   const fetchFeedbacks = () => {
-    const token = localStorage.getItem("token");
-    fetch("/api/Academic_Supervisor_Feedback/", {
-      headers: { "Content-Type": "application/json", ...(token && { Authorization: `Token ${token}` }) },
+  api.get('/api/Academic_Supervisor_Feedback/')
+    .then((res) => {
+      setFeedbacks(Array.isArray(res.data) ? res.data : res.data.results || []);
+      setLoading(false);
     })
-      .then((res) => { if (!res.ok) throw new Error(`Error ${res.status}`); return res.json(); })
-      .then((data) => { setFeedbacks(Array.isArray(data) ? data : data.results || []); setLoading(false); })
-      .catch((err) => { setError(err.message); setLoading(false); });
+    .catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
   };
-
   useEffect(() => { fetchFeedbacks(); }, []);
 
   return (
