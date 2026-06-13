@@ -35,10 +35,12 @@ class Internship_Placement(models.Model):
     student = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='student_placements',limit_choices_to={'role': 'student'}
     )
+    student_name = models.CharField(max_length=255, blank=True)
     company_name = models.CharField(max_length=255)
     description=models.TextField(blank=True)
     start_date = models.DateField()
     end_date = models.DateField()
+    workplace_supervisor_name = models.CharField(max_length=255, blank=True)
     workplace_supervisor = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,
         null=True, blank=True, related_name="workplace_supervised",limit_choices_to={'role': 'workplace'},
     )    

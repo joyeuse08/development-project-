@@ -11,6 +11,10 @@ from django.db.models import Q
 from .models import CustomUser, Internship_Placement, Weekly_Log, Supervisor_Feedback, Academic_Supervisor_Feedback, Weighted_Score, Issue, Student_log, Notification
 from .serializers import (CustomUserSerializer, Internship_PlacementSerializer, Weekly_LogSerializer, Supervisor_FeedbackSerializer, Academic_Supervisor_FeedbackSerializer, Weighted_ScoreSerializer, IssueSerializer,Student_logSerializer, RegisterSerializer)
 from django.http import HttpResponse
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
+
+
 
 class IsSupervisorOrAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -47,13 +51,16 @@ class Internship_PlacementViewSet(viewsets.ModelViewSet):
         return Internship_Placement.objects.all()
 
     def perform_create(self, serializer):
-        if self.request.user.role == 'student':
-            instance = serializer.save(
-                student=self.request.user,
-                status='pending'
-            )
-        elif self.request.user.role == 'admin':
+      if self.request.user.role == 'student':
+        try:
+            instance = serializer.save(student=self.request.user, status='pending')
+        except DjangoValidationError as e:
+            raise DRFValidationError(e.message_dict if hasattr(e, 'message_dict') else e.messages)
+      elif self.request.user.role == 'admin':
+        try:
             instance = serializer.save()
+        except DjangoValidationError as e:
+            raise DRFValidationError(e.message_dict if hasattr(e, 'message_dict') else e.messages)
         else:
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Only students or admins can create internship placements.")
