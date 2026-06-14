@@ -28,7 +28,7 @@ class Weekly_LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weekly_Log
         exclude = ['created_at']
-        read_only_fields = ['student', 'created_at']
+        read_only_fields = ['student', 'created_at', 'placement']
 
 class Supervisor_FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
