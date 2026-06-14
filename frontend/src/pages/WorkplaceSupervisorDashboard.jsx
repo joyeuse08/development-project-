@@ -90,11 +90,11 @@ useEffect(() => {
   const updateLogStatus = async (item, newStatus) => {
     const feedback = feedbackInputs[item.id] || '';
     const endpoint = item.type === 'weekly'
-      ? `/api/Weekly_Log/${item.originalId}/`
-      : `/api/Student_log/${item.originalId}/`;
+      ? `/api/Weekly_Log/${item.originalId}/review/`
+      : `/api/Student_log/${item.originalId}/review/`;
 
     try {
-      await axios.patch(endpoint, {
+      await axios.post(endpoint, {
         status: newStatus,
         feedback: feedback,
       });
