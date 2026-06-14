@@ -231,6 +231,37 @@ class Academic_Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
         if user.role == 'academic':
             return Academic_Supervisor_Feedback.objects.filter(academic_supervisor=user)
         return Academic_Supervisor_Feedback.objects.all()
+    def perform_create(self, serializer):
+        feedback = serializer.save(academic_supervisor=self.request.user)
+        placement = feedback.placement
+        
+        supervisor_feedback = Supervisor_Feedback.objects.filter(
+            placement=placement
+        ).first() 
+
+        if supervisor_feedback:
+            supervisor_score = supervisor_feedback.score
+            academic_score = feedback.academic_score
+            final_score = round((supervisor_score * 0.6) + (academic_score * 0.4), 2)
+
+            Weighted_Score.objects.update_or_create(
+                placement=placement,
+                defaults={
+                    'supervisor_score': supervisor_score,
+                    'academic_score': academic_score,
+                    'final_score': final_score,
+                }
+            )
+
+            Notification.objects.create(
+                recipient=placement.student,
+                actor=self.request.user,
+                verb=f"Your weighted score has been computed: {final_score}",
+                target_id=placement.id,
+                target_type='weighted_score',
+                message=f"Your final internship score is {final_score}",
+            )  
+
 
 class Weighted_ScoreViewSet(viewsets.ModelViewSet):
     serializer_class = Weighted_ScoreSerializer
@@ -252,7 +283,9 @@ class IssueViewSet(viewsets.ModelViewSet):
             return Issue.objects.filter(placement__workplace_supervisor=user)
         if user.role == 'academic':
             return Issue.objects.filter(placement__academic_supervisor=user)
-        return Issue.objects.all()     
+        return Issue.objects.all() 
+
+
 
 # Registration view
 @api_view(['POST'])
