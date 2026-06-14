@@ -100,8 +100,14 @@ useEffect(() => {
         status: newStatus,
         feedback: feedback,
       });
+      setReviewItems(prev => prev.map(i => 
+      i.id === item.id 
+        ? { ...i, status: newStatus, feedback: feedback }
+        : i
+      ));
+
+      setFeedbackInputs(prev => ({ ...prev, [item.id]: undefined }));
       await fetchAllData();
-      setFeedbackInputs(prev => ({ ...prev, [item.id]: '' }));
       toast.success(`Log ${newStatus} successfully!`);
     } catch (err) {
       console.error(err);
