@@ -113,6 +113,14 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         if self.action == 'review':
             return [IsSupervisorOrAdmin()]
         return [IsAuthenticated()]
+    
+    def perform_create(self, serializer):
+      from .models import Internship_Placement
+      placement = Internship_Placement.objects.filter(student=self.request.user).first()
+      if not placement:
+        from rest_framework.exceptions import ValidationError
+        raise ValidationError("No internship placement found for this student.")
+      serializer.save(placement=placement)
 
     @action(detail=True, methods=['post'])
     def review(self, request, pk=None):

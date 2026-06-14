@@ -66,12 +66,7 @@ function SubmitLogForm({ onSuccess }) {
     setSubmitting(true);
     setMessage(null);
     try {
-      const placementResponse = await api.get('/api/Internship_Placement/');
-      const placements = placementResponse.data;
-      const results = placements.results || placements;
-      const placementId = results.length > 0 ? results[0]?.id : null;
-
-    await api.post('/api/Weekly_Log/', { ...form, placement: placementId });
+      await api.post('/api/Weekly_Log/', { ...form, placement: placementId });
       setMessage({ type: "success", text: "Log submitted successfully!" });
       setForm({ week_number: "", activities: "", challenges: "", learnings: "", hours: "", status: "draft" });
       onSuccess();
