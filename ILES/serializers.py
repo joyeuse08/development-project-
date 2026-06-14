@@ -39,6 +39,7 @@ class Academic_Supervisor_FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Academic_Supervisor_Feedback
         fields = "__all__"
+        read_only_fields = ['academic_supervisor', 'evaluated_at']
 
 class Weighted_ScoreSerializer(serializers.ModelSerializer):
     class Meta:
