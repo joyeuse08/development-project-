@@ -45,6 +45,8 @@ class Weighted_ScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weighted_Score
         fields = "__all__"
+        read_only_fields = ['final_score', 'calculated_at']
+        
 
 class IssueSerializer(serializers.ModelSerializer):
     reported_by_name = serializers.CharField(source='created_by.username', read_only=True)
