@@ -76,7 +76,7 @@ function SubmitLogForm({ onSuccess }) {
       setForm({ week_number: "", activities: "", challenges: "", learnings: "", hours: "", status: "draft" });
       onSuccess();
     } catch (err) {
-      setMessage({ type: "error", text: err.message });
+      setMessage({ type: "error", text: JSON.stringify(err.response?.data || err.message) });
     } finally {
       setSubmitting(false);
     }
