@@ -68,7 +68,7 @@ function SubmitLogForm({ onSuccess }) {
     try {
       const placementResponse = await api.get('/api/Internship_Placement/');
       const placements = placementResponse.data;
-      const results = placement.results || placement;
+      const results = placements.results || placements;
       const placementId = results.length > 0 ? results[0]?.id : null;
 
     await api.post('/api/Weekly_Log/', { ...form, placement: placementId });
