@@ -244,6 +244,11 @@ class Academic_Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
             academic_score = feedback.academic_score
             final_score = round((supervisor_score * 0.6) + (academic_score * 0.4), 2)
 
+        if not supervisor_feedback:
+            supervisor_feedback = Supervisor_Feedback.objects.filter(
+                weekly_log__placement=placement
+            ).first() 
+
             Weighted_Score.objects.update_or_create(
                 placement=placement,
                 defaults={
