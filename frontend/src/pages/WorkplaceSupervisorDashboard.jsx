@@ -12,6 +12,7 @@ function WorkplaceSupervisorDashboard() {
   const [weeklyLogs, setWeeklyLogs] = useState([]);
   const [studentLogs, setStudentLogs] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]); 
+  const [scoreInputs, setScoreInputs] = useState({});
 
   // Combined list for review
   const [reviewItems, setReviewItems] = useState([]);
@@ -86,6 +87,32 @@ useEffect(() => {
   // Update feedback for a specific review item
   const handleFeedbackChange = (itemId, value) => {
     setFeedbackInputs(prev => ({ ...prev, [itemId]: value }));
+  };
+
+  const handleScoreChange = (itemId, value) => {
+    setScoreInputs(prev => ({ ...prev, [itemId]: value }));
+  };
+
+  const submitScore = async (item) => {
+    const score = scoreInputs[item.id];
+    if (!score || score < 0 || score > 100) {
+      toast.error('Please enter a valid score between 0 and 100');
+      return;
+    }
+    try {
+      await axios.post('/api/Supervisor_Feedback/', {
+        weekly_log: item.originalId,
+        placement: item.original.placement,
+        supervisor: user.id,
+        comments: feedbackInputs[item.id] || '',
+        supervisor_score: score,
+      });
+      toast.success('Score submitted successfully!');
+      setScoreInputs(prev => ({ ...prev, [item.id]: '' }));
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to submit score: ' + JSON.stringify(err.response?.data));
+    }
   };
 
   // Update status + feedback for an item (calls appropriate endpoint)
@@ -181,6 +208,7 @@ useEffect(() => {
                 <th style={thStyle}>Title / Content</th>
                 <th style={thStyle}>Status</th>
                 <th style={thStyle}>Your Feedback</th>
+                <th style={thStyle}>Score (0-100)</th>
                 <th style={thStyle}>Actions</th>
               </tr>
             </thead>
@@ -219,6 +247,32 @@ useEffect(() => {
                       onChange={(e) => handleFeedbackChange(item.id, e.target.value)}
                       style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #ccc', fontFamily: 'inherit' }}
                     />
+                  </td>
+                  <td style={tdStyle}>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="0-100"
+                      value={scoreInputs[item.id] || ''}
+                      onChange={(e) => handleScoreChange(item.id, e.target.value)}
+                      style={{ width: '70px', padding: '6px', borderRadius: '4px', border: '1px solid #ccc', marginBottom: '6px' }}
+                    />
+                    <br />
+                    <button
+                      onClick={() => submitScore(item)}
+                      style={{
+                        padding: '4px 10px',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        backgroundColor: '#1e3a5f',
+                        color: 'white',
+                        fontSize: '12px',
+                      }}
+                    >
+                      Submit Score
+                    </button>
                   </td>
                   <td style={tdStyle}>
                     <button
