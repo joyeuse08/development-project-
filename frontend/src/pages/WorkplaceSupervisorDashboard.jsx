@@ -104,7 +104,7 @@ useEffect(() => {
         weekly_log: item.originalId,
         placement: item.original.placement,
         supervisor: user.id,
-        comments: feedbackInputs[item.id] || '',
+        comments: feedbackInputs[item.id] || 'No comments',
         supervisor_score: score,
       });
       toast.success('Score submitted successfully!');
