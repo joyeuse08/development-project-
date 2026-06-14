@@ -240,7 +240,7 @@ class Academic_Supervisor_FeedbackViewSet(viewsets.ModelViewSet):
         ).first() 
 
         if supervisor_feedback:
-            supervisor_score = supervisor_feedback.score
+            supervisor_score = supervisor_feedback.supervisor_score
             academic_score = feedback.academic_score
             final_score = round((supervisor_score * 0.6) + (academic_score * 0.4), 2)
 
