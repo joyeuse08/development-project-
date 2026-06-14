@@ -29,6 +29,7 @@ function WorkplaceSupervisorDashboard() {
       title: log.activities?.substring(0, 60) || 'Weekly report',
       content: log.challenges || '',
       status: log.status || 'submitted',
+      feedback: log.feedback || '',
       original: log,
     }));
 
@@ -41,6 +42,7 @@ function WorkplaceSupervisorDashboard() {
       title: log.description?.substring(0, 60) || 'Daily log',
       content: `${log.hours || 0} hours`,
       status: log.status || 'submitted',
+      feedback: log.feedback || '',
       original: log,
     }));
 
@@ -203,7 +205,7 @@ useEffect(() => {
                     <textarea
                       rows="2"
                       placeholder="Write feedback here..."
-                      value={feedbackInputs[item.id] || ''}
+                      value={feedbackInputs[item.id] !== undefined ? feedbackInputs[item.id] : item.feedback}
                       onChange={(e) => handleFeedbackChange(item.id, e.target.value)}
                       style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #ccc', fontFamily: 'inherit' }}
                     />
