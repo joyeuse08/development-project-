@@ -107,7 +107,6 @@ useEffect(() => {
       ));
 
       setFeedbackInputs(prev => ({ ...prev, [item.id]: undefined }));
-      await fetchAllData();
       toast.success(`Log ${newStatus} successfully!`);
     } catch (err) {
       console.error(err);
