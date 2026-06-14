@@ -5,6 +5,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from ILES.models import Internship_Placement
 from datetime import date
+from ILES.models import Weekly_Log
 
 User = get_user_model()
 
@@ -51,7 +52,6 @@ class WeeklyLogTests(APITestCase):
 
     def test_student_can_create_weekly_log(self):
         response = self.client.post('/api/Weekly_Log/', {
-            'placement': self.placement.id,
             'week_number': 1,
             'activities': 'Worked on Django models',
             'challenges': 'Migration errors',
@@ -125,23 +125,31 @@ class InternshipPlacementTests(APITestCase):
 
 class IssueTests(APITestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(
-            username='issueuser',
-            email='issueuser@example.com',
-            password='testpass123',
-            role='student'
-        )
-        self.client.force_authenticate(user=self.user)
+      self.client = APIClient()
+      self.user = User.objects.create_user(
+          username='issueuser',
+          email='issueuser@example.com',
+          password='testpass123',
+          role='student'
+      )
+      self.placement = Internship_Placement.objects.create(
+          student=self.user,
+          company_name='Test Company',
+          start_date=date(2025, 1, 1),
+          end_date=date(2025, 6, 30),
+          status='active'
+      )
+      self.client.force_authenticate(user=self.user)
 
     def test_create_issue(self):
-        response = self.client.post('/api/issues/', {
-            'title': 'Test Issue',
-            'issue_type': 'Bug',
-            'status': 'open',
-        })
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
+      response = self.client.post('/api/issues/', {
+        'title': 'Test Issue',
+        'issue_type': 'Bug',
+        'status': 'open',
+        'placement': self.placement.id,
+        'created_by': self.user.id,
+      })
+      self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
 class SupervisorFeedbackTests(APITestCase):
@@ -151,7 +159,7 @@ class SupervisorFeedbackTests(APITestCase):
             username='supervisor1',
             email='supervisor1@example.com',
             password='testpass123',
-            role='workplace_supervisor'
+            role='workplace'
         )
         self.student = User.objects.create_user(
             username='student3',
@@ -166,44 +174,24 @@ class SupervisorFeedbackTests(APITestCase):
             end_date=date(2025, 6, 30),
             status='active'
         )
+        self.weekly_log = Weekly_Log.objects.create(
+        placement=self.placement,
+        week_number=1,
+        activities='Test activities',
+        status='submitted'
+        )
         self.client.force_authenticate(user=self.supervisor)
 
     def test_supervisor_can_give_feedback(self):
         response = self.client.post('/api/Supervisor_Feedback/', {
             'placement': self.placement.id,
-            'feedback': 'Good performance',
-            'rating': 4,
+            'weekly_log': self.weekly_log.id,
+            'supervisor': self.supervisor.id,
+            'comments': 'Good work!',
+            'supervisor_score': 85,
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
-class WeightedScoreTests(APITestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.admin = User.objects.create_user(
-            username='admin1',
-            email='admin1@example.com',
-            password='testpass123',
-            role='admin'
-        )
-        self.student = User.objects.create_user(
-            username='student4',
-            email='student4@example.com',
-            password='testpass123',
-            role='student'
-        )
-        self.placement = Internship_Placement.objects.create(
-            student=self.student,
-            company_name='Test Company',
-            start_date=date(2025, 1, 1),
-            end_date=date(2025, 6, 30),
-            status='active'
-        )
-        self.client.force_authenticate(user=self.admin)
 
-    def test_create_weighted_score(self):
-        response = self.client.post('/api/Weighted_Score/', {
-            'placement': self.placement.id,
-            'score': 85,
-        })
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)        
+    

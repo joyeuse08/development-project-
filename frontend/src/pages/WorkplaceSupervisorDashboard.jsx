@@ -101,9 +101,9 @@ useEffect(() => {
         feedback: feedback,
       });
       setReviewItems(prev => prev.map(i => 
-      i.id === item.id 
-        ? { ...i, status: newStatus, feedback: feedback }
-        : i
+        i.id === item.id 
+          ? { ...i, status: newStatus, feedback: feedback }
+          : i
       ));
 
       setFeedbackInputs(prev => ({ ...prev, [item.id]: undefined }));
