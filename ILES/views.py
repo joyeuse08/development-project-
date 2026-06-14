@@ -120,7 +120,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
       if not placement:
         from rest_framework.exceptions import ValidationError
         raise ValidationError("No internship placement found for this student.")
-      serializer.save(placement=placement)
+        serializer.save(placement=placement)
 
     @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
