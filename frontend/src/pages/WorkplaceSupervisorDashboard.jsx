@@ -72,7 +72,7 @@ function WorkplaceSupervisorDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [combineLogs]);
   
 useEffect(() => {
   fetchAllData();
