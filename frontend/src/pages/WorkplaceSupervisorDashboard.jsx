@@ -96,17 +96,22 @@ useEffect(() => {
       : `/api/Student_log/${item.originalId}/review/`;
 
     try {
-      await axios.post(endpoint, {
+      const res = await axios.post(endpoint, {
         status: newStatus,
         feedback: feedback,
       });
+      const savedFeedback = res.data.feedback || feedback;
       setReviewItems(prev => prev.map(i => 
         i.id === item.id 
-          ? { ...i, status: newStatus, feedback: feedback }
+          ? { ...i, status: newStatus, feedback: savedFeedback }
           : i
       ));
 
-      setFeedbackInputs(prev => ({ ...prev, [item.id]: undefined }));
+      setFeedbackInputs(prev => {
+        const updated = { ...prev };
+        delete updated[item.id];
+        return updated;
+      });
       toast.success(`Log ${newStatus} successfully!`);
     } catch (err) {
       console.error(err);
