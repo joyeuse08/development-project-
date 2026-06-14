@@ -131,6 +131,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
         if user.role == 'academic' and weekly_log.placement.academic_supervisor != user:
             return Response({'error': 'You are not assigned to this student.'}, status=status.HTTP_403_FORBIDDEN)
         weekly_log.status = request.data.get('status', weekly_log.status)
+        weekly_log.feedback = request.data.get('feedback', weekly_log.feedback)
         weekly_log.save()
         Notification.objects.create(
             recipient=weekly_log.placement.student,
@@ -139,7 +140,7 @@ class Weekly_LogViewSet(viewsets.ModelViewSet):
             target_id=weekly_log.id,
             target_type='weekly_log',
         )
-        return Response({'message': 'Weekly Log updated', 'status': weekly_log.status})
+        return Response({'message': 'Weekly Log updated', 'status': weekly_log.status, 'feedback': weekly_log.feedback})
 
     def perform_update(self, serializer):
         if serializer.instance.status == 'approved':
